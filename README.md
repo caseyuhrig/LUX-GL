@@ -14,10 +14,9 @@ Here are some of the resourses I've been using and API's.
 The Cherno!
 LearnOpenGL
 
-glm
-glfw
-glew
-freetype2
-irrKlang
+- glm
+- glfw
+- glew
+- freetype2
+- irrKlang
 
-- Casey
