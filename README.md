@@ -11,8 +11,8 @@ to run the trained model after the fact.  It will do more, but that's the end go
 
 Here are some of the resourses I've been using and API's.
 
-The Cherno!
-LearnOpenGL
+- The Cherno!
+- LearnOpenGL
 
 - glm
 - glfw
