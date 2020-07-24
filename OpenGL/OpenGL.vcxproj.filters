@@ -69,10 +69,10 @@
     <ClCompile Include="src\glfont\GLUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.cpp">
+    <ClCompile Include="src\Strange.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Strange.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -848,9 +848,6 @@
     <ClInclude Include="src\FrameBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OBJ_Loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ux\Cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1080,6 +1077,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\UniformBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ux\Mesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ux\OBJ_Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1496,6 +1499,7 @@
     <None Include="res\shaders\fontFragment.shader" />
     <None Include="res\shaders\fontVertex.shader" />
     <None Include="res\shaders\ux.shader" />
+    <None Include="res\ux-interface.svg" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\cartographer-logo-600x600.png">

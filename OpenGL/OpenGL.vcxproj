@@ -103,14 +103,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\FT\include;$(SolutionDir)Dependencies\GLFW\include;.\src\vendor;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\irrKlang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\FT\include;$(SolutionDir)Dependencies\GLFW\include;.\src\vendor;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\irrKlang\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\FT\win64;$(SolutionDir)Dependencies\GLFW\lib-vc2019;$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\irrKlang\lib-Winx64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\FT\win64;$(SolutionDir)Dependencies\GLFW\lib-vc2019;$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\irrKlang\lib-Winx64-visualStudio</AdditionalLibraryDirectories>
       <AdditionalDependencies>irrKlang.lib;freetype.lib;glew32s.lib;glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;User32.lib</AdditionalDependencies>
+      <ShowProgress>LinkVerboseLib</ShowProgress>
+      <LinkStatus>true</LinkStatus>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Dependencies\irrKlang\dll-Win64-visualStudio\*.*" "$(TargetDir)"</Command>
@@ -142,7 +144,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\FT\include;$(SolutionDir)Dependencies\GLFW\include;.\src\vendor;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\irrKlang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\FT\include;$(SolutionDir)Dependencies\GLFW\include;.\src\vendor;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\irrKlang\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -150,8 +152,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\FT\win64;$(SolutionDir)Dependencies\GLFW\lib-vc2019;$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\irrKlang\lib-Winx64-visualStudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\FT\win64;$(SolutionDir)Dependencies\GLFW\lib-vc2019;$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\irrKlang\lib-Winx64-visualStudio</AdditionalLibraryDirectories>
       <AdditionalDependencies>irrKlang.lib;freetype.lib;glew32s.lib;glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;User32.lib</AdditionalDependencies>
+      <ShowProgress>LinkVerboseLib</ShowProgress>
+      <LinkStatus>true</LinkStatus>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(SolutionDir)Dependencies\irrKlang\dll-Win64-visualStudio\*.*" "$(TargetDir)"</Command>
@@ -190,6 +194,7 @@
     <ClInclude Include="src\ux\Array.hpp" />
     <ClInclude Include="src\ux\Color.hpp" />
     <ClInclude Include="src\ux\HorzBar.hpp" />
+    <ClInclude Include="src\ux\Mesh.hpp" />
     <ClInclude Include="src\ux\Primitive.hpp" />
     <ClInclude Include="src\ux\Interface.hpp" />
     <ClInclude Include="src\vendor\common\base64.h" />
@@ -202,7 +207,7 @@
     <ClInclude Include="src\ux\Cube.h" />
     <ClInclude Include="src\FrameBuffer.h" />
     <ClInclude Include="src\IndexBuffer.hpp" />
-    <ClInclude Include="src\OBJ_Loader.h" />
+    <ClInclude Include="src\ux\OBJ_Loader.h" />
     <ClInclude Include="src\Renderer.hpp" />
     <ClInclude Include="src\Shader.hpp" />
     <ClInclude Include="src\Texture.h" />
@@ -527,6 +532,7 @@
     <None Include="res\shaders\test.shader" />
     <None Include="res\shaders\text.shader" />
     <None Include="res\shaders\ux.shader" />
+    <None Include="res\ux-interface.svg" />
     <None Include="src\vendor\glm\detail\func_common.inl" />
     <None Include="src\vendor\glm\detail\func_common_simd.inl" />
     <None Include="src\vendor\glm\detail\func_exponential.inl" />

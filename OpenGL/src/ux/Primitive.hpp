@@ -4,9 +4,12 @@
 #include "Color.hpp"
 #include "../Renderer.hpp"
 
+
 // CCW is GL front facing.
 // what is the term when you manipulate vectors and matrixes together
 // tweening? trimming croping
+
+
 
 namespace ux {
 
@@ -111,6 +114,57 @@ namespace ux {
         //{
         //    renderer.Draw(GL_LINES, *vaLines, *ibLines, shader);
         //}
+
+     
+        /*
+        inline void Load(const std::string& filepath)
+        {
+            objl::Loader loader;
+            bool loaded = loader.LoadFile(filepath);
+
+            if (!loaded)
+            {
+                std::cout << "[ERROR] Failed to load " << filepath << std::endl;
+            }
+            if (loaded)
+            {
+                std::cout << "LOADED: " << filepath << std::endl;
+
+                for (int i = 0; i < loader.LoadedMeshes.size(); i++)
+                {
+                    objl::Mesh curMesh = loader.LoadedMeshes[i];
+
+                    // Print Mesh Name
+                    std::cout << "Mesh " << i << ": " << curMesh.MeshName << "\n";
+
+                    // Print Vertices
+                    std::cout << "Vertices:\n";
+
+                    // Go through each vertex and print its number,
+                    //  position, normal, and texture coordinate
+                    for (int j = 0; j < curMesh.Vertices.size(); j++)
+                    {
+                        std::cout << "V" << j << ": " <<
+                            "P(" << curMesh.Vertices[j].Position.X << ", " << curMesh.Vertices[j].Position.Y << ", " << curMesh.Vertices[j].Position.Z << ") " <<
+                            "N(" << curMesh.Vertices[j].Normal.X << ", " << curMesh.Vertices[j].Normal.Y << ", " << curMesh.Vertices[j].Normal.Z << ") " <<
+                            "TC(" << curMesh.Vertices[j].TextureCoordinate.X << ", " << curMesh.Vertices[j].TextureCoordinate.Y << ")\n";
+                    }
+
+                    // Print Indices
+                    std::cout << "Indices:\n";
+
+                    // Go through every 3rd index and print the
+                    //	triangle that these indices represent
+                    for (int j = 0; j < curMesh.Indices.size(); j += 3)
+                    {
+                        std::cout << "T" << j / 3 << ": " << curMesh.Indices[j] << ", " << curMesh.Indices[j + 1] << ", " << curMesh.Indices[j + 2] << "\n";
+                    }
+
+
+                }
+            }
+        }
+        */
     };
 
 }

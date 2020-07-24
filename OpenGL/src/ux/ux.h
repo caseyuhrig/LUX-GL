@@ -8,5 +8,6 @@
 #include "Triangles.h"
 #include "HorzBar.hpp"
 #include "Primitive.hpp"
+#include "Mesh.hpp"
 
 

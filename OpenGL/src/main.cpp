@@ -20,6 +20,8 @@
 #include <GL/glew.h>        // Cross platform link between your graphics card and OpenGL.
 #include <GLFW/glfw3.h>
 
+#include <irrKlang/irrKlang.h>
+
 //#define GLM_FORCE_INLINE
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -37,18 +39,17 @@
 #include "glfont/GLFont.h";
 #include "glfont/FTLabel.h";
 
-#include "OBJ_Loader.h"
-
 #include "UniformBuffer.hpp"
 
-
+//#define IMGUI_DISABLE_WIN32_FUNCTIONS
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
 #include "entt/entt.hpp"
 
-#include <irrklang/irrKlang.h>
+
+
 
 
 
@@ -142,6 +143,8 @@ glm::mat4 rotate(glm::mat4 model, glm::vec3 axis, glm::vec3 angle)
 
 int main(int argc, char** argv)
 {
+    
+
     static const bool USE_ANTIALIASING = true;
 
     // Initialize the library
@@ -758,55 +761,19 @@ int main(int argc, char** argv)
     //engine->play3D(soundFilename.c_str(), soundPos);
 
 
-  
 
 
-    std::string emitterMeshPath = "res/meshes/emitter.obj";
-    objl::Loader Loader;
-    bool loaded = Loader.LoadFile(emitterMeshPath);
 
-    if (!loaded)
-    {
-        std::cout << "[ERROR] Failed to load " << emitterMeshPath << std::endl;       
-    }
-    if (loaded)
-    {
-        std::cout << "LOADED: " << emitterMeshPath << std::endl;
+    /*
+    ux::Mesh emitterMesh = ux::Mesh();
 
-        for (int i = 0; i < Loader.LoadedMeshes.size(); i++)
-        {
-            // Copy one of the loaded meshes to be our current mesh
-            objl::Mesh curMesh = Loader.LoadedMeshes[i];
+    emitterMesh.Load("Emitter_Cube.002", "res/meshes/emitter.obj");
 
-            // Print Mesh Name
-            std::cout << "Mesh " << i << ": " << curMesh.MeshName << "\n";
+    emitterMesh.Build();
 
-            // Print Vertices
-            std::cout << "Vertices:\n";
+    std::cout << "MESH count: " << emitterMesh.GetVertexCount() << std::endl;
 
-            // Go through each vertex and print its number,
-            //  position, normal, and texture coordinate
-            for (int j = 0; j < curMesh.Vertices.size(); j++)
-            {
-                std::cout << "V" << j << ": " <<
-                    "P(" << curMesh.Vertices[j].Position.X << ", " << curMesh.Vertices[j].Position.Y << ", " << curMesh.Vertices[j].Position.Z << ") " <<
-                    "N(" << curMesh.Vertices[j].Normal.X << ", " << curMesh.Vertices[j].Normal.Y << ", " << curMesh.Vertices[j].Normal.Z << ") " <<
-                    "TC(" << curMesh.Vertices[j].TextureCoordinate.X << ", " << curMesh.Vertices[j].TextureCoordinate.Y << ")\n";
-            }
-
-            // Print Indices
-            std::cout << "Indices:\n";
-
-            // Go through every 3rd index and print the
-            //	triangle that these indices represent
-            for (int j = 0; j < curMesh.Indices.size(); j += 3)
-            {
-                std::cout << "T" << j / 3 << ": " << curMesh.Indices[j] << ", " << curMesh.Indices[j + 1] << ", " << curMesh.Indices[j + 2] << "\n";
-            }
-
-
-        }
-    }
+    */
 
 
 
@@ -887,6 +854,9 @@ int main(int argc, char** argv)
             sub_cube->Draw(renderer, shaderBox);
         }
         shaderBox.SetUniformMat4f("u_model", model);
+        
+        //emitterMesh.Draw(renderer, shaderBox);
+
         segment.Draw(renderer, shaderBox);
         shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(90.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
         segment.Draw(renderer, shaderBox);
@@ -914,7 +884,7 @@ int main(int argc, char** argv)
               
         cube.DrawOutline(renderer, shaderQuad);
         ring.Draw(renderer, shaderQuad);
-
+        //emitterMesh.Draw(renderer, shaderBox);
 
         // border
         shaderQuad.Bind();
