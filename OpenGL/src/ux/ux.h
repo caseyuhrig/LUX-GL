@@ -10,7 +10,7 @@
 #include "Primitive.hpp"
 #include "Mesh.hpp"
 #include "Log.hpp"
-
+#include "Window.hpp"
 
 //#define SPDLOG_INLINE
 //#define SPDLOG_HEADER_ONLY

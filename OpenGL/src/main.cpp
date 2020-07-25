@@ -10,12 +10,7 @@
    GL/glew.h contains the main glMethods(...)
 
    Link to all the *.lib files as needed and include all the header *.h files.
-
-   1) READ THE DOCUMENTATION ON THE LIBRARIES
-   2) KNOW YOUR IDE AND HOW TO SET IT UP
 */
-
-
 
 #include <GL/glew.h>                       // Cross platform link between your graphics card and OpenGL.
 #include <GLFW/glfw3.h>
@@ -29,6 +24,7 @@
 #include <ctime>
 
 #define SPDLOG_HEADER_ONLY
+#define SPDLOG_COMPILED_LIB
 #include "spdlog/spdlog.h";
 
 #include "glm/glm.hpp"
@@ -41,7 +37,7 @@
 
 #include "UniformBuffer.hpp"
 
-//#define IMGUI_DISABLE_WIN32_FUNCTIONS
+
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -123,21 +119,24 @@ void GLAPIENTRY MessageCallback(unsigned int source, unsigned int type, unsigned
 }
 
 
-glm::mat4 rotate(glm::mat4 model, glm::vec3 axis, glm::vec3 angle)
+namespace ux
 {
-    //glm::mat4 rotMat = glm::rotate(glm::mat4(1.0), angle.x, glm::vec3(1.0, 0.0, 0.0));
-    //rotMat = glm::rotate(rotMat, angle.y, glm::vec3(0.0, 1.0, 0.0));
-    //rotMat = glm::rotate(rotMat, angle.z, glm::vec3(0.0, 0.0, 1.0));
-    //rotMat = glm::translate(rotMat, axis);
-    //return rotMat * model;
-    return glm::translate(
-        glm::rotate(
+    glm::mat4 rotate(glm::mat4 model, glm::vec3 axis, glm::vec3 angle)
+    {
+        //glm::mat4 rotMat = glm::rotate(glm::mat4(1.0), angle.x, glm::vec3(1.0, 0.0, 0.0));
+        //rotMat = glm::rotate(rotMat, angle.y, glm::vec3(0.0, 1.0, 0.0));
+        //rotMat = glm::rotate(rotMat, angle.z, glm::vec3(0.0, 0.0, 1.0));
+        //rotMat = glm::translate(rotMat, axis);
+        //return rotMat * model;
+        return glm::translate(
             glm::rotate(
-                glm::rotate(glm::mat4(1.0),
-                    angle.x, glm::vec3(1.0, 0.0, 0.0)),
-                angle.y, glm::vec3(0.0, 1.0, 0.0)),
-            angle.z, glm::vec3(0.0, 0.0, 1.0)),
-        axis) * model;
+                glm::rotate(
+                    glm::rotate(glm::mat4(1.0),
+                        angle.x, glm::vec3(1.0, 0.0, 0.0)),
+                    angle.y, glm::vec3(0.0, 1.0, 0.0)),
+                angle.z, glm::vec3(0.0, 0.0, 1.0)),
+            axis) * model;
+    }
 }
 
 
@@ -664,7 +663,7 @@ int main(int argc, char** argv)
         float angle = ux::PI2 / sub_cube_count * n;
         ux::Ref<ux::Cube> sub_cube1 = ux::CreateRef<ux::Cube>(glm::vec3(1.0));
         glm::mat4 model3 = glm::scale(glm::mat4(1.0), glm::vec3(1.0));
-        model3 = rotate(model3, axis, glm::vec3(0.0, angle, 0.0));
+        model3 = ux::rotate(model3, axis, glm::vec3(0.0, angle, 0.0));
         model3 = glm::translate(model3, glm::vec3(10, 0, 0)); // radius   
 
         
@@ -690,7 +689,7 @@ int main(int argc, char** argv)
         //glm::translate();
         //glm::vec3 objTrans = 
 
-        model4 = rotate(model4, axis, glm::vec3(0.0, angle, 0.0));
+        model4 = ux::rotate(model4, axis, glm::vec3(0.0, angle, 0.0));
         model4 = glm::translate(model4, glm::vec3(28, 0, 0)); // radius       
 
         //glm::mat4 trans = glm::translate(glm::mat4(1), translate * scale);
@@ -706,7 +705,7 @@ int main(int argc, char** argv)
         //float angle = ux::RADIANS / sub_cube_count * n;
         float angle = ux::random(ux::RADIANS);
 
-        glm::mat4 rm4 = rotate(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
+        glm::mat4 rm4 = ux::rotate(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
                   rm4 = glm::translate(rm4, glm::vec3(42, 0, 0)); // radius
 
         float radius = 0.1 + ux::random(0.4);
@@ -841,7 +840,7 @@ int main(int argc, char** argv)
         }
         else {
             // rotate around the axis.
-            model = rotate(model, axis, mRotate);
+            model = ux::rotate(model, axis, mRotate);
         }
 
         glm::mat4 mvp = proj * view * model;
