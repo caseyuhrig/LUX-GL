@@ -14,7 +14,11 @@
 // skeletal animation
 // std140 vs std430
 // std430 Note that this layout can only be used with shader storage blocks, not uniform blocks.
-
+//
+// Dynamic Swizzling - Method Swizzling is a dynamic feature that can exchange the implementations of two methods in runtime.
+//
+// Made a note here because the term just sounds neat and couldn't remeber it the other day and it was driving me crazy.
+//
 /*
 glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &max_uniform_buffer_bindings);
 

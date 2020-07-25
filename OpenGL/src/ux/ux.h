@@ -9,5 +9,9 @@
 #include "HorzBar.hpp"
 #include "Primitive.hpp"
 #include "Mesh.hpp"
+#include "Log.hpp"
 
 
+//#define SPDLOG_INLINE
+//#define SPDLOG_HEADER_ONLY
+//#include "spdlog/spdlog.h";

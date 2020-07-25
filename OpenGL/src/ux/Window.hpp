@@ -2,7 +2,7 @@
 
 namespace ux {
 
-    class Interface {
+    class Window {
     private:
         int windowWidth;
         int windowHeight;
@@ -10,7 +10,7 @@ namespace ux {
         int framebufferHeight;
         float aspectRatio;
     public:
-        inline Interface() : windowWidth(0), windowHeight(0), aspectRatio(0.0f) {}
+        inline Window() : windowWidth(0), windowHeight(0), framebufferWidth(0), framebufferHeight(0), aspectRatio(0.0f) {}
 
         inline void Draw() const
         {

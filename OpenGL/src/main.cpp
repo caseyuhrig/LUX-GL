@@ -17,14 +17,8 @@
 
 
 
-#include <GL/glew.h>        // Cross platform link between your graphics card and OpenGL.
+#include <GL/glew.h>                       // Cross platform link between your graphics card and OpenGL.
 #include <GLFW/glfw3.h>
-
-#include <irrKlang/irrKlang.h>
-
-//#define GLM_FORCE_INLINE
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -33,6 +27,12 @@
 #include <chrono>
 #include <thread>
 #include <ctime>
+
+#define SPDLOG_HEADER_ONLY
+#include "spdlog/spdlog.h";
+
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #include "ux/ux.h"
 
@@ -48,7 +48,10 @@
 
 #include "entt/entt.hpp"
 
+#include <irrKlang/irrKlang.h>
 
+#define FMT_HEADER_ONLY
+#include "fmt/format.h"
 
 
 
@@ -140,10 +143,21 @@ glm::mat4 rotate(glm::mat4 model, glm::vec3 axis, glm::vec3 angle)
 
 
 
-
+/*
+ * Wow this is awesome, javadoc tags work in c++. ;)
+ * @param argc A magical value unknown to normal mortals.
+ * @param argv Wonder if ** means the pointer is far away. hmm.
+ */
 int main(int argc, char** argv)
 {
-    
+    fmt::print("Hello, world!\n");
+    //UX_CORE_INFO("Hello from the Logger!");
+    //UX_CORE_TRACE("Hello from the Logger!");
+    //UX_DEBUG("Hello from lame logging...");
+
+    spdlog::set_level(spdlog::level::debug);
+    spdlog::info("Welcome to spdlog!");
+    spdlog::error("Some error message with arg: {}", 1);
 
     static const bool USE_ANTIALIASING = true;
 
@@ -764,7 +778,7 @@ int main(int argc, char** argv)
 
 
 
-    /*
+    
     ux::Mesh emitterMesh = ux::Mesh();
 
     emitterMesh.Load("Emitter_Cube.002", "res/meshes/emitter.obj");
@@ -773,7 +787,7 @@ int main(int argc, char** argv)
 
     std::cout << "MESH count: " << emitterMesh.GetVertexCount() << std::endl;
 
-    */
+    
 
 
 
@@ -884,7 +898,7 @@ int main(int argc, char** argv)
               
         cube.DrawOutline(renderer, shaderQuad);
         ring.Draw(renderer, shaderQuad);
-        //emitterMesh.Draw(renderer, shaderBox);
+
 
         // border
         shaderQuad.Bind();

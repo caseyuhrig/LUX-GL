@@ -3,7 +3,7 @@
 #include "Core.hpp"
 #include "Color.hpp"
 #include "../Renderer.hpp"
-//#include "OBJ_Loader.h"
+#include "OBJ_Loader.h"
 
 
 // CCW is GL front facing.
@@ -44,7 +44,7 @@ namespace ux {
 
     public:
 
-        inline Mesh()
+        Mesh()
             : min(0), max(0), color(1), transformation(0),
             va(CreateRef<VertexArray>()), vb(CreateRef<VertexBuffer>()),
             ib(CreateRef<IndexBuffer>()), layout(CreateRef<VertexBufferLayout>()) {}
@@ -57,7 +57,7 @@ namespace ux {
         //inline virtual void TransformGeometry(const glm::mat4& transformation) = 0;
         //inline virtual void AppendGeometry(const Primitive& primitive, const glm::mat4& transformation = glm::mat4(0)) = 0;
 
-        inline void PublishGeometry() const
+        void PublishGeometry() const
         {
             vb->Init(&vertices[0], vertices.size() * sizeof(float));
             layout->Push<float>(3); // position xyz
@@ -68,7 +68,7 @@ namespace ux {
             ib->Init(&indicies[0], indicies.size());
         }
 
-        inline void Build() // CreateAndPublish() BuildGeometry()
+        void Build() // CreateAndPublish() BuildGeometry()
         {
             //CreateGeometry();
             PublishGeometry();
@@ -77,8 +77,9 @@ namespace ux {
         inline glm::mat4& GetTransformation() { return transformation; }
         inline glm::vec4& GetColor() { return color; }
         inline void SetColor(const glm::vec4& color) { this->color = color; }
+        inline size_t GetVertexCount() { return vertices.size(); }
 
-        inline void Draw(const Renderer& renderer, const Shader& shader) const
+        void Draw(const Renderer& renderer, const Shader& shader) const
         {
             renderer.Draw(GL_TRIANGLES, *va, *ib, shader);
         }
@@ -88,19 +89,16 @@ namespace ux {
         //    renderer.Draw(GL_LINES, *vaLines, *ibLines, shader);
         //}
 
-        inline void AddIndex(unsigned int i1, unsigned int i2, unsigned int i3)
+        void AddIndex(unsigned int i1, unsigned int i2, unsigned int i3)
         {
             indicies.push_back(i1);
             indicies.push_back(i2);
             indicies.push_back(i3);
         }
 
-        inline size_t GetVertexCount()
-        {
-            return vertices.size();
-        }
+        
 
-        inline void AddVertex(
+        void AddVertex(
             const glm::vec3& position,
             const glm::vec4& color,
             const glm::vec2& texCoord,
@@ -124,8 +122,8 @@ namespace ux {
             vertices.push_back(normal.z);
         }
 
-        /*
-        inline void Load(const std::string& mesh_name, const std::string& file_path)
+        
+        void Load(const std::string& mesh_name, const std::string& file_path)
         {
             objl::Loader loader;
             bool loaded = loader.LoadFile(file_path);
@@ -188,7 +186,7 @@ namespace ux {
                 }
             }
         }
-        */
+        
     };
 
 }

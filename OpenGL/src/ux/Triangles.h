@@ -9,25 +9,27 @@
 #include <vector>
 
 
-struct XYZ {
-    glm::vec3 point;
-    glm::vec3 normal;
-};
 
-struct RECT {
-    glm::vec3 p1;
-    glm::vec3 p2;
-    glm::vec3 normal;
-};
-
-struct Triangle {
-    XYZ a;
-    XYZ b;
-    XYZ c;
-};
 
 
 namespace ux {
+
+    struct XYZ {
+        glm::vec3 point;
+        glm::vec3 normal;
+    };
+
+    struct RECT {
+        glm::vec3 p1;
+        glm::vec3 p2;
+        glm::vec3 normal;
+    };
+
+    struct Triangle {
+        XYZ a;
+        XYZ b;
+        XYZ c;
+    };
 
     class Triangles
     {
