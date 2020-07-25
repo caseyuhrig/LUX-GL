@@ -1,5 +1,5 @@
 # OpenGL
-Project to learn OpenGL in C++.  Anyone wishing to chime in is awlcome!  My goal is to build a simulator (sandbox) to perform 3D physics based experiments.
+Project to learn OpenGL in C++ and build a simulator (sandbox) to perform 3D physics based experiments.  Anyone wishing to chime in is welcome!
 
 (quick and dirty summary)
 
