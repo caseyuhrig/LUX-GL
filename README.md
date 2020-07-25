@@ -9,7 +9,7 @@ to run the trained model after the fact.  It will do more, but that's the end go
 
 Here are some of the resourses I've been using and API's.
 
-- The Cherno (@TheCherno)!
+- The Cherno @TheCherno
 - LearnOpenGL (@JoeyDeVries/LearnOpenGL)
 
 Anyone wishing to chime in is welcome!
