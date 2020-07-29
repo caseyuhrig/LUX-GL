@@ -105,6 +105,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\FT\include;$(SolutionDir)Dependencies\GLFW\include;.\src\vendor;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\irrKlang\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,6 +148,8 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\FT\include;$(SolutionDir)Dependencies\GLFW\include;.\src\vendor;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\irrKlang\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -167,8 +171,17 @@
     <ClCompile Include="src\glfont\FTLabel.cpp" />
     <ClCompile Include="src\glfont\GLFont.cpp" />
     <ClCompile Include="src\glfont\GLUtils.cpp" />
+    <ClCompile Include="src\pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="src\Strange.cpp" />
+    <ClCompile Include="src\ux\Context.cpp" />
     <ClCompile Include="src\ux\Log.cpp" />
+    <ClCompile Include="src\ux\TextList.hpp" />
+    <ClCompile Include="src\ux\Window.cpp" />
     <ClCompile Include="src\vendor\common\base64.cpp" />
     <ClCompile Include="src\ux\Cube.cpp" />
     <ClCompile Include="src\Texture.cpp" />
@@ -198,9 +211,12 @@
     <ClInclude Include="src\glfont\FTLabel.h" />
     <ClInclude Include="src\glfont\GLFont.h" />
     <ClInclude Include="src\glfont\GLUtils.h" />
+    <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="src\UniformBuffer.hpp" />
     <ClInclude Include="src\ux\Array.hpp" />
     <ClInclude Include="src\ux\Color.hpp" />
+    <ClInclude Include="src\ux\Context.hpp" />
+    <ClInclude Include="src\ux\Cuboid.hpp" />
     <ClInclude Include="src\ux\HorzBar.hpp" />
     <ClInclude Include="src\ux\Log.hpp" />
     <ClInclude Include="src\ux\Mesh.hpp" />
@@ -537,6 +553,7 @@
     <ClInclude Include="src\vendor\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="src\vendor\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\vendor\nlohmann\json.hpp" />
     <ClInclude Include="src\vendor\spdlog\async.h" />
     <ClInclude Include="src\vendor\spdlog\async_logger-inl.h" />
     <ClInclude Include="src\vendor\spdlog\async_logger.h" />
@@ -628,9 +645,11 @@
     <ClInclude Include="src\VertexArray.hpp" />
     <ClInclude Include="src\VertexBuffer.hpp" />
     <ClInclude Include="src\VertexBufferLayout.hpp" />
+    <ClInclude Include="src\Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini" />
+    <None Include="res\images\ux-gl-sim-icon.svg" />
     <None Include="res\shaders\base.shader" />
     <None Include="res\shaders\basic.shader" />
     <None Include="res\shaders\box.shader" />
@@ -777,6 +796,7 @@
     <None Include="src\vendor\glm\gtx\wrap.inl" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\images\ux-gl-sim-icon.png" />
     <Image Include="res\textures\cartographer-logo-600x600.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

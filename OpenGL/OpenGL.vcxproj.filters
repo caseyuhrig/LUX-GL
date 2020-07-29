@@ -99,6 +99,18 @@
     <ClCompile Include="src\vendor\spdlog\stdout_sinks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ux\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ux\Context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ux\TextList.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3.h">
@@ -1409,6 +1421,21 @@
     <ClInclude Include="src\ux\Window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ux\Context.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\nlohmann\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ux\Cuboid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pch.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\vendor\glm\detail\func_common.inl">
@@ -1824,9 +1851,13 @@
     <None Include="res\shaders\fontVertex.shader" />
     <None Include="res\shaders\ux.shader" />
     <None Include="res\ux-interface.svg" />
+    <None Include="res\images\ux-gl-sim-icon.svg" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\cartographer-logo-600x600.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\images\ux-gl-sim-icon.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

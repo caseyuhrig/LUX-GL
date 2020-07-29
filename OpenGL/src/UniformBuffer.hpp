@@ -80,7 +80,7 @@ public:
         glDeleteBuffers(1, &_ubo_ID);
     }
 
-    inline void SetUniform(std::string name, glm::mat4 m)
+    inline void SetUniformMat4(const std::string& name, const glm::mat4& m)
     {
         auto field = _layout[name];
         /*
@@ -96,7 +96,7 @@ public:
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
-    inline void SetUniform(std::string name, glm::vec4 v)
+    inline void SetUniformVec4(const std::string& name, const glm::vec4& v)
     {
         auto field = _layout[name];
         glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
@@ -104,7 +104,7 @@ public:
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
-    inline void SetUniform(std::string name, glm::vec3 v)
+    inline void SetUniformVec3(const std::string& name, const glm::vec3& v)
     {
         auto field = _layout[name];
         glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
@@ -112,7 +112,7 @@ public:
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 
-    inline void SetUniform(std::string name, float f)
+    inline void SetUniform1f(const std::string& name, float f)
     {
         auto field = _layout[name];
         glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);

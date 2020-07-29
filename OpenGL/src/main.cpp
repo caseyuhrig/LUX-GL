@@ -1,18 +1,4 @@
-﻿/*
-   HOW TO SETUP Modern OpenGl!
-
-   GLFW and GLEW have to be setup.
-
-   Where does the glew32.dll go?  Doesn't, link against the glew32s.lib
-
-   VERY IMPORTANT: In preferences: C/C++ -> Preprocessor -> Preprocessor Definitions (add) GLEW_STATIC in the ; delimited list!
-
-   GL/glew.h contains the main glMethods(...)
-
-   Link to all the *.lib files as needed and include all the header *.h files.
-*/
-
-#include <GL/glew.h>                       // Cross platform link between your graphics card and OpenGL.
+﻿#include <GL/glew.h>                       // Cross platform link between your graphics card and OpenGL.
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -23,20 +9,17 @@
 #include <thread>
 #include <ctime>
 
-#define SPDLOG_HEADER_ONLY
-#define SPDLOG_COMPILED_LIB
-#include "spdlog/spdlog.h";
+//#define SPDLOG_HEADER_ONLY
+//#define SPDLOG_COMPILED_LIB
+//#include "spdlog/spdlog.h";
+// some magic needed to get spdlog working!
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "ux/ux.h"
 
-#include "glfont/GLFont.h";
-#include "glfont/FTLabel.h";
-
 #include "UniformBuffer.hpp"
-
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
@@ -46,82 +29,53 @@
 
 #include <irrKlang/irrKlang.h>
 
-#define FMT_HEADER_ONLY
-#include "fmt/format.h"
+#include "nlohmann/json.hpp"
+
+//#define FMT_HEADER_ONLY
+//#include "fmt/format.h"
 
 
+// If w == 0, the value stored is a vector, if w == 1, the value stored is a point.
+
+// swizzling means rearranging the elements of a vector.
+
+/*
+Homogeneous coordinates
+    Until then, we only considered 3D vertices as a(x, y, z) triplet.
+    Let’s introduce w.We will now have(x, y, z, w) vectors.
+
+    This will be more clear soon, but for now, just remember this :
+
+If w == 1, then the vector(x, y, z, 1) is a position in space.
+    If w == 0, then the vector(x, y, z, 0) is a direction.
+    (In fact, remember this forever.)
+
+    What difference does this make ? Well, for a rotation, it doesn’t change anything.
+    When you rotate a point or a direction, you get the same result.
+    However, for a translation(when you move the point in a certain direction), things are different.
+    What could mean “translate a direction” ?
+    Not much.
+
+    Homogeneous coordinates allow us to use a single mathematical formula to deal with these two cases.
+*/
+// https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
+
+// Vertex shader variables
+//glEnable(GL_PROGRAM_POINT_SIZE);
+// gl_PointSize = 1 in shader for example
+// can be sent in a vertex buffer object
+
+// The integer variable gl_VertexID holds the current ID of the vertex we're drawing. When doing indexed rendering (with 
+// glDrawElements) this variable holds the current index of the vertex we're drawing. When drawing without indices (via 
+// glDrawArrays) this variable holds the number of the currently processed vertex since the start of the render call.
+
+// Fragment shader variables
+// gl_FragCoord, gl_FrontFacing, gl_FragDepth
 
 
-glm::ivec2 origWindowSize, windowSize;
-glm::ivec2 windowPosition;
+namespace ux {
 
-glm::ivec2 origFramebufferSize, framebufferSize;
-float ratio;
-
-
-void window_pos_callback(GLFWwindow* window, int xpos, int ypos)
-{
-    //std::cout << "Window Pos: " << xpos << " " << ypos << std::endl;
-    windowPosition.x = xpos;
-    windowPosition.y = ypos;
-}
-
-void window_size_callback(GLFWwindow* window, int width, int height)
-{
-    std::cout << "Window Size: " << width << " " << height << std::endl;
-    // swap the buffer when we resize in realtime!
-    glfwSwapBuffers(window);
-    windowSize.x = width;
-    windowSize.y = height;
-}
-
-void window_close_callback(GLFWwindow* window)
-{
-    std::cout << "Closing window..." << std::endl;
-    //if (!time_to_close)
-    //    glfwSetWindowShouldClose(window, GLFW_FALSE);
-}
-
-void window_content_scale_callback(GLFWwindow* window, float xscale, float yscale)
-{
-    //set_interface_scale(xscale, yscale);
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    std::cout << "Framebuffer Size: " << width << " " << height << std::endl;
-    glViewport(0, 0, width, height);
-    //ratio = (double)width / (double)height;
-    framebufferSize.x = width;
-    framebufferSize.y = height;
-}
-
-static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
-{
-    //std::cout << xpos << "x" << ypos << std::endl;
-}
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-    {
-        //std::cout << "Clicked (LEFT)!" << std::endl;
-    }
-}
-
-
-void GLAPIENTRY MessageCallback(unsigned int source, unsigned int type, unsigned int id,
-    unsigned int severity, int length,
-    const char* message, const void* userParam)
-{
-    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-        (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
-}
-
-
-namespace ux
-{
-    glm::mat4 rotate(glm::mat4 model, glm::vec3 axis, glm::vec3 angle)
+    inline static glm::mat4 rotateAroundAxis(glm::mat4 model, glm::vec3 axis, glm::vec3 angle)
     {
         //glm::mat4 rotMat = glm::rotate(glm::mat4(1.0), angle.x, glm::vec3(1.0, 0.0, 0.0));
         //rotMat = glm::rotate(rotMat, angle.y, glm::vec3(0.0, 1.0, 0.0));
@@ -137,159 +91,19 @@ namespace ux
                 angle.z, glm::vec3(0.0, 0.0, 1.0)),
             axis) * model;
     }
-}
+};
 
 
-
-
-/*
- * Wow this is awesome, javadoc tags work in c++. ;)
- * @param argc A magical value unknown to normal mortals.
- * @param argv Wonder if ** means the pointer is far away. hmm.
- */
 int main(int argc, char** argv)
 {
-    fmt::print("Hello, world!\n");
-    //UX_CORE_INFO("Hello from the Logger!");
-    //UX_CORE_TRACE("Hello from the Logger!");
-    //UX_DEBUG("Hello from lame logging...");
-
-    spdlog::set_level(spdlog::level::debug);
-    spdlog::info("Welcome to spdlog!");
-    spdlog::error("Some error message with arg: {}", 1);
-
-    static const bool USE_ANTIALIASING = true;
-
-    // Initialize the library
-    if (!glfwInit())
-    {
-        std::cerr << "Something went wrong initializing GLFW!" << std::endl;
-        return -1;
-    }
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    if (USE_ANTIALIASING)
-    {
-        glfwWindowHint(GLFW_SAMPLES, 8);
-    }
-
-    // Create a windowed mode window and its OpenGL context.
-    origWindowSize = glm::ivec2(1500, 900);
-    //origWindowSize = glm::ivec2(4800, 1000);
-    windowSize = origWindowSize;
-    GLFWwindow* window = glfwCreateWindow(origWindowSize.x, origWindowSize.y, "UX[GL]", NULL, NULL);
-    if (!window)
-    {
-        std::cerr << "Something went wrong creating the window!" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
-    // Set the window's callback function.
-    glfwSetWindowPosCallback(window, window_pos_callback);
-    glfwSetWindowSizeCallback(window, window_size_callback);
-    glfwSetWindowCloseCallback(window, window_close_callback);
-    glfwSetWindowContentScaleCallback(window, window_content_scale_callback);
-    glfwSetCursorPosCallback(window, cursor_position_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    // glfwSetWindowSizeLimits(window, 200, 200, 400, 400);
-    // glfwSetWindowSizeLimits(window, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
-    // glfwSetWindowAspectRatio(window, 16, 9);
-    //glfwGetWindowSize(window, &width, &height);
-    //glfwSetWindowAspectRatio(window, width, height);
-    int wwidth, wheight;
-    glfwGetWindowSize(window, &wwidth, &wheight);
-    glfwSetWindowAspectRatio(window, wwidth, wheight);
+    auto window = ux::Window("UX/SIM/GL", 1500, 900);
+    window.Center();
 
 
-    // https://www.glfw.org/docs/3.3/window_guide.html#window_hints_wnd
-    //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
-    //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-
-    // Make the window's context current.
-    // IMPORTANT: has to be done before glewInit()
-    glfwMakeContextCurrent(window);
-
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-        // Problem: glewInit failed, something is seriously wrong.
-        std::cerr << "Error: " << glewGetErrorString(err) << std::endl;
-    }
-    std::cout << "Status:   Using GL: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "Status: Using GLEW: " << glewGetString(GLEW_VERSION) << std::endl;
-
-    // During init, enable debug output
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, 0);
-
-    //glfwSwapInterval(1);
-    glfwSwapInterval(0);
-
-    //int width, height;
-    glfwGetFramebufferSize(window, &origFramebufferSize.x, &origFramebufferSize.y);
-    framebufferSize = origFramebufferSize;
-    ratio = (float)framebufferSize.x / (float)framebufferSize.y;
-
-    printf("Window Size: %d x %d\n", windowSize.x, windowSize.y);
-    printf("Framebuffer Size: %d x %d\n", framebufferSize.x, framebufferSize.y);
-
-    float xscale, yscale;
-    glfwGetWindowContentScale(window, &xscale, &yscale);
-    std::cout << "Window Content Scale: " << xscale << " " << yscale << std::endl;
-
-    // context information
-    // Uniform Buffer Objects (UBO)
-    int max_uniform_buffer_bindings, max_uniform_block_size,
-        max_vertex_uniform_blocks, max_fragment_uniform_blocks,
-        max_geometry_uniform_blocks, gl_max_vertex_uniform_components;
-
-    glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &max_uniform_buffer_bindings);
-    glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &max_uniform_block_size);
-    glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &max_vertex_uniform_blocks);
-    glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_BLOCKS, &max_fragment_uniform_blocks);
-    glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_BLOCKS, &max_geometry_uniform_blocks);
-    glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &gl_max_vertex_uniform_components);
-
-    std::cout << "GL_MAX_UNIFORM_BUFFER_BINDINGS: " << max_uniform_buffer_bindings << std::endl;
-    std::cout << "GL_MAX_UNIFORM_BLOCK_SIZE: " << max_uniform_block_size << std::endl;
-    std::cout << "GL_MAX_VERTEX_UNIFORM_BLOCKS: " << max_vertex_uniform_blocks << std::endl;
-    std::cout << "GL_MAX_FRAGMENT_UNIFORM_BLOCKS: " << max_fragment_uniform_blocks << std::endl;
-    std::cout << "GL_MAX_GEOMETRY_UNIFORM_BLOCKS : " << max_geometry_uniform_blocks << std::endl;
+   
 
 
-    //glEnable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    if (USE_ANTIALIASING)
-    {
-        glEnable(GL_MULTISAMPLE);
-    }
-    // Make sure to turn backface culling off (glDisable(GL_CULL_FACE) ) because since we can look through the mesh, we could see that it has no “back” face.
-    glDisable(GL_CULL_FACE);
 
-    // https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
-
-    // Vertex shader variables
-    //glEnable(GL_PROGRAM_POINT_SIZE);
-    // gl_PointSize = 1 in shader for example
-    // can be sent in a vertex buffer object
-
-    // The integer variable gl_VertexID holds the current ID of the vertex we're drawing. When doing indexed rendering (with 
-    // glDrawElements) this variable holds the current index of the vertex we're drawing. When drawing without indices (via 
-    // glDrawArrays) this variable holds the number of the currently processed vertex since the start of the render call.
-
-    // Fragment shader variables
-    // gl_FragCoord, gl_FrontFacing, gl_FragDepth
 
 
 
@@ -299,7 +113,7 @@ int main(int argc, char** argv)
 
     auto segment2 = ux::Segment(1.25f, 1.5f, 0.0f, 15.0f, 0.125f);
 
-    float color_front[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    
 
 
 
@@ -319,6 +133,8 @@ int main(int argc, char** argv)
 
     auto shaderBase = Shader("res/shaders/base.shader");
 
+    auto shaderBase2 = Shader("res/shaders/base.shader");
+
     auto shaderText = Shader("res/shaders/text.shader");
 
     auto shaderUX = Shader("res/shaders/ux.shader");
@@ -334,15 +150,12 @@ int main(int argc, char** argv)
     glm::vec3 translate = { -1.4, 0.0, 0.0 };
 
     glm::vec3 mRotate = { 0.5, 0.0, 2.0 };
-    float zNear = 0.01f;
-    float zFar = 2000.0;
+    
 
     float rotator = 0.0;
     float rotator_increment = 0.0; //0.001;
 
-    // lighting
-    glm::vec3 lightPos = glm::vec3(-24.0, 1.0, 1.0);
-    glm::vec3 lightInc = glm::vec3(0.045, 0.0, 0.0);
+
 
 
     float translateZ = -100.0;
@@ -350,28 +163,129 @@ int main(int argc, char** argv)
 
 
     glm::vec4 color = { 0.2, 0.2, 0.2, 1.0 };
+
+
+    // lighting
+    glm::vec3 lightPos = glm::vec3(-24.0, 1.0, 1.0);
+    glm::vec3 lightInc = glm::vec3(0.045, 0.0, 0.0);
+
     glm::vec4 light_color = { 1.0, 1.0, 1.0, 1.0 };
     glm::vec4 light_ambient = { 0.2, 0.2, 0.2, 1.0 };
     glm::vec4 light_diffuse = { 0.5, 0.5, 0.5, 1.0 };
     glm::vec4 light_specular = { 0.2, 0.2, 0.2, 1.0 };
 
+
+    ux::Light light1 = {
+        lightPos,
+        light_ambient,
+        light_diffuse,
+        light_specular
+    };
+
+    ux::Light light2 = {
+        glm::vec3(1.0f, 1.0f, -24.0f),
+        light_ambient,
+        light_diffuse,
+        light_specular
+    };
+
+    ux::Light lights[2] = { 
+        light1, 
+        light2 
+    };
+
+    std::cout << "Lights Size: " << sizeof(lights) << std::endl;
+
+    auto ubo_Lights = UniformBuffer("LightProperties", 3, 128, &lights);
+    ubo_Lights.AddUniform("lights[0].position", 0, 16);
+    ubo_Lights.AddUniform("lights[0].ambient_color", 16, 12);
+    ubo_Lights.AddUniform("lights[0].diffuse_color", 32, 12);
+    ubo_Lights.AddUniform("lights[0].specular_color", 48, 12);
+
+    ubo_Lights.AddUniform("lights[1].position", 64, 16);
+    ubo_Lights.AddUniform("lights[1].ambient_color", 80, 12);
+    ubo_Lights.AddUniform("lights[1].diffuse_color", 96, 12);
+    ubo_Lights.AddUniform("lights[1].specular_color", 112, 12);
+
+    //ubo_Lights.SetUniform("lights[0].ambient_color", light_ambient);
+
+
+
     glm::vec3 camera_position = { 0.0, 0.0, 10.0 };
-    glm::vec3 camera_look_at = { 0.0, 0.0, 0.0 };
+    glm::vec3 camera_look_at = { 0.0, 0.0, 0.0 };   // glm::lookAt(...) ??? check this out
+
+    ux::CameraProperties cameraProperties = {
+        camera_position,
+        camera_look_at
+    };
+
+    auto ubo_Cameras = UniformBuffer("CameraProperties", 5, 32, &cameraProperties);
+    ubo_Cameras.AddUniform("cameras[0].location", 0, 12);
+    ubo_Cameras.AddUniform("cameras[0].look_at", 16, 12);
+
+    //ubo_CameraProperties.AddUniformVec3("cameras", 0, "position", 0, 12);
+
+    //ubo_CameraProperties.SetUniform("cameras[0].camera_location", camera_position);
+    //ubo_CameraProperties.SetUniformVec3("cameras", 0, "position", camera_position);
+
+
+
+
+    float zNear = 0.01f;
+    float zFar = 2000.0;
+
 
     float gamma = 1.0;
+
+
+
     bool animate = true;
     bool show_text = true;
 
-    //float ambient_strength = 0.1;
-    //float specular_strength = 0.5;
-    float specular_shininess = 32.0;
+   
 
     glm::vec4 ambient_color = { 0.348f, 0.348f, 0.348f, 1.0f };
     glm::vec4 diffuse_color = { 0.608f, 0.608f, 0.608f, 1.0f };
     glm::vec4 specular_color = { 0.5f, 0.5f, 0.5f, 1.0f };
+    //float ambient_strength = 0.1;
+    //float specular_strength = 0.5;
+    float specular_shininess = 32.0;
+
+    /*
+    ux::Material material = {
+        ambient_color,
+        diffuse_color,
+        specular_color,
+        specular_shininess
+    };
+    */
+
+    ux::Material material = {
+        { 0.348f, 0.348f, 0.348f, 1.0f },    // ambient color
+        { 0.608f, 0.608f, 0.608f, 1.0f },    // diffuse color
+        { 0.5f, 0.5f, 0.5f, 1.0f },          // specular color
+        32.0f                                // specular shininess
+    };
+
+    std::cout << "Material Size: " << sizeof(material) << std::endl;
+
+    auto ubo_Materials = UniformBuffer("MaterialProperties", 4, 64, &material);
+    ubo_Materials.AddUniform("material.ambient_color", 0, 12);
+    ubo_Materials.AddUniform("material.diffuse_color", 16, 12);
+    ubo_Materials.AddUniform("material.specular_color", 32, 12);
+    ubo_Materials.AddUniform("material.specular_shininess", 48, 4);
+
+    //ubo_Material.SetUniform("material.ambient_color", ambient_color);
+    //ubo_Material.SetUniform("material.specular_color", specular_color);
 
 
-    glm::mat4 proj = glm::perspective(glm::radians(55.0f), (float)ratio, zNear, zFar); // PROJECTION (SCREEN)
+
+
+
+
+    //glm::mat4 proj = glm::perspective(glm::radians(55.0f), window.GetAspectRatio(), zNear, zFar); // PROJECTION (SCREEN)
+    glm::mat4 proj = glm::infinitePerspective(glm::radians(55.0f), window.GetAspectRatio(), zNear); // looks the same
+    // also look at glm::frustum(...) matrix, glm::perspectiveFov(...)
 
     glm::mat4 viewBase = glm::lookAt(camera_position,     // Camera position in world space
         camera_look_at,      // look at origin
@@ -381,143 +295,29 @@ int main(int argc, char** argv)
     glm::mat4 viewRotateX = glm::rotate(viewTranslate, rotateXY.x, glm::vec3(1.0, 0.0, 0.0));
     glm::mat4 view = glm::rotate(viewRotateX, rotateXY.y, glm::vec3(0.0, 1.0, 0.0)); // CAMERA
 
-    // If w == 0, the value stored is a vector, if w == 1, the value stored is a point. 
 
-    glm::vec4 cp = glm::vec4(camera_position, 1.0);
-    glm::vec4 cla = glm::vec4(camera_look_at, 1.0);
-    //glm::vec4 lp = glm::vec4(lightPos, 1.0);
-
-    typedef struct Awesome
-    {
-        glm::vec4      ux_color;               // 16
-        // material
-        glm::vec4      ux_ambient_color;       // 16
-        glm::vec4      ux_diffuse_color;       // 16
-        glm::vec4      ux_specular_color;      // 16
-        float          ux_specular_shininess;  // 16 (4)
-        float          padding1[3];
-        // camera
-        glm::vec4      ux_camera_position;     // 16
-        glm::vec4      ux_camera_look_at;      // 16
-        // light
-        glm::vec4      ux_light_pos;           // 16 (12)
-        //float          padding2[1];
-        glm::vec4      ux_light_color;         // 16
-        glm::vec4      ux_light_ambient;       // 16
-        glm::vec4      ux_light_diffuse;       // 16
-        glm::vec4      ux_light_specular;      // 16
-        // core matrix(s)
-        glm::mat4      ux_view;                // 64
-        glm::mat4      ux_proj;                // 64
-        // post-production
-        float          ux_gamma;               // 16 (4)
-        float          padding3[3];
+    ux::SceneProperties scenes[1] = {
+    
+        glm::mat4(1.0f),
+        view,
+        proj,
+        gamma
     };
 
-    typedef struct Light
-    {
 
-    };
-
-    typedef struct Super
-    {
-        glm::vec4 s_color1;
-        glm::vec4 s_color2;
-    };
-
-    typedef struct Pooper
-    {
-        glm::mat4 view;
-        glm::mat4 proj;
-    };
-
-    Awesome awesome = {
-        //                 (shader var name)         (type) (off) (sz)
-        color,              // ux_color               vec4   0     16
-        // material
-        ambient_color,      // ux_ambient_color       vec4   16    16
-        diffuse_color,      // ux_diffuse_color       vec4   32    16
-        specular_color,     // ux_specular_color      vec4   48    16
-        specular_shininess, // ux_specular_shininess  float  64    16  (4)
-        {0.0f, 0.0f, 0.0f },
-        // camera
-        cp,                 // ux_camera_position     vec3   80    16
-        cla,                // ux_camera_look_at      vec3   96    16
-        // light
-        glm::vec4(lightPos, 1.0),           // ux_light_pos           vec3   112   16  (12)
-       // {0.0f},
-        light_color,        // ux_light_color         vec4   128   16
-        light_ambient,      // ux_light_ambient       vec4   144   16
-        light_diffuse,      // ux_light_diffuse       vec4   160   16
-        light_specular,     // ux_light_specular      vec4   176   16
-        // core matrix(s)
-        view,               // ux_view;               mat4   192   64
-        proj,               // ux_proj;               mat4   256   64
-        // post-production
-        gamma,              // ux_gamma;              float  320   16  (4)
-        {0.0f, 0.0f, 0.0f}
-        //                                            (size)      336
-    };
-
-    
-    
-
-    Super super = {
-        glm::vec4(1.0, 0.0, 0.0, 1.0),
-        glm::vec4(0.0, 0.0, 1.0, 1.0)
-    };
-
-    Pooper pooper = { view, proj };
+    auto ubo_SceneProperties = UniformBuffer("SceneProperties", 6, 208, &scenes);
+    ubo_SceneProperties.AddUniform("scenes[0].model", 0, 64);
+    ubo_SceneProperties.AddUniform("scenes[0].view", 64, 64);
+    ubo_SceneProperties.AddUniform("scenes[0].proj", 128, 64);
+    ubo_SceneProperties.AddUniform("scenes[0].gamma", 192, 4);
 
 
-    auto ubo_Awesome = UniformBuffer("Awesome", 0, 336, &awesome);
-    ubo_Awesome.AddUniform("ux_color", 0, 16);
-    ubo_Awesome.AddUniform("ux_ambient_color", 16, 16);
-    ubo_Awesome.AddUniform("ux_diffuse_color", 32, 16);
-    ubo_Awesome.AddUniform("ux_specular_color", 48, 16);
-    ubo_Awesome.AddUniform("ux_specular_shininess", 64, 16);
-    ubo_Awesome.AddUniform("ux_camera_position", 80, 16);
-    ubo_Awesome.AddUniform("ux_camera_look_at", 96, 16);
-    ubo_Awesome.AddUniform("ux_light_pos", 112, 16);
-    ubo_Awesome.AddUniform("ux_light_color", 128, 16);
-    ubo_Awesome.AddUniform("ux_light_ambient", 144, 16);
-    ubo_Awesome.AddUniform("ux_light_diffuse", 160, 16);
-    ubo_Awesome.AddUniform("ux_light_specular", 176, 16);
-    ubo_Awesome.AddUniform("ux_view", 192, 64);
-    ubo_Awesome.AddUniform("ux_proj", 256, 64);
-    ubo_Awesome.AddUniform("ux_gamma", 320, 16);
-
-    ubo_Awesome.SetUniform("ux_ambient_color", ambient_color);
-    ubo_Awesome.SetUniform("ux_light_diffuse", light_diffuse);
-    ubo_Awesome.SetUniform("ux_light_specular", light_specular);
-    ubo_Awesome.SetUniform("ux_view", view);
-    //ubo_Awesome.SetUniform("ux_diffuse_color", diffuse_color);
-
-
-    auto ubo_Super = UniformBuffer("Super", 2, sizeof(super), &super);
-    ubo_Super.AddUniform("s_color1", 0, 16);
-    ubo_Super.AddUniform("s_color2", 16, 16);
-    ubo_Super.SetUniform("s_color2", glm::vec4(0, 1, 0, 1));
-    //ubo_Super.SetUniform("s_color2", glm::vec4(0, 0, 1, 1));
-    
-
-
-
-
-    
-
-    auto ubo_Pooper = UniformBuffer("Pooper", 1, sizeof(pooper), &pooper);
-    ubo_Pooper.AddUniform("view", 0, 64);
-    ubo_Pooper.AddUniform("proj", 64, 64);
-    
-    ubo_Pooper.SetUniform("view", view);
-    ubo_Pooper.SetUniform("proj99", proj);
-    
-    
-
-
+   
 
     Renderer renderer;
+
+
+
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -525,7 +325,7 @@ int main(int argc, char** argv)
     ImGui::CreateContext();
     //ImGuiIO& io = ImGui::GetIO(); (void)io;
     // Setup Platform/Renderer bindings
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplGlfw_InitForOpenGL(window.GetNativeWindow(), true);
     ImGui_ImplOpenGL3_Init(glsl_version);
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -537,16 +337,17 @@ int main(int argc, char** argv)
 
 
     auto lightCube = ux::Cube(glm::vec3(1.0f, 1.0f, 1.0f));
+    auto lightCube2 = ux::Cube(glm::vec3(1.0f, 1.0f, 1.0f));
 
 
 
     auto lines = ux::Lines();
     //lines.add(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     //lines.add(glm::vec3(0.5, 0, 0), glm::vec3(0.5, 1, 0));
-    lines.add(glm::vec3(0.0f, framebufferSize.y - 1, 0.0f), glm::vec3(framebufferSize.x - 1, framebufferSize.y - 1, 0.0f)); // TOP
-    lines.add(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(framebufferSize.x - 1, 0.0f, 0.0f)); // BOTTOM
-    lines.add(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, framebufferSize.y - 1, 0.0f)); // LEFT
-    lines.add(glm::vec3(framebufferSize.x - 1, 0.0f, 0.0f), glm::vec3(framebufferSize.x - 1, framebufferSize.y - 1, 0.0f)); // RIGHT
+    lines.add(glm::vec3(0.0f, window.GetFramebufferWidth() - 1, 0.0f), glm::vec3(window.GetFramebufferWidth() - 1, window.GetFramebufferHeight() - 1, 0.0f)); // TOP
+    lines.add(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(window.GetFramebufferWidth() - 1, 0.0f, 0.0f)); // BOTTOM
+    lines.add(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, window.GetFramebufferHeight() - 1, 0.0f)); // LEFT
+    lines.add(glm::vec3(window.GetFramebufferWidth() - 1, 0.0f, 0.0f), glm::vec3(window.GetFramebufferWidth() - 1, window.GetFramebufferHeight() - 1, 0.0f)); // RIGHT
     lines.commit();
 
     auto lines2 = ux::Lines();
@@ -558,101 +359,23 @@ int main(int argc, char** argv)
     auto triangles = ux::Triangles();
     triangles.createRing(2.2, 2.3, 0.1, 180);
 
+
+
  
-
-    std::shared_ptr<GLFont> header_font = std::shared_ptr<GLFont>(new GLFont("res/fonts/Inconsolata/static/InconsolataCondensed-Medium.ttf"));
-    std::shared_ptr<GLFont> glfont = std::shared_ptr<GLFont>(new GLFont("res/fonts/Inconsolata/static/InconsolataCondensed-Light.ttf"));
-
-    int startX = 50;
-    int startY = 50;
-
-
-
-    std::unique_ptr<FTLabel> header = std::unique_ptr<FTLabel>(new FTLabel(
-        header_font, "UX/GL v0.12", startX, startY, framebufferSize.x, framebufferSize.y
-    ));
-    header->setColor(1.0, 1.0, 1.0, 1.0);
-    header->setPixelSize(24);
-
-    startY += 24;
-
-    std::unique_ptr<FTLabel> title = std::unique_ptr<FTLabel>(new FTLabel(
-        glfont, "UX/GL INTERFACE v0.12", startX, startY, framebufferSize.x, framebufferSize.y
-    ));
-    title->setColor(1.0, 1.0, 1.0, 1.0);
-    title->setPixelSize(18);
-
-    startY += 16;
-
-    std::unique_ptr<FTLabel> labelMXR = std::unique_ptr<FTLabel>(new FTLabel(
-        glfont, "MXR: 0.000000", startX, startY, framebufferSize.x, framebufferSize.y
-    ));
-    labelMXR->setColor(1.0, 1.0, 1.0, 1.0);
-    labelMXR->setPixelSize(18);
-
-    startY += 16;
-
-    std::unique_ptr<FTLabel> labelMYR = std::unique_ptr<FTLabel>(new FTLabel(
-        glfont, "MYR: 0.000000", startX, startY, framebufferSize.x, framebufferSize.y
-    ));
-    labelMYR->setColor(1.0, 1.0, 1.0, 1.0);
-    labelMYR->setPixelSize(18);
-
-    startY += 16;
-
-    const std::unique_ptr<FTLabel> labelMZR = std::unique_ptr<FTLabel>(new FTLabel(
-        glfont, "MZR: 0.000000", startX, startY, framebufferSize.x, framebufferSize.y
-    ));
-    labelMZR->setColor(1.0, 1.0, 1.0, 1.0);
-    labelMZR->setPixelSize(18);
-
-    startY += 16;
-
-    std::unique_ptr<FTLabel> labelMS = std::unique_ptr<FTLabel>(new FTLabel(
-        glfont, "MS/FR: 0.000000", startX, startY, framebufferSize.x, framebufferSize.y
-    ));
-    labelMS->setColor(1.0, 1.0, 1.0, 1.0);
-    labelMS->setPixelSize(18);
-
-    startY += 16;
-
-    std::unique_ptr<FTLabel> labelFPS = std::unique_ptr<FTLabel>(new FTLabel(
-        glfont, "FPS: 0.000000", startX, startY, framebufferSize.x, framebufferSize.y
-    ));
-    labelFPS->setColor(1.0, 1.0, 1.0, 1.0);
-    labelFPS->setPixelSize(18);
-
-    startY += 16;
-
-    std::unique_ptr<FTLabel> labelTime = std::unique_ptr<FTLabel>(new FTLabel(
-        glfont, "[DATE/TIME]", startX, startY, framebufferSize.x, framebufferSize.y
-    ));
-    labelTime->setColor(1.0, 1.0, 1.0, 1.0);
-    labelTime->setPixelSize(18);
+    auto textList = ux::TextList(50, 50, window.GetFramebufferWidth(), window.GetFramebufferHeight());
+    textList.AddFont(0, "res/fonts/Inconsolata/static/InconsolataCondensed-Medium.ttf");
+    textList.AddFont(1, "res/fonts/Inconsolata/static/InconsolataCondensed-Light.ttf");
+    textList.AddText(0, 0, 24, 24, "UX/SIM/GL v0.12");
+    textList.AddText(1, 1, 18, 18, "UX/GL INTERFACE v0.12");
+    textList.AddText(1, 2, 18, 18, "MXR: 0.000000");
+    textList.AddText(1, 3, 18, 18, "MYR: 0.000000");
+    textList.AddText(1, 4, 18, 18, "MZR: 0.000000");
+    textList.AddText(1, 5, 18, 18, "MS/FR: 0.000000");
+    textList.AddText(1, 6, 18, 18, "FPS: 0.000000");
+    textList.AddText(1, 7, 18, 18, "[DATE/TIME]");
 
 
 
-  
-
-    /*
-    Homogeneous coordinates
-        Until then, we only considered 3D vertices as a(x, y, z) triplet.
-        Let’s introduce w.We will now have(x, y, z, w) vectors.
-
-        This will be more clear soon, but for now, just remember this :
-
-    If w == 1, then the vector(x, y, z, 1) is a position in space.
-        If w == 0, then the vector(x, y, z, 0) is a direction.
-        (In fact, remember this forever.)
-
-        What difference does this make ? Well, for a rotation, it doesn’t change anything.
-        When you rotate a point or a direction, you get the same result.
-        However, for a translation(when you move the point in a certain direction), things are different.
-        What could mean “translate a direction” ? 
-        Not much.
-
-        Homogeneous coordinates allow us to use a single mathematical formula to deal with these two cases.
-    */
 
     //std::vector<ux::Ref<ux::Cube>> sub_cubes;
     std::array<ux::Ref<ux::Cube>, 260> sub_cubes;
@@ -663,7 +386,7 @@ int main(int argc, char** argv)
         float angle = ux::PI2 / sub_cube_count * n;
         ux::Ref<ux::Cube> sub_cube1 = ux::CreateRef<ux::Cube>(glm::vec3(1.0));
         glm::mat4 model3 = glm::scale(glm::mat4(1.0), glm::vec3(1.0));
-        model3 = ux::rotate(model3, axis, glm::vec3(0.0, angle, 0.0));
+        model3 = ux::rotateAroundAxis(model3, axis, glm::vec3(0.0, angle, 0.0));
         model3 = glm::translate(model3, glm::vec3(10, 0, 0)); // radius   
 
         
@@ -689,7 +412,7 @@ int main(int argc, char** argv)
         //glm::translate();
         //glm::vec3 objTrans = 
 
-        model4 = ux::rotate(model4, axis, glm::vec3(0.0, angle, 0.0));
+        model4 = ux::rotateAroundAxis(model4, axis, glm::vec3(0.0, angle, 0.0));
         model4 = glm::translate(model4, glm::vec3(28, 0, 0)); // radius       
 
         //glm::mat4 trans = glm::translate(glm::mat4(1), translate * scale);
@@ -702,10 +425,9 @@ int main(int argc, char** argv)
     for (size_t n = 0;n < sub_cube_count;n++)
     {
         float length = ux::random(8.0);
-        //float angle = ux::RADIANS / sub_cube_count * n;
         float angle = ux::random(ux::RADIANS);
 
-        glm::mat4 rm4 = ux::rotate(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
+        glm::mat4 rm4 = ux::rotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
                   rm4 = glm::translate(rm4, glm::vec3(42, 0, 0)); // radius
 
         float radius = 0.1 + ux::random(0.4);
@@ -716,10 +438,41 @@ int main(int argc, char** argv)
     }
 
 
+    /*
+    const int moreCount = 100;
+    std::array<ux::Ref<ux::Cuboid>, moreCount> moreCubes;
+
+ 
+    for (size_t n = 0;n < moreCount;n++)
+    {
+        float length = ux::random(8.0);
+        float angle = ux::random(ux::RADIANS);
+
+        glm::mat4 rm4 = ux::rotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
+        rm4 = glm::translate(rm4, glm::vec3(45, 0, 0)); // radius
+
+        float radius = 0.1 + ux::random(0.4);
+        ux::Ref<ux::Cuboid> moreCube = ux::CreateRef<ux::Cuboid>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), rm4);
+        moreCube->Build();
+
+        //ux::Ref<ux::Cuboid> moreCube = ux::CreateRef<ux::Cuboid>();
+        moreCube->Transformation() = glm::mat4(1.0);
+        moreCubes[n] = moreCube;
+    }
+
+    */
+
+    glm::mat4 tfm = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
+    auto cuboid = ux::Cuboid(glm::vec3(-0.2f), glm::vec3(0.2f), tfm);
+    cuboid.Build();
+
+
+
+
     glm::vec4 amber = ux::COLOR_AMBER;
     amber.a = 0.8;
 
-    float yy = framebufferSize.y - 74;
+    float yy = window.GetFramebufferHeight() - 74;
     auto horzBar = ux::HorzBar(glm::vec2(200.0f, yy - 20), glm::vec2(400.0f, yy));
     horzBar.SetColor(amber);
     horzBar.Build();
@@ -733,9 +486,14 @@ int main(int argc, char** argv)
     shaderBase.SetUniformMat4f("u_view", view);
     shaderBase.SetUniformMat4f("u_model", modelLight);
 
+    shaderBase2.Bind();
+    shaderBase2.SetUniformMat4f("u_proj", proj);
+    shaderBase2.SetUniformMat4f("u_view", view);
+    shaderBase2.SetUniformMat4f("u_model", modelLight);
+
 
     // ORTHO
-    glm::mat4 projOrtho = glm::ortho(0.f, (float)framebufferSize.x, 0.0f, (float)framebufferSize.y, 0.1f, zFar); // PROJECTION (SCREEN)
+    glm::mat4 projOrtho = glm::ortho(0.f, (float)window.GetFramebufferWidth(), 0.0f, (float)window.GetFramebufferHeight(), 0.1f, zFar); // PROJECTION (SCREEN)
     glm::mat4 viewOrtho = glm::lookAt(glm::vec3(0, 0, 10.0),  // Camera position in world space (doesn't really apply when using an ortho projection matrix)
         glm::vec3(0, 0, 0),  // look at origin
         glm::vec3(0, 1, 0)); // Head is up (set to 0, -1, 0 to look upside down)       
@@ -779,11 +537,9 @@ int main(int argc, char** argv)
 
     
     ux::Mesh emitterMesh = ux::Mesh();
-
-    emitterMesh.Load("Emitter_Cube.002", "res/meshes/emitter.obj");
-
+    emitterMesh.Load("Emitter_Cube", "res/meshes/emitter.obj");
+    //emitterMesh.Load("head_Cube", "res/meshes/Toon-Female-blockout.obj");
     emitterMesh.Build();
-
     std::cout << "MESH count: " << emitterMesh.GetVertexCount() << std::endl;
 
     
@@ -809,7 +565,7 @@ int main(int argc, char** argv)
       //glEnable(GL_BLEND);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // Loop until the user closes the window
-    while (!glfwWindowShouldClose(window))
+    while (window.Loop())
     {
         if (sound1) {
             auto soundPos = irrklang::vec3df(lightPos.x, lightPos.y, lightPos.z);
@@ -840,7 +596,7 @@ int main(int argc, char** argv)
         }
         else {
             // rotate around the axis.
-            model = ux::rotate(model, axis, mRotate);
+            model = ux::rotateAroundAxis(model, axis, mRotate);
         }
 
         glm::mat4 mvp = proj * view * model;
@@ -861,14 +617,42 @@ int main(int argc, char** argv)
             // Keeping the real-time rotation on the screen and stuff in sync.
             glm::mat4 transform = sub_cube->Transformation();
             glm::mat4 trans = glm::translate(glm::mat4(1), translate * scale);
-            transform = trans * rotate(transform, axis, mRotate);
+            transform = trans * ux::rotateAroundAxis(transform, axis, mRotate);
             transform = glm::rotate(transform, rotator, glm::vec3(0, 1.0, 0));
             shaderBox.SetUniformMat4f("u_model", transform);
             sub_cube->Draw(renderer, shaderBox);
         }
+
+        // SHADER BOX DOESN'T SUPPORT 3.4.2.3 VECTOR BUFFER OBJECT!!!
+        /*
+        for (auto moreCube : moreCubes)
+        {
+            // Performs the transformations after the geometry has been canculated.
+            // Keeping the real-time rotation on the screen and stuff in sync.
+            //glm::mat4 transform = glm::mat4(0.0f); //moreCube->Transformation();
+            //transform = glm::translate(glm::mat4(1), translate * scale);
+            //
+            glm::mat4 transform = moreCube->Transformation();
+            glm::mat4 trans = glm::translate(glm::mat4(1), translate * scale);
+            transform = trans * ux::rotateAroundAxis(transform, axis, mRotate);
+            transform = glm::rotate(transform, rotator, glm::vec3(0, 1.0, 0));
+            //transform = glm::rotate(transform, mRotate[1], glm::vec3(0, 1.0, 0));
+            //glm::mat4 transform = trans * ux::rotateAroundAxis(transform, axis, mRotate);
+            //transform = ux::rotateAroundAxis(transform, axis, mRotate);
+
+            //transform = glm::rotate(transform, rotator, glm::vec3(0, 1.0, 0));
+            shaderBox.SetUniformMat4f("u_model", transform);
+            moreCube->Draw(renderer, shaderBox);
+        }
+        */
+
+        shaderBox.SetUniformMat4f("u_model", model);
+        cuboid.Draw(renderer, shaderBox);
+
+
         shaderBox.SetUniformMat4f("u_model", model);
         
-        //emitterMesh.Draw(renderer, shaderBox);
+        emitterMesh.Draw(renderer, shaderBox);
 
         segment.Draw(renderer, shaderBox);
         shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(90.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
@@ -886,7 +670,10 @@ int main(int argc, char** argv)
        
 
 
+        // note this used shaderBase!!!
         lightCube.Draw(renderer, shaderBase);
+
+        lightCube2.Draw(renderer, shaderBase2);
         
 
 
@@ -920,30 +707,23 @@ int main(int argc, char** argv)
 
         if (show_text)
         {
-            labelMXR->setText2(ux::format("MODEL: % 12.6f % 12.6f % 12.6f", mRotate[0], mRotate[1], mRotate[2]));
-            labelMYR->setText2(ux::format("LIGHT: % 12.6f % 12.6f % 12.6f", lightPos[0], lightPos[1], lightPos[2]));
-            labelMZR->setText2(ux::format("COLOR: %6.4f %1.4f %1.4f %1.4f", color[0], color[1], color[2], color[3]));
+            // TODO text can be made faster here!
+            textList.SetText(2, ux::format("MODEL: % 12.6f % 12.6f % 12.6f", mRotate[0], mRotate[1], mRotate[2]));
+            textList.SetText(3, ux::format("LIGHT: % 12.6f % 12.6f % 12.6f", lightPos[0], lightPos[1], lightPos[2]));
+            textList.SetText(4, ux::format("COLOR: %6.4f %1.4f %1.4f %1.4f", color[0], color[1], color[2], color[3]));
             float msFrame = 1000.0f / ImGui::GetIO().Framerate;
             float frameRate = ImGui::GetIO().Framerate;
-            labelMS->setText2(ux::format("MS/FR: %8.6f", msFrame));
-            labelFPS->setText2(ux::format("  FPS: %8.3f", frameRate));
-            labelTime->setText2(ux::ReadableTime());
+            textList.SetText(5, ux::format("MS/FR: %8.6f", msFrame));
+            textList.SetText(6, ux::format("  FPS: %8.3f", frameRate));
+            textList.SetText(7, ux::ReadableTime());
 
-
-            header->render();
-            title->render();
-            labelMXR->render();
-            labelMYR->render();
-            labelMZR->render();
-            labelMS->render();
-            labelFPS->render();
-            labelTime->render();
+            textList.Draw();
         }
         
         {
             ImGuiColorEditFlags misc_flags = ImGuiColorEditFlags_Float;
 
-            ImGui::Begin("UX/GL");
+            ImGui::Begin("UX/SIM/GL");
             //ImGui::SliderFloat4("ABCD", abcd, -3.0f, 3.0f, "%.6f");
             //ImGui::SliderFloat4("EFGH", efgh, -3.0f, 3.0f, "%.6f");
             //ImGui::ColorEdit3("Color", (float*)&color, misc_flags);
@@ -951,20 +731,17 @@ int main(int argc, char** argv)
             ImGui::SliderFloat3("Model Translate", (float*)&translate, -5.0f, 5.0f);
             ImGui::SliderFloat3("Model Rotate", (float*)&mRotate, 0.0f, ux::PI2);
             ImGui::Separator();
-            ImGui::ColorEdit3("Ambient Color", (float*)&ambient_color, misc_flags);
-            if (ImGui::IsItemActive()) {
-                ubo_Awesome.SetUniform("ux_ambient_color", ambient_color);
-            }
-            ImGui::ColorEdit3("Diffuse Color", (float*)&diffuse_color, misc_flags);
-            ImGui::ColorEdit3("Specular Color", (float*)&specular_color, misc_flags);
-            if (ImGui::IsItemActive()) {
-                ubo_Awesome.SetUniform("ux_specular_color", specular_color);
-            }
-            ImGui::SliderFloat("Specular Shininess", &specular_shininess, 0.0f, 100.0f);
-            if (ImGui::IsItemActive()) {
-                ubo_Awesome.SetUniform("ux_specular_shininess", specular_shininess);
-            }
+            // MATERIAL
+            ImGui::ColorEdit3("Ambient Color", (float*)&material.ambient_color, misc_flags);
+            if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.ambient_color", material.ambient_color);
+            ImGui::ColorEdit3("Diffuse Color", (float*)&material.diffuse_color, misc_flags);
+            if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.diffuse_color", material.diffuse_color);
+            ImGui::ColorEdit3("Specular Color", (float*)&material.specular_color, misc_flags);
+            if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.specular_color", material.specular_color);
+            ImGui::SliderFloat("Specular Shininess", &material.specular_shininess, 0.0f, 100.0f);
+            if (ImGui::IsItemActive()) ubo_Materials.SetUniform1f("material.specular_shininess", material.specular_shininess);
             ImGui::Separator();
+
             ImGui::SliderFloat3("Camera Position", (float*)&camera_position, -100.0f, 100.0f);
             ImGui::SliderFloat3("Camera Look At", (float*)&camera_look_at, -100.0f, 100.0f);
             ImGui::SliderFloat("Z Near", &zNear, -200.0f, 2000.0f);
@@ -972,26 +749,29 @@ int main(int argc, char** argv)
             ImGui::Separator();
             ImGui::SliderFloat3("Light Position", (float*)&lightPos, -100.0f, 100.0f);
             if (ImGui::IsItemActive()) {
-                ubo_Awesome.SetUniform("ux_light_pos", glm::vec4(lightPos, 1.0));
+                ubo_Lights.SetUniformVec4("lights[0].position", glm::vec4(lightPos, 1.0f));
+                //ubo_Awesome.SetUniform("ux_light_pos", glm::vec4(lightPos, 1.0f));
                 shaderBase.Bind();
-                shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lightPos));              
+                shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0f), lightPos));              
             }
             ImGui::ColorEdit3("Light Ambient", (float*)&light_ambient, misc_flags);
+            if (ImGui::IsItemActive()) ubo_Lights.SetUniformVec3("lights[0].ambient_color", light_ambient);
+
             ImGui::ColorEdit3("Light Diffuse", (float*)&light_diffuse, misc_flags);
+            if (ImGui::IsItemActive()) ubo_Lights.SetUniformVec3("lights[0].diffuse_color", light_diffuse);
             ImGui::ColorEdit3("Light Specular", (float*)&light_specular, misc_flags);
-            if (ImGui::IsItemActive()) ubo_Awesome.SetUniform("ux_light_specular", light_specular);
+            if (ImGui::IsItemActive()) ubo_Lights.SetUniformVec3("lights[0].specular_color", light_specular);
             ImGui::SliderFloat3("Light Increment", (float*)&lightInc, -2.0f, 2.0f);
+
             ImGui::ColorEdit3("s_color1", (float*)&color, misc_flags);
-            if (ImGui::IsItemActive()) {
-                ubo_Super.SetUniform("s_color1", color);
-            }
+            //if (ImGui::IsItemActive()) ubo_Super.SetUniform("s_color1", color);
             ImGui::Separator();
             ImGui::Checkbox("Animate", &animate);
             ImGui::SameLine();
             ImGui::Checkbox("Show Text", &show_text);
             ImGui::SliderFloat("Rotator Increment", &rotator_increment, -2, 2);
             ImGui::SliderFloat("Gamma", &gamma, 0.0f, 5.0f);
-            if (ImGui::IsItemActive()) ubo_Awesome.SetUniform("ux_gamma", gamma);
+            if (ImGui::IsItemActive()) ubo_SceneProperties.SetUniform1f("scenes[0].gamma", gamma);
             if (ImGui::Button("Play Sound"))
             {
                 auto soundPos = irrklang::vec3df(lightPos.x, lightPos.y, lightPos.z);
@@ -1020,9 +800,18 @@ int main(int argc, char** argv)
             {
                 lightInc.x = -lightInc.x;
             }
-            ubo_Awesome.SetUniform("ux_light_pos", glm::vec4(lightPos, 1.0));
+            //ubo_Awesome.SetUniform("ux_light_pos", glm::vec4(lightPos, 1.0));
+            ubo_Lights.SetUniformVec4("lights[0].position", glm::vec4(lightPos, 1.0));
             shaderBase.Bind();
             shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lightPos));
+
+            glm::vec3 lp2 = glm::vec3(1.0f,lightPos.y, lightPos.x);
+            //glm::mat4 lp2m = ux::rotateAroundAxis(glm::mat4(1.0f), axis, mRotate);
+
+            ubo_Lights.SetUniformVec4("lights[1].position", glm::vec4(lp2, 1.0f));
+            shaderBase2.Bind();
+            shaderBase2.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lp2));
+            //shaderBase2.SetUniformMat4f("u_model", lp2m);
             /*
             mRotate += (0.00025, 0.00025, 0.00025);
             if (mRotate.x >= ux::PI2)
@@ -1040,8 +829,9 @@ int main(int argc, char** argv)
             }
         }
         
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        window.ContinueLoop();
+        //glfwSwapBuffers(window);
+        //glfwPollEvents();
     }
     
     // cleanup audio
@@ -1053,8 +843,9 @@ int main(int argc, char** argv)
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
     
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    //glfwDestroyWindow(window);
+    //glfwTerminate();
+    window.Close();
     
     return 0;
 }

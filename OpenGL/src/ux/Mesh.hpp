@@ -8,7 +8,6 @@
 
 // CCW is GL front facing.
 // what is the term when you manipulate vectors and matrixes together
-// tweening? trimming croping
 
 
 
@@ -28,8 +27,8 @@ namespace ux {
         //Ref<VertexBufferLayout> layoutLines;
         //Ref<IndexBuffer> ibLines;
 
-        glm::vec4 color;
-        glm::mat4 transformation;
+        
+        
 
       
 
@@ -37,7 +36,9 @@ namespace ux {
 
         glm::vec3 min;
         glm::vec3 max;
-   
+        glm::mat4 transformation;
+        glm::vec4 color;
+
         std::vector<float> vertices;
         std::vector<unsigned int> indicies;
 
@@ -49,33 +50,40 @@ namespace ux {
             va(CreateRef<VertexArray>()), vb(CreateRef<VertexBuffer>()),
             ib(CreateRef<IndexBuffer>()), layout(CreateRef<VertexBufferLayout>()) {}
 
+        Mesh(glm::vec3 min, glm::vec3 max, glm::mat4 transform)
+            : min(min), max(max), color(1), transformation(transform),
+            va(CreateRef<VertexArray>()), vb(CreateRef<VertexBuffer>()),
+            ib(CreateRef<IndexBuffer>()), layout(CreateRef<VertexBufferLayout>()) {}
+
         //inline ~Primitive() {}
 
         //void transform(glm::mat4& transformation);
 
-        //inline virtual void CreateGeometry() = 0;
+        inline virtual void CreateGeometry() {};
+
         //inline virtual void TransformGeometry(const glm::mat4& transformation) = 0;
         //inline virtual void AppendGeometry(const Primitive& primitive, const glm::mat4& transformation = glm::mat4(0)) = 0;
 
         void PublishGeometry() const
         {
             vb->Init(&vertices[0], vertices.size() * sizeof(float));
-            layout->Push<float>(3); // position xyz
+            layout->Push<float>(3); // position xyz,    location = 0
+            layout->Push<float>(3); // normal xyz,      location = 1
             layout->Push<float>(4); // color rgba
             layout->Push<float>(2); // texture coordinates xy
-            layout->Push<float>(3); // normal xyz
+            
             va->AddBuffer(*vb, *layout);
             ib->Init(&indicies[0], indicies.size());
         }
 
         void Build() // CreateAndPublish() BuildGeometry()
         {
-            //CreateGeometry();
+            CreateGeometry();
             PublishGeometry();
         }
 
-        inline glm::mat4& GetTransformation() { return transformation; }
-        inline glm::vec4& GetColor() { return color; }
+        inline glm::mat4 GetTransformation() { return transformation; }
+        inline glm::vec4 GetColor() { return color; }
         inline void SetColor(const glm::vec4& color) { this->color = color; }
         inline size_t GetVertexCount() { return vertices.size(); }
 
@@ -108,6 +116,10 @@ namespace ux {
             vertices.push_back(position.x);
             vertices.push_back(position.y);
             vertices.push_back(position.z);
+            // normal
+            vertices.push_back(normal.x);
+            vertices.push_back(normal.y);
+            vertices.push_back(normal.z);
             // color
             vertices.push_back(color.r);
             vertices.push_back(color.g);
@@ -116,10 +128,11 @@ namespace ux {
             // texture coordinate
             vertices.push_back(texCoord.x);
             vertices.push_back(texCoord.y);
-            // normal
-            vertices.push_back(normal.x);
-            vertices.push_back(normal.y);
-            vertices.push_back(normal.z);
+        }
+
+        glm::mat4 Transformation()
+        {
+            return transformation;
         }
 
         
@@ -144,12 +157,12 @@ namespace ux {
                         std::cout << "LOADING: " << mesh_name << std::endl;
                         for (int j = 0; j < curMesh.Vertices.size(); j++)
                         {
-
+                            /*
                             std::cout << "V" << j << ": " <<
                                 "P(" << curMesh.Vertices[j].Position.X << ", " << curMesh.Vertices[j].Position.Y << ", " << curMesh.Vertices[j].Position.Z << ") " <<
                                 "N(" << curMesh.Vertices[j].Normal.X << ", " << curMesh.Vertices[j].Normal.Y << ", " << curMesh.Vertices[j].Normal.Z << ") " <<
                                 "TC(" << curMesh.Vertices[j].TextureCoordinate.X << ", " << curMesh.Vertices[j].TextureCoordinate.Y << ")\n";
-
+*/
                             glm::vec3 position = { curMesh.Vertices[j].Position.X, curMesh.Vertices[j].Position.Y, curMesh.Vertices[j].Position.Z };
                             glm::vec2 texCoord = { curMesh.Vertices[j].TextureCoordinate.X, curMesh.Vertices[j].TextureCoordinate.Y };
                             glm::vec3 normal = { curMesh.Vertices[j].Normal.X, curMesh.Vertices[j].Normal.Y, curMesh.Vertices[j].Normal.Z };
@@ -171,7 +184,7 @@ namespace ux {
                         //	triangle that these indices represent
                         for (int j = 0; j < curMesh.Indices.size(); j += 3)
                         {
-                            std::cout << "T" << j / 3 << ": " << curMesh.Indices[j] << ", " << curMesh.Indices[j + 1] << ", " << curMesh.Indices[j + 2] << "\n";
+                            //std::cout << "T" << j / 3 << ": " << curMesh.Indices[j] << ", " << curMesh.Indices[j + 1] << ", " << curMesh.Indices[j + 2] << "\n";
 
                             unsigned int index1 = curMesh.Indices[j];
                             unsigned int index2 = curMesh.Indices[j + 1];

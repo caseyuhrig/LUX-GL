@@ -339,3 +339,4 @@ ASALocalRun/
 # BeatPulse healthcheck temp database
 healthchecksdb
 /OpenGL/res/meshes/.emitter.obj.swp
+*.blend1
