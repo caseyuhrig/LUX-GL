@@ -1,7 +1,7 @@
-# OpenGL
-C++ OpenGL project to build a 3D simulator (sandbox) for physics based experiments and mathematical art.
+# LUX/GL
+C++ OpenGL project to build an LCARS style user interface, 3D simulator (sandbox) for physics based experiments, and mathematical art.
 
-This project to NOT a game engine :)  Not that creating a 3D character and shooting at him won't happen!
+This project is NOT a game engine :)  Not that creating a 3D character and shooting at him won't happen!
 
 The goal is a 3D simulator with a physics engine (@bulletphysics) that can be used with machine learning experiments.  Like training 
 a 3D character to walk in Python, then connecting the Python program with this C++ OpenGL simulator/visualizer to watch as it learns and/or
