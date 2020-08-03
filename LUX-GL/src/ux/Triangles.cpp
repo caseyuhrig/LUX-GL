@@ -1,7 +1,7 @@
 #include "Triangles.h";
 
 
-#include "ux.h";
+
 
 
 namespace ux {

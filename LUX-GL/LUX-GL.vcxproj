@@ -219,7 +219,6 @@
     <ClInclude Include="src\ux\HorzBar.hpp" />
     <ClInclude Include="src\ux\Log.hpp" />
     <ClInclude Include="src\ux\Mesh.hpp" />
-    <ClInclude Include="src\ux\Primitive.hpp" />
     <ClInclude Include="src\ux\primitive\ScoopedCorner.hpp" />
     <ClInclude Include="src\ux\Scene.hpp" />
     <ClInclude Include="src\ux\Window.hpp" />
@@ -228,7 +227,6 @@
     <ClInclude Include="src\ux\Segment.hpp" />
     <ClInclude Include="src\ux\Torus.h" />
     <ClInclude Include="src\ux\Triangles.h" />
-    <ClInclude Include="src\ux\ux.h" />
     <ClInclude Include="src\ux\Core.hpp" />
     <ClInclude Include="src\ux\Cube.h" />
     <ClInclude Include="src\FrameBuffer.hpp" />

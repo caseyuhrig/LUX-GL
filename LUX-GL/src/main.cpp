@@ -17,7 +17,15 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "ux/ux.h"
+#include "ux/Window.hpp"
+#include "ux/Cube.h"
+#include "ux/Segment.hpp"
+#include "ux/Lines.h"
+#include "ux/Triangles.h"
+#include "ux/TextList.hpp"
+#include "ux/Cuboid.hpp"
+#include "ux/Color.hpp"
+#include "ux/HorzBar.hpp"
 #include "ux/primitive/ScoopedCorner.hpp"
 
 #include "UniformBuffer.hpp"
