@@ -4,8 +4,8 @@
 #include <map>
 #include <memory>
 
-#include "../glfont/GLFont.h"
-#include "../glfont/FTLabel.h"
+#include "glfont/GLFont.h"
+#include "glfont/FTLabel.h"
 
 
 // MIT license for the font code https://github.com/jtberglund/GLFont/blob/master/LICENSE

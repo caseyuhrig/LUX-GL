@@ -168,10 +168,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\glfont\FontAtlas.cpp" />
-    <ClCompile Include="src\glfont\FTLabel.cpp" />
-    <ClCompile Include="src\glfont\GLFont.cpp" />
-    <ClCompile Include="src\glfont\GLUtils.cpp" />
+    <ClCompile Include="src\vendor\glfont\FontAtlas.cpp" />
+    <ClCompile Include="src\vendor\glfont\FTLabel.cpp" />
+    <ClCompile Include="src\vendor\glfont\GLFont.cpp" />
+    <ClCompile Include="src\vendor\glfont\GLUtils.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
@@ -206,10 +206,10 @@
   <ItemGroup>
     <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3.h" />
     <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3native.h" />
-    <ClInclude Include="src\glfont\FontAtlas.h" />
-    <ClInclude Include="src\glfont\FTLabel.h" />
-    <ClInclude Include="src\glfont\GLFont.h" />
-    <ClInclude Include="src\glfont\GLUtils.h" />
+    <ClInclude Include="src\vendor\glfont\FontAtlas.h" />
+    <ClInclude Include="src\vendor\glfont\FTLabel.h" />
+    <ClInclude Include="src\vendor\glfont\GLFont.h" />
+    <ClInclude Include="src\vendor\glfont\GLUtils.h" />
     <ClInclude Include="src\pch.hpp" />
     <ClInclude Include="src\UniformBuffer.hpp" />
     <ClInclude Include="src\ux\Array.hpp" />
@@ -231,7 +231,7 @@
     <ClInclude Include="src\ux\Cube.h" />
     <ClInclude Include="src\FrameBuffer.hpp" />
     <ClInclude Include="src\IndexBuffer.hpp" />
-    <ClInclude Include="src\ux\OBJ_Loader.h" />
+    <ClInclude Include="src\vendor\OBJ_Loader.h" />
     <ClInclude Include="src\Renderer.hpp" />
     <ClInclude Include="src\Shader.hpp" />
     <ClInclude Include="src\Texture.h" />
