@@ -4,7 +4,7 @@
 #include "Array.hpp"
 #include "Cube.h"
 #include "Cuboid.hpp"
-#include "Segment.h"
+#include "Segment.hpp"
 #include "Lines.h"
 #include "Triangles.h"
 #include "HorzBar.hpp"

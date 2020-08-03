@@ -18,8 +18,10 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "ux/ux.h"
+#include "ux/primitive/ScoopedCorner.hpp"
 
 #include "UniformBuffer.hpp"
+#include "FrameBuffer.hpp"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
@@ -72,6 +74,7 @@ If w == 1, then the vector(x, y, z, 1) is a position in space.
 // Fragment shader variables
 // gl_FragCoord, gl_FrontFacing, gl_FragDepth
 
+// entt::entity e_Handle { entt::null }; // saving for future reference
 
 namespace ux {
 
@@ -91,20 +94,35 @@ namespace ux {
                 angle.z, glm::vec3(0.0, 0.0, 1.0)),
             axis) * model;
     }
+
+    glm::mat4 transform(glm::mat4 root, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotate)
+    {
+        glm::mat4 m2scale = glm::scale(glm::mat4(1.0), scale);
+        glm::mat4 m2trans = glm::translate(glm::mat4(1.0), translate);
+        glm::mat4 m2rotate1 = glm::rotate(glm::mat4(1.0), rotate[0], glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::mat4 m2rotate2 = glm::rotate(glm::mat4(1.0), rotate[1], glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 m2rotate3 = glm::rotate(glm::mat4(1.0), rotate[2], glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 matrix = m2rotate3 * m2rotate2 * m2rotate1 * m2trans * m2scale;
+        return root * matrix;
+    }
+
 };
 
 
 int main(int argc, char** argv)
 {
+    bool animate = false;
+    bool show_text = true;
+    bool use_render_buffer = false;
+    bool use_imgui = true;
+    bool show_models = true;
+
+
     auto window = ux::Window("UX/SIM/GL", 1500, 900);
     window.Center();
 
 
-   
-
-
-
-
+    std::cout << "[WINDOW SIZE] " << window.GetWidth() << " " << window.GetHeight() << std::endl;
 
 
     auto cube = ux::Cube(glm::vec3(1.0f));
@@ -113,13 +131,8 @@ int main(int argc, char** argv)
 
     auto segment2 = ux::Segment(1.25f, 1.5f, 0.0f, 15.0f, 0.125f);
 
-    
 
-
-
-
-
-
+ 
 
     auto shader = Shader("res/shaders/basic.shader");
 
@@ -128,29 +141,31 @@ int main(int argc, char** argv)
     //shader.SetUniform1i("u_Texture", 0);
 
     auto shaderQuad = Shader("res/shaders/quad.shader");
-
     auto shaderBox = Shader("res/shaders/box.shader");
-
     auto shaderBase = Shader("res/shaders/base.shader");
-
     auto shaderBase2 = Shader("res/shaders/base.shader");
-
     auto shaderText = Shader("res/shaders/text.shader");
-
     auto shaderUX = Shader("res/shaders/ux.shader");
+
+  
 
 
 
     glm::vec3 axis = { 0.0, 0.0, 0.0 };
 
     // all object in the scene are scaled by scale
-    float scale = 25.0; //1.0; //0.125;
+    float scale = 5.0; //1.0; //0.125;
+    //glm::vec3 translate = { -1.4, 0.0, 0.0 };
+    //glm::vec3 mRotate = { 0.5, 0.0, 2.0 };
+    glm::vec3 translate = { 0.0, 0.0, 0.0 };
+    glm::vec3 mRotate = { 0.0, 0.0, 0.0 };
 
 
-    glm::vec3 translate = { -1.4, 0.0, 0.0 };
+    float scale2 = 1.0f;
+    glm::vec3 translate2 = { 0.0f, 0.0f, 0.0f };
+    glm::vec3 rotate2 = { 0.0f, 0.0f, 0.0f };
 
-    glm::vec3 mRotate = { 0.5, 0.0, 2.0 };
-    
+
 
     float rotator = 0.0;
     float rotator_increment = 0.0; //0.001;
@@ -166,7 +181,8 @@ int main(int argc, char** argv)
 
 
     // lighting
-    glm::vec3 lightPos = glm::vec3(-24.0, 1.0, 1.0);
+    //glm::vec3 lightPos = glm::vec3(-24.0, 1.0, 1.0);
+    glm::vec3 lightPos = glm::vec3(13.0, 17.0, 38.0);
     glm::vec3 lightInc = glm::vec3(0.045, 0.0, 0.0);
 
     glm::vec4 light_color = { 1.0, 1.0, 1.0, 1.0 };
@@ -239,8 +255,7 @@ int main(int argc, char** argv)
 
 
 
-    bool animate = true;
-    bool show_text = true;
+ 
 
    
 
@@ -319,17 +334,7 @@ int main(int argc, char** argv)
 
 
 
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    const char* glsl_version = "#version 440";
-    ImGui::CreateContext();
-    //ImGuiIO& io = ImGui::GetIO(); (void)io;
-    // Setup Platform/Renderer bindings
-    ImGui_ImplGlfw_InitForOpenGL(window.GetNativeWindow(), true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
+ 
 
 
     
@@ -406,14 +411,14 @@ int main(int argc, char** argv)
     {
         float angle = ux::PI2 / sub_cube_count * n;
         ux::Ref<ux::Cube> sub_cube2 = ux::CreateRef<ux::Cube>(glm::vec3(1.0));
-        glm::mat4 model4 = glm::scale(glm::mat4(1.0), glm::vec3(1.0));
+        glm::mat4 model4 = glm::scale(glm::mat4(1.0), glm::vec3(0.25));
         //glm::vec3 ss = glm::scale(glm::mat4(1.0), glm::vec3(1.0));
         //glm::vec4 obj = glm::vec4(0);
         //glm::translate();
         //glm::vec3 objTrans = 
 
         model4 = ux::rotateAroundAxis(model4, axis, glm::vec3(0.0, angle, 0.0));
-        model4 = glm::translate(model4, glm::vec3(28, 0, 0)); // radius       
+        model4 = glm::translate(model4, glm::vec3(11.5f, 0, 0)); // radius       
 
         //glm::mat4 trans = glm::translate(glm::mat4(1), translate * scale);
         //model4 = trans * rotate(model4, axis, mRotate);
@@ -428,9 +433,9 @@ int main(int argc, char** argv)
         float angle = ux::random(ux::RADIANS);
 
         glm::mat4 rm4 = ux::rotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
-                  rm4 = glm::translate(rm4, glm::vec3(42, 0, 0)); // radius
+                  rm4 = glm::translate(rm4, glm::vec3(4, 0, 0)); // radius
 
-        float radius = 0.1 + ux::random(0.4);
+        float radius = 0.05 + ux::random(0.1);
         ux::Ref<ux::Cube> sub_cube2 = ux::CreateRef<ux::Cube>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), rm4);
 
         sub_cube2->Transformation() = glm::mat4(1.0);
@@ -438,31 +443,35 @@ int main(int argc, char** argv)
     }
 
 
-    /*
-    const int moreCount = 100;
+    
+    const int moreCount = 300;
     std::array<ux::Ref<ux::Cuboid>, moreCount> moreCubes;
-
- 
     for (size_t n = 0;n < moreCount;n++)
     {
-        float length = ux::random(8.0);
+        float length = ux::random(5.0);
         float angle = ux::random(ux::RADIANS);
 
         glm::mat4 rm4 = ux::rotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
-        rm4 = glm::translate(rm4, glm::vec3(45, 0, 0)); // radius
+        //glm::mat4 rm4 = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
+        rm4 = rm4 * glm::translate(rm4, glm::vec3(8, 0, 0)); // radius
+        //glm::mat4 rm4 = glm::translate(glm::mat4(1.0f), glm::vec3(25, 0, 0)); // radius
+        //rm4 = rm4 * glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
+        //rm4 = rm4 * ux::rotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
 
-        float radius = 0.1 + ux::random(0.4);
-        ux::Ref<ux::Cuboid> moreCube = ux::CreateRef<ux::Cuboid>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), rm4);
+        float radius = 0.025 + ux::random(0.1);
+        //ux::Ref<ux::Cuboid> moreCube = ux::CreateRef<ux::Cuboid>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), rm4);
+        ux::Ref<ux::Cuboid> moreCube = ux::CreateRef<ux::Cuboid>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1.0f));
         moreCube->Build();
 
         //ux::Ref<ux::Cuboid> moreCube = ux::CreateRef<ux::Cuboid>();
-        moreCube->Transformation() = glm::mat4(1.0);
+        moreCube->SetTransformation(rm4); //glm::mat4(1.0);
         moreCubes[n] = moreCube;
     }
 
-    */
+    
 
-    glm::mat4 tfm = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
+    //glm::mat4 tfm = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
+    glm::mat4 tfm = glm::mat4(1.0f);
     auto cuboid = ux::Cuboid(glm::vec3(-0.2f), glm::vec3(0.2f), tfm);
     cuboid.Build();
 
@@ -481,12 +490,12 @@ int main(int argc, char** argv)
  
     glm::mat4 modelLight = glm::translate(glm::mat4(1.0), lightPos);
 
-    shaderBase.Bind();
+    //shaderBase.Bind();
     shaderBase.SetUniformMat4f("u_proj", proj);
     shaderBase.SetUniformMat4f("u_view", view);
     shaderBase.SetUniformMat4f("u_model", modelLight);
 
-    shaderBase2.Bind();
+    //shaderBase2.Bind();
     shaderBase2.SetUniformMat4f("u_proj", proj);
     shaderBase2.SetUniformMat4f("u_view", view);
     shaderBase2.SetUniformMat4f("u_model", modelLight);
@@ -537,7 +546,7 @@ int main(int argc, char** argv)
 
     
     ux::Mesh emitterMesh = ux::Mesh();
-    emitterMesh.Load("Emitter_Cube", "res/meshes/emitter.obj");
+    emitterMesh.Load("Cube_Cube.003", "res/meshes/emitter.obj");
     //emitterMesh.Load("head_Cube", "res/meshes/Toon-Female-blockout.obj");
     emitterMesh.Build();
     std::cout << "MESH count: " << emitterMesh.GetVertexCount() << std::endl;
@@ -546,24 +555,127 @@ int main(int argc, char** argv)
 
 
 
+    entt::registry registry;
+
+    auto entity = registry.create();
+
+    registry.emplace<glm::vec3>(entity, 10.0f, 10.0f, 10.0f);
+
+    glm::vec3 out = registry.get<glm::vec3>(entity);
+
+    std::cout << "OUT: " << glm::to_string(out) << std::endl;
+
+    registry.destroy(entity);
+
+
+
+    auto frameBufferShader = Shader("res/shaders/framebuffer.shader");
+    std::cout << "set uniform1i" << std::endl;
+    frameBufferShader.Bind();
+    frameBufferShader.SetUniform1i("screenTexture", 0);
+    std::cout << "set uniform1i [END]" << std::endl;
+
+    //FrameBufferSpecification spec;
+    //spec.Width = 1500;
+    //spec.Height = 900;
+    //FrameBuffer frameBuffer = FrameBuffer(spec);
 
 
 
 
+    float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+       // positions   // texCoords
+       -1.0f,  1.0f,  0.0f, 1.0f,
+       -1.0f, -1.0f,  0.0f, 0.0f,
+        1.0f, -1.0f,  1.0f, 0.0f,
+
+       -1.0f,  1.0f,  0.0f, 1.0f,
+        1.0f, -1.0f,  1.0f, 0.0f,
+        1.0f,  1.0f,  1.0f, 1.0f
+    };
+    // screen quad VAO
+    unsigned int quadVAO, quadVBO;
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+
+  
+
+      // framebuffer configuration
+    // -------------------------
+    unsigned int framebuffer;
+    glGenFramebuffers(1, &framebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    // create a color attachment texture
+    unsigned int textureColorbuffer;
+    glGenTextures(1, &textureColorbuffer);
+    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1500, 900, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight()); // use a single renderbuffer object for both a depth AND stencil buffer.
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    else 
+        UX_LOG_ERROR("FB GOOD!");
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glLineWidth(2.5f);
 
 
 
+    auto scoopedCorner = ux::ScoopedCorner(glm::vec2(10.0f, 10.0f), 50.0f, amber);
+    scoopedCorner.Build();
 
+
+  
+
+    // TODO put in the renderer init?
     glPointSize(5.0);
     glEnable(GL_MULTISAMPLE);
+    //glDisable(GL_MULTISAMPLE);
     glEnable(GL_LINE_SMOOTH);
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
+    // Make sure to turn backface culling off (glDisable(GL_CULL_FACE) ) because since we can 
+    // look through the mesh, we could see that it has no “back” face.
+    glDisable(GL_CULL_FACE);
     //glEnable(GL_FRAMEBUFFER_SRGB);
-      //glEnable(GL_BLEND);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    if (use_imgui)
+    {
+        // Setup Dear ImGui context
+        IMGUI_CHECKVERSION();
+        const char* glsl_version = "#version 440";
+        ImGui::CreateContext();
+        //ImGuiIO& io = ImGui::GetIO(); (void)io;
+        // Setup Platform/Renderer bindings
+        ImGui_ImplGlfw_InitForOpenGL(window.GetNativeWindow(), true);
+        ImGui_ImplOpenGL3_Init(glsl_version);
+        // Setup Dear ImGui style
+        ImGui::StyleColorsDark();
+        //ImGui::StyleColorsClassic();
+    }
+
     // Loop until the user closes the window
     while (window.Loop())
     {
@@ -572,59 +684,58 @@ int main(int argc, char** argv)
             sound1->setPosition(soundPos);
         }
 
+       
+
+        if (use_render_buffer)
+        {
+            //frameBuffer.Bind();
+            //std::cout << "using framebuffer " << framebuffer << std::endl;
+            glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+            glViewport(0, 0, window.GetWidth(), window.GetHeight());
+            glEnable(GL_DEPTH_TEST);
+            glDepthFunc(GL_LESS);
+            //glEnable(GL_TEXTURE_2D);
+            //glDisable(GL_MULTISAMPLE);
+        }
 
         renderer.Clear();
-        
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
 
-        //glfwGetTime();
+        float time = static_cast<float>(glfwGetTime());
+        shaderBox.SetUniform1f("u_time", time);
 
  
         // PERSPECTIVE
-        glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(scale)); // MODEL
-        model = glm::translate(model, translate);
-        bool around_center = true;
-        if (around_center)
-        {
-            // rotates around (0,0,0) of the model.
-            model = glm::rotate(model, mRotate[0], glm::vec3(1.0, 0.0, 0.0));
-            model = glm::rotate(model, mRotate[1], glm::vec3(0.0, 1.0, 0.0));
-            model = glm::rotate(model, mRotate[2], glm::vec3(0.0, 0.0, 1.0));
-        }
-        else {
-            // rotate around the axis.
-            model = ux::rotateAroundAxis(model, axis, mRotate);
-        }
+
+        glm::mat4 model = ux::transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
+        //glm::mat4 model = ux::transform(glm::mat4(1.0f), glm::vec3(1.0f), translate, mRotate);
+
+        model = ux::transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
 
         glm::mat4 mvp = proj * view * model;
 
-    
-
-
-
-
-
-        shaderBox.Bind();
-        shaderBox.SetUniformMat4f("u_model", model);
         shaderBox.SetUniformMat4f("u_view", view);
         shaderBox.SetUniformMat4f("u_proj", proj);
-        for (auto sub_cube : sub_cubes)
+        
+        if (show_models)
         {
-            // Performs the transformations after the geometry has been canculated.
-            // Keeping the real-time rotation on the screen and stuff in sync.
-            glm::mat4 transform = sub_cube->Transformation();
-            glm::mat4 trans = glm::translate(glm::mat4(1), translate * scale);
-            transform = trans * ux::rotateAroundAxis(transform, axis, mRotate);
-            transform = glm::rotate(transform, rotator, glm::vec3(0, 1.0, 0));
-            shaderBox.SetUniformMat4f("u_model", transform);
-            sub_cube->Draw(renderer, shaderBox);
+            shaderBox.SetUniformMat4f("u_model", model);
+            //cuboid.Draw(renderer, shaderBox);
         }
 
-        // SHADER BOX DOESN'T SUPPORT 3.4.2.3 VECTOR BUFFER OBJECT!!!
-        /*
+
+        
+        if (show_models)
+        {           
+            for (auto sub_cube : sub_cubes)
+            {
+                shaderBox.SetUniformMat4f("u_model", model * sub_cube->Transformation());
+                sub_cube->Draw(renderer, shaderBox);
+            }
+        }
+
+
+        
+        
         for (auto moreCube : moreCubes)
         {
             // Performs the transformations after the geometry has been canculated.
@@ -632,75 +743,80 @@ int main(int argc, char** argv)
             //glm::mat4 transform = glm::mat4(0.0f); //moreCube->Transformation();
             //transform = glm::translate(glm::mat4(1), translate * scale);
             //
+            /*
             glm::mat4 transform = moreCube->Transformation();
             glm::mat4 trans = glm::translate(glm::mat4(1), translate * scale);
             transform = trans * ux::rotateAroundAxis(transform, axis, mRotate);
             transform = glm::rotate(transform, rotator, glm::vec3(0, 1.0, 0));
+            */
             //transform = glm::rotate(transform, mRotate[1], glm::vec3(0, 1.0, 0));
             //glm::mat4 transform = trans * ux::rotateAroundAxis(transform, axis, mRotate);
             //transform = ux::rotateAroundAxis(transform, axis, mRotate);
 
             //transform = glm::rotate(transform, rotator, glm::vec3(0, 1.0, 0));
-            shaderBox.SetUniformMat4f("u_model", transform);
+            shaderBox.SetUniformMat4f("u_model", model * moreCube->GetTransformation());
             moreCube->Draw(renderer, shaderBox);
         }
-        */
-
-        shaderBox.SetUniformMat4f("u_model", model);
-        cuboid.Draw(renderer, shaderBox);
-
-
-        shaderBox.SetUniformMat4f("u_model", model);
         
-        emitterMesh.Draw(renderer, shaderBox);
 
-        segment.Draw(renderer, shaderBox);
-        shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(90.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-        segment.Draw(renderer, shaderBox);
-        shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(180.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-        segment.Draw(renderer, shaderBox);
-        shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(270.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-        segment.Draw(renderer, shaderBox);
-
-        for (float ang = 0.0f;ang < 360.0f;ang += 20.0f)
+        if (show_models)
         {
-            shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(ang * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-            segment2.Draw(renderer, shaderBox);
+            shaderBox.SetUniformMat4f("u_model", model);
+            emitterMesh.Draw(renderer, shaderBox);
         }
-       
+
+
+        if (show_models)
+        {
+            shaderBox.SetUniformMat4f("u_model", model);
+            segment.Draw(renderer, shaderBox);
+            shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(90.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
+            segment.Draw(renderer, shaderBox);
+            shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(180.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
+            segment.Draw(renderer, shaderBox);
+            shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(270.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
+            segment.Draw(renderer, shaderBox);
+
+            for (float ang = 0.0f;ang < 360.0f;ang += 20.0f)
+            {
+                shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(ang * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
+                segment2.Draw(renderer, shaderBox);
+            }
+        }
+        
 
 
         // note this used shaderBase!!!
         lightCube.Draw(renderer, shaderBase);
-
         lightCube2.Draw(renderer, shaderBase2);
         
 
 
 
-        shaderQuad.Bind();
-        shaderQuad.SetUniformMat4f("u_MVP", mvp);
-        shaderQuad.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
+        //shaderQuad.Bind();
+        //shaderQuad.SetUniformMat4f("u_MVP", mvp);
+        //shaderQuad.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
               
-        cube.DrawOutline(renderer, shaderQuad);
-        ring.Draw(renderer, shaderQuad);
+        // wireframe cube
+        //cube.DrawOutline(renderer, shaderQuad);
+        //ring.Draw(renderer, shaderQuad);
 
-
-        // border
-        shaderQuad.Bind();
-        shaderQuad.SetUniformMat4f("u_MVP", mvpOrtho);
-        shaderQuad.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
-        //horzBar.Draw(renderer, shaderQuad);
-        lines.Draw(renderer, shaderQuad);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        shaderUX.Bind();
+        // border
+        shaderQuad.SetUniformMat4f("u_MVP", mvpOrtho);
+        shaderQuad.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
+        lines.Draw(renderer, shaderQuad);
+        
+
         shaderUX.SetUniformMat4f("u_MVP", mvpOrtho);
-        shaderUX.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
+        shaderUX.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);    
+        scoopedCorner.Draw(renderer, shaderUX);
         horzBar.Draw(renderer, shaderUX);
         lines2.Draw(renderer, shaderUX); // why won't it draw if this isn't here?
+
         
 
 
@@ -720,77 +836,88 @@ int main(int argc, char** argv)
             textList.Draw();
         }
         
+        if (use_imgui)
         {
-            ImGuiColorEditFlags misc_flags = ImGuiColorEditFlags_Float;
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
-            ImGui::Begin("UX/SIM/GL");
-            //ImGui::SliderFloat4("ABCD", abcd, -3.0f, 3.0f, "%.6f");
-            //ImGui::SliderFloat4("EFGH", efgh, -3.0f, 3.0f, "%.6f");
-            //ImGui::ColorEdit3("Color", (float*)&color, misc_flags);
-
-            ImGui::SliderFloat3("Model Translate", (float*)&translate, -5.0f, 5.0f);
-            ImGui::SliderFloat3("Model Rotate", (float*)&mRotate, 0.0f, ux::PI2);
-            ImGui::Separator();
-            // MATERIAL
-            ImGui::ColorEdit3("Ambient Color", (float*)&material.ambient_color, misc_flags);
-            if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.ambient_color", material.ambient_color);
-            ImGui::ColorEdit3("Diffuse Color", (float*)&material.diffuse_color, misc_flags);
-            if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.diffuse_color", material.diffuse_color);
-            ImGui::ColorEdit3("Specular Color", (float*)&material.specular_color, misc_flags);
-            if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.specular_color", material.specular_color);
-            ImGui::SliderFloat("Specular Shininess", &material.specular_shininess, 0.0f, 100.0f);
-            if (ImGui::IsItemActive()) ubo_Materials.SetUniform1f("material.specular_shininess", material.specular_shininess);
-            ImGui::Separator();
-
-            ImGui::SliderFloat3("Camera Position", (float*)&camera_position, -100.0f, 100.0f);
-            ImGui::SliderFloat3("Camera Look At", (float*)&camera_look_at, -100.0f, 100.0f);
-            ImGui::SliderFloat("Z Near", &zNear, -200.0f, 2000.0f);
-            ImGui::SliderFloat("Z Far", &zFar, 0.0f, 2000.0f);
-            ImGui::Separator();
-            ImGui::SliderFloat3("Light Position", (float*)&lightPos, -100.0f, 100.0f);
-            if (ImGui::IsItemActive()) {
-                ubo_Lights.SetUniformVec4("lights[0].position", glm::vec4(lightPos, 1.0f));
-                //ubo_Awesome.SetUniform("ux_light_pos", glm::vec4(lightPos, 1.0f));
-                shaderBase.Bind();
-                shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0f), lightPos));              
-            }
-            ImGui::ColorEdit3("Light Ambient", (float*)&light_ambient, misc_flags);
-            if (ImGui::IsItemActive()) ubo_Lights.SetUniformVec3("lights[0].ambient_color", light_ambient);
-
-            ImGui::ColorEdit3("Light Diffuse", (float*)&light_diffuse, misc_flags);
-            if (ImGui::IsItemActive()) ubo_Lights.SetUniformVec3("lights[0].diffuse_color", light_diffuse);
-            ImGui::ColorEdit3("Light Specular", (float*)&light_specular, misc_flags);
-            if (ImGui::IsItemActive()) ubo_Lights.SetUniformVec3("lights[0].specular_color", light_specular);
-            ImGui::SliderFloat3("Light Increment", (float*)&lightInc, -2.0f, 2.0f);
-
-            ImGui::ColorEdit3("s_color1", (float*)&color, misc_flags);
-            //if (ImGui::IsItemActive()) ubo_Super.SetUniform("s_color1", color);
-            ImGui::Separator();
-            ImGui::Checkbox("Animate", &animate);
-            ImGui::SameLine();
-            ImGui::Checkbox("Show Text", &show_text);
-            ImGui::SliderFloat("Rotator Increment", &rotator_increment, -2, 2);
-            ImGui::SliderFloat("Gamma", &gamma, 0.0f, 5.0f);
-            if (ImGui::IsItemActive()) ubo_SceneProperties.SetUniform1f("scenes[0].gamma", gamma);
-            if (ImGui::Button("Play Sound"))
             {
-                auto soundPos = irrklang::vec3df(lightPos.x, lightPos.y, lightPos.z);
-                engine->play3D(soundFilename.c_str(), soundPos);
-            }
-            if (ImGui::Button("Exit"))
-            {
-                std::cout << "EXIT" << std::endl;
-                break;
-            }
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::End();
+                ImGuiColorEditFlags misc_flags = ImGuiColorEditFlags_Float;
 
-            ImGui::ShowDemoWindow();
+                ImGui::Begin("UX/SIM/GL");
+                //ImGui::SliderFloat4("ABCD", abcd, -3.0f, 3.0f, "%.6f");
+                //ImGui::SliderFloat4("EFGH", efgh, -3.0f, 3.0f, "%.6f");
+                //ImGui::ColorEdit3("Color", (float*)&color, misc_flags);
+                ImGui::SliderFloat("M1 Scale", &scale, 1.0f, 50.0f);
+                ImGui::SliderFloat3("M1 Translate", (float*)&translate, -20.0f, 20.0f);
+                ImGui::SliderFloat3("M1 Rotate", (float*)&mRotate, 0.0f, ux::PI2);
+                ImGui::Separator();
+                ImGui::SliderFloat("M2 Scale", &scale2, 1.0f, 50.0f);
+                ImGui::SliderFloat3("M2 Translate", (float*)&translate2, -20.0f, 20.0f);
+                ImGui::SliderFloat3("M2 Rotate", (float*)&rotate2, 0.0f, ux::PI2);
+                ImGui::Separator();
+                // MATERIAL
+                ImGui::ColorEdit3("Ambient Color", (float*)&material.ambient_color, misc_flags);
+                if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.ambient_color", material.ambient_color);
+                ImGui::ColorEdit3("Diffuse Color", (float*)&material.diffuse_color, misc_flags);
+                if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.diffuse_color", material.diffuse_color);
+                ImGui::ColorEdit3("Specular Color", (float*)&material.specular_color, misc_flags);
+                if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.specular_color", material.specular_color);
+                ImGui::SliderFloat("Specular Shininess", &material.specular_shininess, 0.0f, 100.0f);
+                if (ImGui::IsItemActive()) ubo_Materials.SetUniform1f("material.specular_shininess", material.specular_shininess);
+                ImGui::Separator();
+
+                ImGui::SliderFloat3("Camera Position", (float*)&camera_position, -100.0f, 100.0f);
+                ImGui::SliderFloat3("Camera Look At", (float*)&camera_look_at, -100.0f, 100.0f);
+                ImGui::SliderFloat("Z Near", &zNear, -200.0f, 2000.0f);
+                ImGui::SliderFloat("Z Far", &zFar, 0.0f, 2000.0f);
+                ImGui::Separator();
+                ImGui::SliderFloat3("Light Position", (float*)&lightPos, -100.0f, 100.0f);
+                if (ImGui::IsItemActive()) {
+                    ubo_Lights.SetUniformVec4("lights[0].position", glm::vec4(lightPos, 1.0f));
+                    //ubo_Awesome.SetUniform("ux_light_pos", glm::vec4(lightPos, 1.0f));
+                    shaderBase.Bind();
+                    shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0f), lightPos));
+                }
+                ImGui::ColorEdit3("Light Ambient", (float*)&light_ambient, misc_flags);
+                if (ImGui::IsItemActive()) ubo_Lights.SetUniformVec3("lights[0].ambient_color", light_ambient);
+
+                ImGui::ColorEdit3("Light Diffuse", (float*)&light_diffuse, misc_flags);
+                if (ImGui::IsItemActive()) ubo_Lights.SetUniformVec3("lights[0].diffuse_color", light_diffuse);
+                ImGui::ColorEdit3("Light Specular", (float*)&light_specular, misc_flags);
+                if (ImGui::IsItemActive()) ubo_Lights.SetUniformVec3("lights[0].specular_color", light_specular);
+                ImGui::SliderFloat3("Light Increment", (float*)&lightInc, -2.0f, 2.0f);
+
+                ImGui::ColorEdit3("s_color1", (float*)&color, misc_flags);
+                //if (ImGui::IsItemActive()) ubo_Super.SetUniform("s_color1", color);
+                ImGui::Separator();
+                ImGui::Checkbox("Animate", &animate);
+                ImGui::SameLine();
+                ImGui::Checkbox("Show Text", &show_text);
+                ImGui::SliderFloat("Rotator Increment", &rotator_increment, -2, 2);
+                ImGui::SliderFloat("Gamma", &gamma, 0.0f, 5.0f);
+                if (ImGui::IsItemActive()) ubo_SceneProperties.SetUniform1f("scenes[0].gamma", gamma);
+                if (ImGui::Button("Play Sound"))
+                {
+                    auto soundPos = irrklang::vec3df(lightPos.x, lightPos.y, lightPos.z);
+                    engine->play3D(soundFilename.c_str(), soundPos);
+                }
+                if (ImGui::Button("Exit"))
+                {
+                    std::cout << "EXIT" << std::endl;
+                    break;
+                }
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                ImGui::End();
+
+                ImGui::ShowDemoWindow();
+            }
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        
         
         if (animate)
         {
@@ -828,6 +955,29 @@ int main(int argc, char** argv)
                 }
             }
         }
+
+        
+        if (use_render_buffer)
+        {
+            //frameBuffer.Unbind();
+
+            // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            //std::cout << "GL Error: " << glGetError() << std::endl;
+            glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+            // clear all relevant buffers
+            glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            frameBufferShader.Bind();
+            //frameBufferShader.SetUniform1i("screenTexture", textureColorbuffer);
+            glBindVertexArray(quadVAO);
+            glBindTexture(GL_TEXTURE_2D, textureColorbuffer);	// use the color attachment texture as the texture of the quad plane
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+
+            //GLenum err = glGetError();
+            //std::cout << "GL Error: " << err << std::endl;
+        }
         
         window.ContinueLoop();
         //glfwSwapBuffers(window);
@@ -838,11 +988,14 @@ int main(int argc, char** argv)
     if (sound1) sound1->drop(); // release music stream.
     engine->drop();
 
-    // Cleanup  
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-    
+    if (use_imgui)
+    {
+        // Cleanup  
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+    }
+
     //glfwDestroyWindow(window);
     //glfwTerminate();
     window.Close();

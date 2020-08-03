@@ -172,42 +172,49 @@ public:
 
     inline void SetUniform1i(const std::string& name, int value)
     {
-        glUniform1i(_GetUniformLocation(name), value);
+        //glUniform1i(_GetUniformLocation(name), value);
+        glProgramUniform1i(programID, _GetUniformLocation(name), value);
     }
 
 
     inline void SetUniform1f(const std::string& name, float value)
     {
-        glUniform1f(_GetUniformLocation(name), value);
+        //glUniform1f(_GetUniformLocation(name), value);
+        glProgramUniform1f(programID, _GetUniformLocation(name), value);
     }
 
 
     inline void SetUniform3f(const std::string& name, float v0, float v1, float v2)
     {
-        glUniform3f(_GetUniformLocation(name), v0, v1, v2);
+        //glUniform3f(_GetUniformLocation(name), v0, v1, v2);
+        glProgramUniform3f(programID, _GetUniformLocation(name), v0, v1, v2);
     }
 
 
     inline void SetUniformVec3f(const std::string& name, glm::vec3 v)
     {
-        glUniform3f(_GetUniformLocation(name), v[0], v[1], v[2]);
+        //glUniform3f(_GetUniformLocation(name), v[0], v[1], v[2]);
+        glProgramUniform3f(programID, _GetUniformLocation(name), v[0], v[1], v[2]);
     }
 
 
     inline void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
     {
-        glUniform4f(_GetUniformLocation(name), v0, v1, v2, v3);
+        //glUniform4f(_GetUniformLocation(name), v0, v1, v2, v3);
+        glProgramUniform4f(programID, _GetUniformLocation(name), v0, v1, v2, v3);
     }
 
 
     inline void SetUniformVec4f(const std::string& name, glm::vec4& v)
     {
-        glUniform4f(_GetUniformLocation(name), v[0], v[1], v[2], v[3]);
+        //glUniform4f(_GetUniformLocation(name), v[0], v[1], v[2], v[3]);
+        glProgramUniform4f(programID, _GetUniformLocation(name), v[0], v[1], v[2], v[3]);
     }
 
 
     inline void SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
     {
-        glUniformMatrix4fv(_GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+        //glUniformMatrix4fv(_GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+        glProgramUniformMatrix4fv(programID, _GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
     }
 };

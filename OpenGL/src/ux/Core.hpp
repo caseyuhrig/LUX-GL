@@ -24,6 +24,11 @@ namespace ux {
 	static const double TO_RAD = PI / 180.0;
 	static const double TO_DEG = 180.0 / PI;
 
+	static const float PIf = 3.14159265358979323846264f;
+	static const float PI2f = PIf * 2.0f;
+	static const float RADIANSf = PI2f;
+	static const float TO_RADf = PIf / 180.0f;
+	static const float TO_DEGf = 180.0f / PIf;
 
 	typedef struct SceneProperties // size = 208
 	{
@@ -113,7 +118,8 @@ namespace ux {
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 
-	
+
+
 	// rotates (model) around a specified point (axis) by (angle.xyz).
 	/*
 	inline glm::mat4 rotate(glm::mat4 model, glm::vec3 axis, glm::vec3 angle)
