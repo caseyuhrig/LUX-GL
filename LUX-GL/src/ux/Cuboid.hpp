@@ -10,15 +10,11 @@ namespace ux {
     class Cuboid : public Mesh
     {
     public:
-        Cuboid(const glm::vec3& min, const glm::vec3& max, const glm::mat4& transform) : Mesh(min, max, transform)
-        {
-            //std::cout << "CUBOID: " << glm::to_string(min) << " " << glm::to_string(max) << std::endl;
-        }
+        Cuboid(const glm::vec3& min, const glm::vec3& max, const glm::mat4& transform) 
+            : Mesh(min, max, transform) {}
 
         void CreateGeometry() override
         {
-            //std::cout << "Creating CUBOID geometry <===========!!" << std::endl;
-
             float verticesBox[] = {
                 min.x, min.y, min.z,  0.0f,  0.0f, -1.0f,
                 max.x, min.y, min.z,  0.0f,  0.0f, -1.0f,
@@ -90,5 +86,4 @@ namespace ux {
             
         }
     };
-
 }

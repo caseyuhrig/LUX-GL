@@ -20,13 +20,14 @@
 #include "ux/Window.hpp"
 #include "ux/Cube.h"
 #include "ux/Segment.hpp"
-#include "ux/Lines.h"
-#include "ux/Triangles.h"
+#include "ux/Lines.hpp"
 #include "ux/TextList.hpp"
 #include "ux/Cuboid.hpp"
 #include "ux/Color.hpp"
 #include "ux/HorzBar.hpp"
 #include "ux/primitive/ScoopedCorner.hpp"
+#include "ux/Ring.hpp"
+#include "Texture.h"
 
 #include "UniformBuffer.hpp"
 #include "FrameBuffer.hpp"
@@ -121,12 +122,12 @@ int main(int argc, char** argv)
 {
     bool animate = false;
     bool show_text = true;
-    bool use_render_buffer = false;
+    bool use_render_buffer = true;
     bool use_imgui = true;
     bool show_models = true;
 
 
-    auto window = ux::Window("UX/SIM/GL", 1500, 900);
+    auto window = ux::Window("LUX/GL", 1500, 900);
     window.Center();
 
 
@@ -369,8 +370,8 @@ int main(int argc, char** argv)
     auto ring = ux::Lines();
     ring.createRing(2.2, 2.3, 0.1, 180);
 
-    auto triangles = ux::Triangles();
-    triangles.createRing(2.2, 2.3, 0.1, 180);
+    auto triangles = ux::Ring(2.2, 2.3, 0.1, 180);
+    triangles.Build();
 
 
 
@@ -378,8 +379,8 @@ int main(int argc, char** argv)
     auto textList = ux::TextList(50, 50, window.GetFramebufferWidth(), window.GetFramebufferHeight());
     textList.AddFont(0, "res/fonts/Inconsolata/static/InconsolataCondensed-Medium.ttf");
     textList.AddFont(1, "res/fonts/Inconsolata/static/InconsolataCondensed-Light.ttf");
-    textList.AddText(0, 0, 24, 24, "UX/SIM/GL v0.12");
-    textList.AddText(1, 1, 18, 18, "UX/GL INTERFACE v0.12");
+    textList.AddText(0, 0, 24, 24, "LUX/GL v0.12a");
+    textList.AddText(1, 1, 18, 18, "LCARS USER EXPERIENCE GRAPHICS LIBRARY");
     textList.AddText(1, 2, 18, 18, "MXR: 0.000000");
     textList.AddText(1, 3, 18, 18, "MYR: 0.000000");
     textList.AddText(1, 4, 18, 18, "MZR: 0.000000");
@@ -562,7 +563,7 @@ int main(int argc, char** argv)
     
 
 
-
+    /*
     entt::registry registry;
 
     auto entity = registry.create();
@@ -574,21 +575,21 @@ int main(int argc, char** argv)
     std::cout << "OUT: " << glm::to_string(out) << std::endl;
 
     registry.destroy(entity);
+    */
 
 
+    bool MULTI_SAMPLE = false;
+    int samples = 4;
 
     auto frameBufferShader = Shader("res/shaders/framebuffer.shader");
-    std::cout << "set uniform1i" << std::endl;
     frameBufferShader.Bind();
     frameBufferShader.SetUniform1i("screenTexture", 0);
-    std::cout << "set uniform1i [END]" << std::endl;
+    
 
     //FrameBufferSpecification spec;
     //spec.Width = 1500;
     //spec.Height = 900;
     //FrameBuffer frameBuffer = FrameBuffer(spec);
-
-
 
 
     float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
@@ -614,34 +615,81 @@ int main(int argc, char** argv)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 
-  
+    UX_LOG_DEBUG("WINDOW: %dx%d", window.GetWidth(), window.GetHeight());
 
-      // framebuffer configuration
+    // framebuffer configuration
     // -------------------------
     unsigned int framebuffer;
     glGenFramebuffers(1, &framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     // create a color attachment texture
-    unsigned int textureColorbuffer;
-    glGenTextures(1, &textureColorbuffer);
-    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1500, 900, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
-    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    unsigned int rbo;
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight()); // use a single renderbuffer object for both a depth AND stencil buffer.
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-    else 
-        UX_LOG_ERROR("FB GOOD!");
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    unsigned int textureColorbuffer, m_DepthAttachment;
+    glGenTextures(1, &textureColorbuffer);  
+    if (MULTI_SAMPLE)
+    {
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorbuffer);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGBA8, window.GetWidth(), window.GetHeight(), GL_FALSE);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorbuffer, 0);
+
+        glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_DepthAttachment);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment);
+        glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight(), GL_FALSE);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_DepthAttachment, 0);
+    }
+    else {
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, window.GetWidth(), window.GetHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); // GL_RGBA?
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+
+        glCreateTextures(GL_TEXTURE_2D, 1, &m_DepthAttachment);
+        glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight(), 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment, 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_DepthAttachment, 0);
+    }
     
+    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+    /*
+    if (MULTI_SAMPLE)
+    {
+        unsigned int rboC, rboD;
+        glGenRenderbuffers(1, &rboC);
+        glBindRenderbuffer(GL_RENDERBUFFER, rboC);
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, window.GetWidth(), window.GetHeight());
+        //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rboC);
+
+        glGenRenderbuffers(1, &rboD);
+        glBindRenderbuffer(GL_RENDERBUFFER, rboD);
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight());
+        //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboD);
+        
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rboC);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboD);
+    }
+    else {
+        unsigned int rbo;
+        glGenRenderbuffers(1, &rbo);
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight());
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+    }
+    */
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        UX_LOG_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+    else UX_LOG_DEBUG("FB GOOD!");
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+    //std::cout << "TextureColorBuffer: " << textureColorbuffer << std::endl;
+
+
+
+
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     //glLineWidth(2.5f);
 
@@ -684,6 +732,8 @@ int main(int argc, char** argv)
         //ImGui::StyleColorsClassic();
     }
 
+    //glDisable(GL_MULTISAMPLE);
+
     // Loop until the user closes the window
     while (window.Loop())
     {
@@ -692,21 +742,34 @@ int main(int argc, char** argv)
             sound1->setPosition(soundPos);
         }
 
-       
+   
 
         if (use_render_buffer)
         {
             //frameBuffer.Bind();
             //std::cout << "using framebuffer " << framebuffer << std::endl;
             glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-            glViewport(0, 0, window.GetWidth(), window.GetHeight());
-            glEnable(GL_DEPTH_TEST);
-            glDepthFunc(GL_LESS);
+            //glViewport(0, 0, window.GetWidth(), window.GetHeight());
+            //glViewport(0, 0, 100, 100);
+           
+            //glDepthFunc(GL_LESS);
             //glEnable(GL_TEXTURE_2D);
-            //glDisable(GL_MULTISAMPLE);
+            
+
+            //glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+            //glClear(GL_COLOR_BUFFER_BIT);
+            //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
         renderer.Clear();
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        //glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_MULTISAMPLE);
+        glEnable(GL_LINE_SMOOTH);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         float time = static_cast<float>(glfwGetTime());
         shaderBox.SetUniform1f("u_time", time);
@@ -971,18 +1034,34 @@ int main(int argc, char** argv)
 
             // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            //std::cout << "GL Error: " << glGetError() << std::endl;
-            glDisable(GL_DEPTH_TEST); // disable depth test so screen-space quad isn't discarded due to depth test.
+            
+            
+            
             // clear all relevant buffers
-            glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
-            glClear(GL_COLOR_BUFFER_BIT);
-
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
+            //glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glDisable(GL_DEPTH_TEST);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             frameBufferShader.Bind();
+            glActiveTexture(GL_TEXTURE0); // + slot WOW guy didn't do this learnopengl
+
             //frameBufferShader.SetUniform1i("screenTexture", textureColorbuffer);
             glBindVertexArray(quadVAO);
-            glBindTexture(GL_TEXTURE_2D, textureColorbuffer);	// use the color attachment texture as the texture of the quad plane
-            glDrawArrays(GL_TRIANGLES, 0, 6);
 
+            if (MULTI_SAMPLE)
+            {
+                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorbuffer);
+                glDrawArrays(GL_TRIANGLES, 0, 6);
+                //glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+                //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+                //glBlitFramebuffer(0, 0, window.GetWidth(), window.GetHeight(), 0, 0, window.GetWidth(), window.GetHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            }
+            else {
+                glBindTexture(GL_TEXTURE_2D, textureColorbuffer);	// use the color attachment texture as the texture of the quad plane
+                glDrawArrays(GL_TRIANGLES, 0, 6);
+            }
             //GLenum err = glGetError();
             //std::cout << "GL Error: " << err << std::endl;
         }

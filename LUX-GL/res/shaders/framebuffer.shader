@@ -1,5 +1,5 @@
 #shader vertex
-#version 330 core
+#version 450 core
 layout(location = 0) in vec2 aPos;
 layout(location = 1) in vec2 aTexCoords;
 
@@ -14,18 +14,35 @@ void main()
 
 
 #shader fragment
-#version 330 core
-out vec4 FragColor;
+#version 450 core
+//precision highp float;
+//precision highp float;
+//precision highp int;
+//precision highp sampler2D;
+
+layout(location = 0) out vec4 FragColor;
 
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
+//uniform sampler2DMS screenTexture;
+
+
+vec4 MultiSampleTexture(sampler2DMS tex, ivec2 texCoord, int samples)
+{
+    vec4 result = vec4(0.0);
+    for (int i = 0; i < samples; i++)
+        result += texelFetch(tex, texCoord, i);
+
+    result /= float(samples);
+    return result;
+}
 
 void main()
 {
-    vec3 col = texture(screenTexture, TexCoords).rgb;
-    //col = vec3(1.0, 0.0, 0.0);
-    FragColor = vec4(col, 1.0);
+    //FragColor = MultiSampleTexture(screenTexture, ivec2(TexCoords), 4);
+    //FragColor = vec4(1.0,0.0,0.0,1.0);
+    FragColor = texture(screenTexture, TexCoords).rgba;
 }
 
 

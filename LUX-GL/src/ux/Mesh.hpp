@@ -62,7 +62,8 @@ namespace ux {
          * TODO Remove color, need to find another way to attach color data without storing in the mesh object.
          */
         void AddTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const glm::vec3& normal, const glm::vec4 color);
-        // TODO Auto-calc the normal?
+        // Adds a triangle and calculates the normal automatically.
+        //void AddTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const bool smooth, const glm::vec4 color);
         //void AddTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3);
     private:
         Ref<VertexArray> va;
