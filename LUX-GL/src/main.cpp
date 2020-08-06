@@ -578,8 +578,8 @@ int main(int argc, char** argv)
     */
 
 
-    bool MULTI_SAMPLE = false;
-    int samples = 4;
+    bool MULTI_SAMPLE = true;
+    int samples = 8;
 
     auto frameBufferShader = Shader("res/shaders/framebuffer.shader");
     frameBufferShader.Bind();
@@ -624,21 +624,28 @@ int main(int argc, char** argv)
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     // create a color attachment texture
     unsigned int textureColorbuffer, m_DepthAttachment;
-    glGenTextures(1, &textureColorbuffer);  
+    //glGenTextures(1, &textureColorbuffer);  
     if (MULTI_SAMPLE)
     {
+        glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &textureColorbuffer);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorbuffer);
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGBA8, window.GetWidth(), window.GetHeight(), GL_FALSE);
+        //glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        //glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorbuffer, 0);
+
 
         glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_DepthAttachment);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment);
         glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight(), GL_FALSE);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+        //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment, 0); // REMOVE
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_DepthAttachment, 0);
     }
     else {
+        glCreateTextures(GL_TEXTURE_2D, 1, &textureColorbuffer);
         glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, window.GetWidth(), window.GetHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); // GL_RGBA?
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -655,6 +662,7 @@ int main(int argc, char** argv)
     
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
     /*
+    unsigned int fboMsaaId;
     if (MULTI_SAMPLE)
     {
         unsigned int rboC, rboD;
@@ -665,9 +673,15 @@ int main(int argc, char** argv)
 
         glGenRenderbuffers(1, &rboD);
         glBindRenderbuffer(GL_RENDERBUFFER, rboD);
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight());
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH_COMPONENT, window.GetWidth(), window.GetHeight());
+        // GL_DEPTH_COMPONENT GL_DEPTH24_STENCIL8
         //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboD);
         
+        
+        glGenFramebuffers(1, &fboMsaaId);
+        glBindFramebuffer(GL_FRAMEBUFFER, fboMsaaId);
+        //glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rboC);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboD);
     }
@@ -749,6 +763,7 @@ int main(int argc, char** argv)
             //frameBuffer.Bind();
             //std::cout << "using framebuffer " << framebuffer << std::endl;
             glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+            //glBindFramebuffer(GL_FRAMEBUFFER, fboMsaaId);
             //glViewport(0, 0, window.GetWidth(), window.GetHeight());
             //glViewport(0, 0, 100, 100);
            
@@ -1031,7 +1046,13 @@ int main(int argc, char** argv)
         if (use_render_buffer)
         {
             //frameBuffer.Unbind();
+            if (MULTI_SAMPLE)
+            {
+                //glBindFramebuffer(GL_READ_FRAMEBUFFER, fboMsaaId);
+                //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
+                //glBlitFramebuffer(0, 0, window.GetWidth(), window.GetHeight(), 0, 0, window.GetWidth(), window.GetHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
+            }
             // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             
@@ -1052,11 +1073,10 @@ int main(int argc, char** argv)
 
             if (MULTI_SAMPLE)
             {
+                
+                //glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
                 glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorbuffer);
                 glDrawArrays(GL_TRIANGLES, 0, 6);
-                //glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-                //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-                //glBlitFramebuffer(0, 0, window.GetWidth(), window.GetHeight(), 0, 0, window.GetWidth(), window.GetHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
             }
             else {
                 glBindTexture(GL_TEXTURE_2D, textureColorbuffer);	// use the color attachment texture as the texture of the quad plane

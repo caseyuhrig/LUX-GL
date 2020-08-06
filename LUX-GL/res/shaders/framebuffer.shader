@@ -24,8 +24,8 @@ layout(location = 0) out vec4 FragColor;
 
 in vec2 TexCoords;
 
-uniform sampler2D screenTexture;
-//uniform sampler2DMS screenTexture;
+//uniform sampler2D screenTexture;
+uniform sampler2DMS screenTexture;
 
 
 vec4 MultiSampleTexture(sampler2DMS tex, ivec2 texCoord, int samples)
@@ -40,9 +40,11 @@ vec4 MultiSampleTexture(sampler2DMS tex, ivec2 texCoord, int samples)
 
 void main()
 {
-    //FragColor = MultiSampleTexture(screenTexture, ivec2(TexCoords), 4);
+    ivec2 texSize = textureSize(screenTexture);
+    ivec2 texCoord = ivec2(TexCoords * texSize);
+    FragColor = MultiSampleTexture(screenTexture, texCoord, 8);
     //FragColor = vec4(1.0,0.0,0.0,1.0);
-    FragColor = texture(screenTexture, TexCoords).rgba;
+    //FragColor = texture(screenTexture, TexCoords).rgba;
 }
 
 
