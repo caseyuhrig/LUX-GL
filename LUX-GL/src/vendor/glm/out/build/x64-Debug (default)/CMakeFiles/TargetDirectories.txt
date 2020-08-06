@@ -1,2 +1,0 @@
-C:/Users/casey/Documents/source/repos/OpenGL/OpenGL/src/vendor/glm/out/build/x64-Debug (default)/CMakeFiles/edit_cache.dir
-C:/Users/casey/Documents/source/repos/OpenGL/OpenGL/src/vendor/glm/out/build/x64-Debug (default)/CMakeFiles/rebuild_cache.dir
