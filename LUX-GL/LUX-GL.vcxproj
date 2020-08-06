@@ -113,7 +113,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\FT\win64;$(SolutionDir)Dependencies\GLFW\lib-vc2019;$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\irrKlang\lib-Winx64-visualStudio</AdditionalLibraryDirectories>
-      <AdditionalDependencies>irrKlang.lib;freetype.lib;glew32s.lib;glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;User32.lib</AdditionalDependencies>
+      <AdditionalDependencies>irrKlang.lib;freetype.lib;glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;User32.lib</AdditionalDependencies>
       <ShowProgress>LinkVerboseLib</ShowProgress>
       <LinkStatus>true</LinkStatus>
     </Link>
@@ -158,7 +158,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\FT\win64;$(SolutionDir)Dependencies\GLFW\lib-vc2019;$(SolutionDir)Dependencies\GLEW\lib\Release\x64;$(SolutionDir)Dependencies\irrKlang\lib-Winx64-visualStudio</AdditionalLibraryDirectories>
-      <AdditionalDependencies>irrKlang.lib;freetype.lib;glew32s.lib;glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;User32.lib</AdditionalDependencies>
+      <AdditionalDependencies>irrKlang.lib;freetype.lib;glfw3.lib;opengl32.lib;gdi32.lib;shell32.lib;User32.lib</AdditionalDependencies>
       <ShowProgress>LinkVerboseLib</ShowProgress>
       <LinkStatus>true</LinkStatus>
     </Link>
@@ -169,6 +169,7 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ux\Ring.cpp" />
+    <ClCompile Include="src\vendor\glad\glad.c" />
     <ClCompile Include="src\vendor\glfont\FontAtlas.cpp" />
     <ClCompile Include="src\vendor\glfont\FTLabel.cpp" />
     <ClCompile Include="src\vendor\glfont\GLFont.cpp" />
@@ -207,6 +208,7 @@
     <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3.h" />
     <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3native.h" />
     <ClInclude Include="src\ux\Ring.hpp" />
+    <ClInclude Include="src\vendor\glad\glad.h" />
     <ClInclude Include="src\vendor\glfont\FontAtlas.h" />
     <ClInclude Include="src\vendor\glfont\FTLabel.h" />
     <ClInclude Include="src\vendor\glfont\GLFont.h" />
@@ -231,6 +233,7 @@
     <ClInclude Include="src\ux\Cube.h" />
     <ClInclude Include="src\FrameBuffer.hpp" />
     <ClInclude Include="src\IndexBuffer.hpp" />
+    <ClInclude Include="src\vendor\KHR\khrplatform.h" />
     <ClInclude Include="src\vendor\OBJ_Loader.h" />
     <ClInclude Include="src\Renderer.hpp" />
     <ClInclude Include="src\Shader.hpp" />

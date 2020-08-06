@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "Log.hpp"
@@ -21,23 +21,33 @@ namespace ux {
         void Init()
         {
             glfwMakeContextCurrent(_window_handle);    // <---- IMPORTANT: has to be done before glewInit()
-
-
-
-            GLenum err = glewInit();
-            if (GLEW_OK != err)
+            if (_window_handle == NULL)
             {
+                UX_LOG_FATAL("Failed to create GLFW window");
+                glfwTerminate();
+            }
+
+
+            //GLenum err = glewInit();
+            //if (GLEW_OK != err)
+            //{
                 // Problem: glewInit failed, something is seriously wrong.
-                std::cerr << "[ERROR]: " << glewGetErrorString(err) << std::endl;
+            //    std::cerr << "[ERROR]: " << glewGetErrorString(err) << std::endl;
+            //}
+            if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+            {
+                UX_LOG_FATAL("Failed to initialize OpenGL context");
+                //return -1;
+                glfwTerminate();
             }
             UX_LOG_INFO("Status:   Using GL: %s", glGetString(GL_VERSION));
-            UX_LOG_INFO("Status: Using GLEW: %s", glewGetString(GLEW_VERSION));
+            //UX_LOG_INFO("Status: Using GLEW: %s", glewGetString(GLEW_VERSION));
 
      
             std::string glVendorString = (char*)glGetString(GL_VENDOR);
             std::string glVersionString = (char*)glGetString(GL_VERSION);
             std::string glRendererString = (char*)glGetString(GL_RENDERER);
-            std::string glewVersionString = std::string((char*)glewGetString(GLEW_VERSION));
+            //std::string glewVersionString = std::string((char*)glewGetString(GLEW_VERSION));
             int version;
             int versionMajor;
             int versionMinor;

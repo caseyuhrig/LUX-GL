@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GL/glew.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -49,7 +49,7 @@ namespace ux {
             : _window_width(window_width), _window_height(window_height), _aspect_ratio(0),
             _framebuffer_width(0), _framebuffer_height(0), _xscale(0), _yscale(0), _window_handle(nullptr)
         {
-            static const bool USE_ANTIALIASING = true;
+            //static const bool USE_ANTIALIASING = true;
 
             if (!glfwInit())
             {
@@ -59,15 +59,10 @@ namespace ux {
             // https://www.glfw.org/docs/3.3/window_guide.html#window_hints_wnd
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-            //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
-
-            if (USE_ANTIALIASING)
-            {
-                glfwWindowHint(GLFW_SAMPLES, 8);
-            }
-            //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
+            // GLFW_SAMPLES doesn't do anything when using custom framebuffers.
+            //if (USE_ANTIALIASING) glfwWindowHint(GLFW_SAMPLES, 8);
             //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
             //glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
             glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);

@@ -1,4 +1,4 @@
-﻿#include <GL/glew.h>                       // Cross platform link between your graphics card and OpenGL.
+﻿#include <glad/glad.h>  
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -33,8 +33,15 @@
 #include "FrameBuffer.hpp"
 
 #include "imgui/imgui.h"
+//#define IMAPP_IMPL
+//#include "imgui/ImApp.h"
+#include "imgui/ImGuizmo.h"
+
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+
+
+
 
 #include "entt/entt.hpp"
 
@@ -115,6 +122,12 @@ namespace ux {
         return root * matrix;
     }
 
+    std::string to_uppercase(std::string text)
+    {
+        std::transform(text.begin(), text.end(), text.begin(),
+            [](unsigned char c) { return std::toupper(c); });
+        return text;
+    }
 };
 
 
@@ -163,16 +176,16 @@ int main(int argc, char** argv)
     glm::vec3 axis = { 0.0, 0.0, 0.0 };
 
     // all object in the scene are scaled by scale
-    float scale = 5.0; //1.0; //0.125;
+    float scale = 7.716; // 5.0 1.0; //0.125;
     //glm::vec3 translate = { -1.4, 0.0, 0.0 };
     //glm::vec3 mRotate = { 0.5, 0.0, 2.0 };
-    glm::vec3 translate = { 0.0, 0.0, 0.0 };
+    glm::vec3 translate = { -20.0, 0.299, 0.0 };
     glm::vec3 mRotate = { 0.0, 0.0, 0.0 };
 
 
     float scale2 = 1.0f;
     glm::vec3 translate2 = { 0.0f, 0.0f, 0.0f };
-    glm::vec3 rotate2 = { 0.0f, 0.0f, 0.0f };
+    glm::vec3 rotate2 = { 0.938f, 0.469f, 0.0f };
 
 
 
@@ -490,8 +503,8 @@ int main(int argc, char** argv)
     glm::vec4 amber = ux::COLOR_AMBER;
     amber.a = 0.8;
 
-    float yy = window.GetFramebufferHeight() - 74;
-    auto horzBar = ux::HorzBar(glm::vec2(200.0f, yy - 20), glm::vec2(400.0f, yy));
+    float yy = window.GetFramebufferHeight() - 152;
+    auto horzBar = ux::HorzBar(glm::vec2(164.0f, yy - 20), glm::vec2(400.0f, yy));
     horzBar.SetColor(amber);
     horzBar.Build();
    
@@ -735,7 +748,7 @@ int main(int argc, char** argv)
     {
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
-        const char* glsl_version = "#version 440";
+        const char* glsl_version = "#version 450";
         ImGui::CreateContext();
         //ImGuiIO& io = ImGui::GetIO(); (void)io;
         // Setup Platform/Renderer bindings
@@ -917,7 +930,7 @@ int main(int argc, char** argv)
             float frameRate = ImGui::GetIO().Framerate;
             textList.SetText(5, ux::format("MS/FR: %8.6f", msFrame));
             textList.SetText(6, ux::format("  FPS: %8.3f", frameRate));
-            textList.SetText(7, ux::ReadableTime());
+            textList.SetText(7, ux::to_uppercase(ux::ReadableTime()));
 
             textList.Draw();
         }
@@ -933,6 +946,8 @@ int main(int argc, char** argv)
                 ImGuiColorEditFlags misc_flags = ImGuiColorEditFlags_Float;
 
                 ImGui::Begin("UX/SIM/GL");
+                //ImGuizmo::DrawGrid(cameraView, cameraProjection, identityMatrix, 100.f);
+                //ImGuizmo::DrawCubes(cameraView, cameraProjection, &objectMatrix[0][0], gizmoCount);
                 //ImGui::SliderFloat4("ABCD", abcd, -3.0f, 3.0f, "%.6f");
                 //ImGui::SliderFloat4("EFGH", efgh, -3.0f, 3.0f, "%.6f");
                 //ImGui::ColorEdit3("Color", (float*)&color, misc_flags);

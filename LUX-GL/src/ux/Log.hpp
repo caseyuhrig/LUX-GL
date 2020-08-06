@@ -46,7 +46,18 @@ namespace ux {
 		{
 			auto now = Utils::Time::now();
 			std::string message = fmt::sprintf(format_str, args...);
-			fmt::printf("%02d:%02d:%02d [ERROR] %s\n", now.Hour, now.Minute, now.Second, message);
+			std::string level = fmt::format(fmt::bg(fmt::color::black) | fmt::fg(fmt::color::red) | fmt::emphasis::bold, "ERROR");
+			fmt::printf("%02d:%02d:%02d [%s] %s\n", now.Hour, now.Minute, now.Second, level, message);
+		}
+
+
+		template <typename S, typename... Args>
+		static void LOG_FATAL(const S& format_str, const Args&... args)
+		{
+			auto now = Utils::Time::now();
+			std::string message = fmt::sprintf(format_str, args...);
+			std::string level = fmt::format(fmt::bg(fmt::color::red) | fmt::fg(fmt::color::black) | fmt::emphasis::bold, "FATAL");
+			fmt::printf("%02d:%02d:%02d [%s] %s\n", now.Hour, now.Minute, now.Second, level, message);
 		}
 
 	};
@@ -56,3 +67,4 @@ namespace ux {
 #define UX_LOG_DEBUG(...) ux::Log::LOG_DEBUG(__VA_ARGS__)
 #define UX_LOG_INFO(...) ux::Log::LOG_INFO(__VA_ARGS__)
 #define UX_LOG_ERROR(...) ux::Log::LOG_ERROR(__VA_ARGS__)
+#define UX_LOG_FATAL(...) ux::Log::LOG_FATAL(__VA_ARGS__)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GL\glew.h"
+#include <glad\glad.h>
 #include "ft2build.h"
 #include FT_FREETYPE_H
 #include "glm\glm.hpp"
@@ -165,7 +165,7 @@ private:
     
     // Used for debugging opengl only
     inline void getError() {
-        const GLubyte* error = gluGetString(glGetError());
+        const GLubyte* error = glGetString(glGetError());
         if(error != GL_NO_ERROR)
             printf("----------------------------- %i ----------------------", error);
     }
