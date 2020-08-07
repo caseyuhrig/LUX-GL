@@ -16,6 +16,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "ux/Window.hpp"
 #include "ux/Cube.h"
@@ -35,7 +36,7 @@
 #include "imgui/imgui.h"
 //#define IMAPP_IMPL
 //#include "imgui/ImApp.h"
-#include "imgui/ImGuizmo.h"
+//#include "imgui/ImGuizmo.h"
 
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -946,8 +947,7 @@ int main(int argc, char** argv)
                 ImGuiColorEditFlags misc_flags = ImGuiColorEditFlags_Float;
 
                 ImGui::Begin("UX/SIM/GL");
-                //ImGuizmo::DrawGrid(cameraView, cameraProjection, identityMatrix, 100.f);
-                //ImGuizmo::DrawCubes(cameraView, cameraProjection, &objectMatrix[0][0], gizmoCount);
+
                 //ImGui::SliderFloat4("ABCD", abcd, -3.0f, 3.0f, "%.6f");
                 //ImGui::SliderFloat4("EFGH", efgh, -3.0f, 3.0f, "%.6f");
                 //ImGui::ColorEdit3("Color", (float*)&color, misc_flags);
@@ -1011,12 +1011,44 @@ int main(int argc, char** argv)
                     break;
                 }
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                /*
+                int m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+                float m_SnapValue = 0.5f;
+                float rw = (float)ImGui::GetWindowWidth();
+                float rh = (float)ImGui::GetWindowHeight();
+                ImGuizmo::SetOrthographic(false);
+                ImGuizmo::SetDrawlist();
+                ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, rw, rh);
+                bool snap = false; //Input::IsKeyPressed(HZ_KEY_LEFT_CONTROL);
+                
+                ImGuizmo::DrawGrid(&view[0][0], &proj[0][0], &model[0][0], 100.f);
+                ImGuizmo::DrawCubes(&view[0][0], &proj[0][0], &model[0][0], 1);
+                ImGuizmo::Manipulate(glm::value_ptr(view * model),
+                    glm::value_ptr(proj),
+                    (ImGuizmo::OPERATION)m_GizmoType,
+                    ImGuizmo::LOCAL,
+                    glm::value_ptr(model),
+                    nullptr,
+                    snap ? &m_SnapValue : nullptr);
+                */
+                /*
+                ImGuizmo::Manipulate(glm::value_ptr(m_ActiveScene->GetCamera().GetViewMatrix()* m_MeshEntity->Transform()),
+                    glm::value_ptr(m_ActiveScene->GetCamera().GetProjectionMatrix()),
+                    (ImGuizmo::OPERATION)m_GizmoType,
+                    ImGuizmo::LOCAL,
+                    glm::value_ptr(*m_CurrentlySelectedTransform),
+                    nullptr,
+                    snap ? &m_SnapValue : nullptr);
+                    */
+                    //ImGuizmo::DrawGrid(cameraView, cameraProjection, identityMatrix, 100.f);
+                    //ImGuizmo::DrawCubes(cameraView, cameraProjection, &objectMatrix[0][0], gizmoCount);
                 ImGui::End();
 
                 ImGui::ShowDemoWindow();
             }
 
             ImGui::Render();
+            ImGui::EndFrame();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         }
         
