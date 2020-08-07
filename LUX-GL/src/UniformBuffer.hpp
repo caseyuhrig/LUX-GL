@@ -147,7 +147,7 @@ public:
     inline void SetData(const void* data)
     {
         glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
-        glBufferSubData(GL_UNIFORM_BUFFER, _data_size, 0, data);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, _data_size, data);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
     }
 

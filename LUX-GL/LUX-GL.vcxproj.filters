@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ux\primitive\ScoopedCorner.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ux\Array.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1074,6 +1071,18 @@
     <ClInclude Include="src\VertexBufferLayout.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\ux\Core\Layer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ux\Interface\ScoopedCorner.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ux\Renderer\Canvas.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ux\Renderer\Skybox.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ux\Cube.cpp">
@@ -1143,6 +1152,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ux\Core\Layer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ux\Renderer\Canvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ux\Renderer\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1549,5 +1567,145 @@
     <None Include="src\vendor\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="docs\ux-interface.svg" />
+    <None Include="imgui.ini" />
+    <None Include="res\shaders\base.shader" />
+    <None Include="res\shaders\basic.shader" />
+    <None Include="res\shaders\box.shader" />
+    <None Include="res\shaders\fontFragment.shader" />
+    <None Include="res\shaders\fontVertex.shader" />
+    <None Include="res\shaders\framebuffer.shader" />
+    <None Include="res\shaders\quad.shader" />
+    <None Include="res\shaders\test.shader" />
+    <None Include="res\shaders\text.shader" />
+    <None Include="res\shaders\ux.shader" />
+    <None Include="res\images\ux-gl-sim-icon.svg" />
+    <None Include="res\shaders\skybox-shader.glsl" />
+    <None Include="res\shaders\cubemap-shader.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\textures\cartographer-logo-600x600.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\images\ux-gl-sim-icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\audio\bleep.mp3" />
+    <Media Include="res\audio\sound_effect_3.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\audio\tlsf\cslaser2.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\audio\tlsf\engineloop.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\audio\tlsf\explosion3.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\audio\tlsf\Laser1.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\audio\tlsf\laser2.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\audio\tlsf\lockon2.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\audio\tlsf\meteor.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\audio\tlsf\meteor2.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\audio\tlsf\phit2.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="res\audio\tlsf\targetlights.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="res\fonts\arial.ttf" />
+    <Font Include="res\fonts\InconsolataSemiCondensed-Medium.ttf" />
+    <Font Include="res\fonts\Inconsolata\Inconsolata-VariableFont_wdth,wght.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\Inconsolata-Black.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\Inconsolata-Bold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-Black.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-Bold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-ExtraBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-ExtraLight.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-Light.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-Medium.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-Regular.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-SemiBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-Black.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-Bold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-ExtraBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-ExtraLight.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-Light.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-Medium.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-Regular.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-SemiBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\Inconsolata-ExtraBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-Black.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-Bold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-ExtraBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-ExtraLight.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-Light.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-Medium.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-Regular.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-SemiBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-Black.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-Bold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-ExtraBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-ExtraLight.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-Light.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-Medium.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-Regular.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-SemiBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\Inconsolata-ExtraLight.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\Inconsolata-Light.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\Inconsolata-Medium.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\Inconsolata-Regular.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\Inconsolata-SemiBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-Black.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-Bold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-ExtraBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-ExtraLight.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-Light.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-Medium.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-Regular.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-SemiBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-Black.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-Bold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-ExtraBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-ExtraLight.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-Light.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-Medium.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-Regular.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-SemiBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-Black.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-Bold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-ExtraBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-ExtraLight.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-Light.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-Medium.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-Regular.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-SemiBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-Black.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-Bold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-ExtraBold.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-ExtraLight.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-Light.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-Medium.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-Regular.ttf" />
+    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-SemiBold.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\fonts\Inconsolata\OFL.txt" />
+    <Text Include="res\fonts\Inconsolata\README.txt" />
   </ItemGroup>
 </Project>

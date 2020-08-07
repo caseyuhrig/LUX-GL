@@ -26,9 +26,12 @@
 #include "ux/Cuboid.hpp"
 #include "ux/Color.hpp"
 #include "ux/HorzBar.hpp"
-#include "ux/primitive/ScoopedCorner.hpp"
+#include "ux/Interface/ScoopedCorner.hpp"
 #include "ux/Ring.hpp"
 #include "Texture.h"
+
+#include "ux/Renderer/Canvas.hpp"
+#include "ux/Renderer/Skybox.hpp"
 
 #include "UniformBuffer.hpp"
 #include "FrameBuffer.hpp"
@@ -56,7 +59,7 @@
 
 // If w == 0, the value stored is a vector, if w == 1, the value stored is a point.
 
-// swizzling means rearranging the elements of a vector.
+// swizzling means rearranging the elements of a vector (kinda).
 
 /*
 Homogeneous coordinates
@@ -134,9 +137,8 @@ namespace ux {
 
 int main(int argc, char** argv)
 {
-    bool animate = false;
-    bool show_text = true;
-    bool use_render_buffer = true;
+    bool animate = true;
+    bool show_text = false;
     bool use_imgui = true;
     bool show_models = true;
 
@@ -145,7 +147,7 @@ int main(int argc, char** argv)
     window.Center();
 
 
-    std::cout << "[WINDOW SIZE] " << window.GetWidth() << " " << window.GetHeight() << std::endl;
+    //std::cout << "[WINDOW SIZE] " << window.GetWidth() << " " << window.GetHeight() << std::endl;
 
 
     auto cube = ux::Cube(glm::vec3(1.0f));
@@ -157,12 +159,13 @@ int main(int argc, char** argv)
 
  
 
-    auto shader = Shader("res/shaders/basic.shader");
+    
 
     //auto texture = Texture("res/textures/cartographer-logo-600x600.png");
     //texture.Bind();
     //shader.SetUniform1i("u_Texture", 0);
 
+    auto shader = Shader("res/shaders/basic.shader");
     auto shaderQuad = Shader("res/shaders/quad.shader");
     auto shaderBox = Shader("res/shaders/box.shader");
     auto shaderBase = Shader("res/shaders/base.shader");
@@ -173,7 +176,6 @@ int main(int argc, char** argv)
   
 
 
-
     glm::vec3 axis = { 0.0, 0.0, 0.0 };
 
     // all object in the scene are scaled by scale
@@ -182,23 +184,15 @@ int main(int argc, char** argv)
     //glm::vec3 mRotate = { 0.5, 0.0, 2.0 };
     glm::vec3 translate = { -20.0, 0.299, 0.0 };
     glm::vec3 mRotate = { 0.0, 0.0, 0.0 };
-
+    float translateZ = -100.0;
+    glm::vec2 rotateXY = glm::vec2(0.0, glm::radians(0.0));
 
     float scale2 = 1.0f;
     glm::vec3 translate2 = { 0.0f, 0.0f, 0.0f };
     glm::vec3 rotate2 = { 0.938f, 0.469f, 0.0f };
 
-
-
     float rotator = 0.0;
     float rotator_increment = 0.0; //0.001;
-
-
-
-
-    float translateZ = -100.0;
-    glm::vec2 rotateXY = glm::vec2(0.0, glm::radians(0.0));
-
 
     glm::vec4 color = { 0.2, 0.2, 0.2, 1.0 };
 
@@ -233,7 +227,7 @@ int main(int argc, char** argv)
         light2 
     };
 
-    std::cout << "Lights Size: " << sizeof(lights) << std::endl;
+    //std::cout << "Lights Size: " << sizeof(lights) << std::endl;
 
     auto ubo_Lights = UniformBuffer("LightProperties", 3, 128, &lights);
     ubo_Lights.AddUniform("lights[0].position", 0, 16);
@@ -246,34 +240,36 @@ int main(int argc, char** argv)
     ubo_Lights.AddUniform("lights[1].diffuse_color", 96, 12);
     ubo_Lights.AddUniform("lights[1].specular_color", 112, 12);
 
-    //ubo_Lights.SetUniform("lights[0].ambient_color", light_ambient);
+
+    ubo_Lights.SetData(lights);
 
 
 
     glm::vec3 camera_position = { 0.0, 0.0, 10.0 };
     glm::vec3 camera_look_at = { 0.0, 0.0, 0.0 };   // glm::lookAt(...) ??? check this out
 
-    ux::CameraProperties cameraProperties = {
-        camera_position,
-        camera_look_at
+    ux::CameraProperties cameraProperties[1] = {
+        {
+        { 0.0, 0.0, 10.0 }, // position
+        { 0.0, 0.0, 0.0 }   // look_at
+        }
     };
 
     auto ubo_Cameras = UniformBuffer("CameraProperties", 5, 32, &cameraProperties);
     ubo_Cameras.AddUniform("cameras[0].location", 0, 12);
     ubo_Cameras.AddUniform("cameras[0].look_at", 16, 12);
 
-    //ubo_CameraProperties.AddUniformVec3("cameras", 0, "position", 0, 12);
 
-    //ubo_CameraProperties.SetUniform("cameras[0].camera_location", camera_position);
-    //ubo_CameraProperties.SetUniformVec3("cameras", 0, "position", camera_position);
+    uint32_t ACTIVE_CAMERA = 0;
 
+    ubo_Cameras.SetData(cameraProperties);
 
 
 
     float zNear = 0.01f;
     float zFar = 2000.0;
 
-
+    // TODO put gamma in the render
     float gamma = 1.0;
 
 
@@ -282,12 +278,12 @@ int main(int argc, char** argv)
 
    
 
-    glm::vec4 ambient_color = { 0.348f, 0.348f, 0.348f, 1.0f };
-    glm::vec4 diffuse_color = { 0.608f, 0.608f, 0.608f, 1.0f };
-    glm::vec4 specular_color = { 0.5f, 0.5f, 0.5f, 1.0f };
+    //glm::vec4 ambient_color = { 0.348f, 0.348f, 0.348f, 1.0f };
+    //glm::vec4 diffuse_color = { 0.608f, 0.608f, 0.608f, 1.0f };
+    //glm::vec4 specular_color = { 0.5f, 0.5f, 0.5f, 1.0f };
     //float ambient_strength = 0.1;
     //float specular_strength = 0.5;
-    float specular_shininess = 32.0;
+    //float specular_shininess = 32.0;
 
     /*
     ux::Material material = {
@@ -305,7 +301,7 @@ int main(int argc, char** argv)
         32.0f                                // specular shininess
     };
 
-    std::cout << "Material Size: " << sizeof(material) << std::endl;
+    //std::cout << "Material Size: " << sizeof(material) << std::endl;
 
     auto ubo_Materials = UniformBuffer("MaterialProperties", 4, 64, &material);
     ubo_Materials.AddUniform("material.ambient_color", 0, 12);
@@ -313,8 +309,7 @@ int main(int argc, char** argv)
     ubo_Materials.AddUniform("material.specular_color", 32, 12);
     ubo_Materials.AddUniform("material.specular_shininess", 48, 4);
 
-    //ubo_Material.SetUniform("material.ambient_color", ambient_color);
-    //ubo_Material.SetUniform("material.specular_color", specular_color);
+  
 
 
 
@@ -417,14 +412,6 @@ int main(int argc, char** argv)
         model3 = ux::rotateAroundAxis(model3, axis, glm::vec3(0.0, angle, 0.0));
         model3 = glm::translate(model3, glm::vec3(10, 0, 0)); // radius   
 
-        
-        //glm::mat4 transMat = glm::translate(glm::mat4(1), translate * scale);
-        //glm::vec3 newPointVec = transMat * glm::vec4();
-        //model3 = trans * rotate(model3, axis, mRotate);
-        
-        //glm::vec3 new_point = glm::vec3(model3 * glm::vec4(glm::vec4(1.0)));
-        //sub_cubes[n].setXYZs(n, new_point);
-
         sub_cube1->Transformation() = model3;
         sub_cubes[n] = sub_cube1;
 
@@ -435,16 +422,9 @@ int main(int argc, char** argv)
         float angle = ux::PI2 / sub_cube_count * n;
         ux::Ref<ux::Cube> sub_cube2 = ux::CreateRef<ux::Cube>(glm::vec3(1.0));
         glm::mat4 model4 = glm::scale(glm::mat4(1.0), glm::vec3(0.25));
-        //glm::vec3 ss = glm::scale(glm::mat4(1.0), glm::vec3(1.0));
-        //glm::vec4 obj = glm::vec4(0);
-        //glm::translate();
-        //glm::vec3 objTrans = 
 
         model4 = ux::rotateAroundAxis(model4, axis, glm::vec3(0.0, angle, 0.0));
         model4 = glm::translate(model4, glm::vec3(11.5f, 0, 0)); // radius       
-
-        //glm::mat4 trans = glm::translate(glm::mat4(1), translate * scale);
-        //model4 = trans * rotate(model4, axis, mRotate);
 
         sub_cube2->Transformation() = model4;
         sub_cubes[n + 20] = sub_cube2;
@@ -475,27 +455,20 @@ int main(int argc, char** argv)
         float angle = ux::random(ux::RADIANS);
 
         glm::mat4 rm4 = ux::rotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
-        //glm::mat4 rm4 = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
         rm4 = rm4 * glm::translate(rm4, glm::vec3(8, 0, 0)); // radius
-        //glm::mat4 rm4 = glm::translate(glm::mat4(1.0f), glm::vec3(25, 0, 0)); // radius
-        //rm4 = rm4 * glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
-        //rm4 = rm4 * ux::rotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
 
         float radius = 0.025 + ux::random(0.1);
-        //ux::Ref<ux::Cuboid> moreCube = ux::CreateRef<ux::Cuboid>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), rm4);
         ux::Ref<ux::Cuboid> moreCube = ux::CreateRef<ux::Cuboid>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1.0f));
         moreCube->Build();
 
-        //ux::Ref<ux::Cuboid> moreCube = ux::CreateRef<ux::Cuboid>();
-        moreCube->SetTransformation(rm4); //glm::mat4(1.0);
+        moreCube->SetTransformation(rm4);
         moreCubes[n] = moreCube;
     }
 
     
 
-    //glm::mat4 tfm = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 0.0f, 0.0f));
-    glm::mat4 tfm = glm::mat4(1.0f);
-    auto cuboid = ux::Cuboid(glm::vec3(-0.2f), glm::vec3(0.2f), tfm);
+
+    auto cuboid = ux::Cuboid(glm::vec3(-0.2f), glm::vec3(0.2f), glm::mat4(1.0f));
     cuboid.Build();
 
 
@@ -591,135 +564,16 @@ int main(int argc, char** argv)
     registry.destroy(entity);
     */
 
-
-    bool MULTI_SAMPLE = true;
-    int samples = 8;
-
-    auto frameBufferShader = Shader("res/shaders/framebuffer.shader");
-    frameBufferShader.Bind();
-    frameBufferShader.SetUniform1i("screenTexture", 0);
-    
-
-    //FrameBufferSpecification spec;
-    //spec.Width = 1500;
-    //spec.Height = 900;
-    //FrameBuffer frameBuffer = FrameBuffer(spec);
+ 
 
 
-    float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
-       // positions   // texCoords
-       -1.0f,  1.0f,  0.0f, 1.0f,
-       -1.0f, -1.0f,  0.0f, 0.0f,
-        1.0f, -1.0f,  1.0f, 0.0f,
-
-       -1.0f,  1.0f,  0.0f, 1.0f,
-        1.0f, -1.0f,  1.0f, 0.0f,
-        1.0f,  1.0f,  1.0f, 1.0f
-    };
-    // screen quad VAO
-    unsigned int quadVAO, quadVBO;
-    glGenVertexArrays(1, &quadVAO);
-    glGenBuffers(1, &quadVBO);
-    glBindVertexArray(quadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-
-    UX_LOG_DEBUG("WINDOW: %dx%d", window.GetWidth(), window.GetHeight());
-
-    // framebuffer configuration
-    // -------------------------
-    unsigned int framebuffer;
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    // create a color attachment texture
-    unsigned int textureColorbuffer, m_DepthAttachment;
-    //glGenTextures(1, &textureColorbuffer);  
-    if (MULTI_SAMPLE)
-    {
-        glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &textureColorbuffer);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorbuffer);
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGBA8, window.GetWidth(), window.GetHeight(), GL_FALSE);
-        //glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        //glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorbuffer, 0);
-
-
-        glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_DepthAttachment);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment);
-        glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight(), GL_FALSE);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-        //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment, 0); // REMOVE
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_DepthAttachment, 0);
-    }
-    else {
-        glCreateTextures(GL_TEXTURE_2D, 1, &textureColorbuffer);
-        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, window.GetWidth(), window.GetHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); // GL_RGBA?
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
-
-        glCreateTextures(GL_TEXTURE_2D, 1, &m_DepthAttachment);
-        glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight(), 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment, 0);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_DepthAttachment, 0);
-    }
-    
-    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    /*
-    unsigned int fboMsaaId;
-    if (MULTI_SAMPLE)
-    {
-        unsigned int rboC, rboD;
-        glGenRenderbuffers(1, &rboC);
-        glBindRenderbuffer(GL_RENDERBUFFER, rboC);
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, window.GetWidth(), window.GetHeight());
-        //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rboC);
-
-        glGenRenderbuffers(1, &rboD);
-        glBindRenderbuffer(GL_RENDERBUFFER, rboD);
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH_COMPONENT, window.GetWidth(), window.GetHeight());
-        // GL_DEPTH_COMPONENT GL_DEPTH24_STENCIL8
-        //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboD);
-        
-        
-        glGenFramebuffers(1, &fboMsaaId);
-        glBindFramebuffer(GL_FRAMEBUFFER, fboMsaaId);
-        //glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rboC);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboD);
-    }
-    else {
-        unsigned int rbo;
-        glGenRenderbuffers(1, &rbo);
-        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight());
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-    }
-    */
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        UX_LOG_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
-    else UX_LOG_DEBUG("FB GOOD!");
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-    //std::cout << "TextureColorBuffer: " << textureColorbuffer << std::endl;
+    lux::Canvas canvas = lux::Canvas();
+    canvas.Init(window.GetWidth(), window.GetHeight());
 
 
 
 
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    //glLineWidth(2.5f);
+
 
 
 
@@ -728,8 +582,10 @@ int main(int argc, char** argv)
 
 
   
-
+    /*
     // TODO put in the renderer init?
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glLineWidth(2.5f);
     glPointSize(5.0);
     glEnable(GL_MULTISAMPLE);
     //glDisable(GL_MULTISAMPLE);
@@ -744,6 +600,7 @@ int main(int argc, char** argv)
     //glEnable(GL_FRAMEBUFFER_SRGB);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    */
 
     if (use_imgui)
     {
@@ -760,40 +617,26 @@ int main(int argc, char** argv)
         //ImGui::StyleColorsClassic();
     }
 
-    //glDisable(GL_MULTISAMPLE);
+    auto skybox = lux::Skybox();
+    skybox.Init();
 
-    // Loop until the user closes the window
+    auto cubemapShader = Shader("res/shaders/cubemap-shader.glsl");
+
+    auto testShader = cubemapShader;
+    //auto testShader = shaderBox;
+
     while (window.Loop())
     {
         if (sound1) {
             auto soundPos = irrklang::vec3df(lightPos.x, lightPos.y, lightPos.z);
             sound1->setPosition(soundPos);
         }
-
    
-
-        if (use_render_buffer)
-        {
-            //frameBuffer.Bind();
-            //std::cout << "using framebuffer " << framebuffer << std::endl;
-            glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-            //glBindFramebuffer(GL_FRAMEBUFFER, fboMsaaId);
-            //glViewport(0, 0, window.GetWidth(), window.GetHeight());
-            //glViewport(0, 0, 100, 100);
-           
-            //glDepthFunc(GL_LESS);
-            //glEnable(GL_TEXTURE_2D);
-            
-
-            //glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-            //glClear(GL_COLOR_BUFFER_BIT);
-            //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        }
-
+        canvas.Begin();
         renderer.Clear();
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         //glClear(GL_COLOR_BUFFER_BIT);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_MULTISAMPLE);
         glEnable(GL_LINE_SMOOTH);
@@ -828,8 +671,13 @@ int main(int argc, char** argv)
         {           
             for (auto sub_cube : sub_cubes)
             {
+                cubemapShader.SetUniformMat4f("view", view);
+                cubemapShader.SetUniformMat4f("projection", proj);
+                cubemapShader.SetUniformMat4f("model", model * sub_cube->Transformation());
+
                 shaderBox.SetUniformMat4f("u_model", model * sub_cube->Transformation());
-                sub_cube->Draw(renderer, shaderBox);
+                sub_cube->Draw(renderer, testShader);
+                //sub_cube->Draw(renderer, shaderBox);
             }
         }
 
@@ -838,49 +686,33 @@ int main(int argc, char** argv)
         
         for (auto moreCube : moreCubes)
         {
-            // Performs the transformations after the geometry has been canculated.
-            // Keeping the real-time rotation on the screen and stuff in sync.
-            //glm::mat4 transform = glm::mat4(0.0f); //moreCube->Transformation();
-            //transform = glm::translate(glm::mat4(1), translate * scale);
-            //
-            /*
-            glm::mat4 transform = moreCube->Transformation();
-            glm::mat4 trans = glm::translate(glm::mat4(1), translate * scale);
-            transform = trans * ux::rotateAroundAxis(transform, axis, mRotate);
-            transform = glm::rotate(transform, rotator, glm::vec3(0, 1.0, 0));
-            */
-            //transform = glm::rotate(transform, mRotate[1], glm::vec3(0, 1.0, 0));
-            //glm::mat4 transform = trans * ux::rotateAroundAxis(transform, axis, mRotate);
-            //transform = ux::rotateAroundAxis(transform, axis, mRotate);
-
-            //transform = glm::rotate(transform, rotator, glm::vec3(0, 1.0, 0));
             shaderBox.SetUniformMat4f("u_model", model * moreCube->GetTransformation());
-            moreCube->Draw(renderer, shaderBox);
+            moreCube->Draw(renderer, testShader);
         }
         
 
         if (show_models)
         {
             shaderBox.SetUniformMat4f("u_model", model);
-            emitterMesh.Draw(renderer, shaderBox);
+            emitterMesh.Draw(renderer, testShader);
         }
 
 
         if (show_models)
         {
             shaderBox.SetUniformMat4f("u_model", model);
-            segment.Draw(renderer, shaderBox);
+            segment.Draw(renderer, testShader);
             shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(90.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-            segment.Draw(renderer, shaderBox);
+            segment.Draw(renderer, testShader);
             shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(180.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-            segment.Draw(renderer, shaderBox);
+            segment.Draw(renderer, testShader);
             shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(270.0 * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-            segment.Draw(renderer, shaderBox);
+            segment.Draw(renderer, testShader);
 
             for (float ang = 0.0f;ang < 360.0f;ang += 20.0f)
             {
                 shaderBox.SetUniformMat4f("u_model", glm::rotate(model, (float)(ang * ux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-                segment2.Draw(renderer, shaderBox);
+                segment2.Draw(renderer, testShader);
             }
         }
         
@@ -901,15 +733,13 @@ int main(int argc, char** argv)
         //cube.DrawOutline(renderer, shaderQuad);
         //ring.Draw(renderer, shaderQuad);
 
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
         // border
         shaderQuad.SetUniformMat4f("u_MVP", mvpOrtho);
         shaderQuad.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
         lines.Draw(renderer, shaderQuad);
         
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         shaderUX.SetUniformMat4f("u_MVP", mvpOrtho);
         shaderUX.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);    
@@ -918,7 +748,7 @@ int main(int argc, char** argv)
         lines2.Draw(renderer, shaderUX); // why won't it draw if this isn't here?
 
         
-
+        skybox.Render(camera_position, proj);
 
 
         if (show_text)
@@ -961,13 +791,13 @@ int main(int argc, char** argv)
                 ImGui::Separator();
                 // MATERIAL
                 ImGui::ColorEdit3("Ambient Color", (float*)&material.ambient_color, misc_flags);
-                if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.ambient_color", material.ambient_color);
+                if (ImGui::IsItemActive()) ubo_Materials.SetData(&material); //ubo_Materials.SetUniformVec3("material.ambient_color", material.ambient_color);
                 ImGui::ColorEdit3("Diffuse Color", (float*)&material.diffuse_color, misc_flags);
-                if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.diffuse_color", material.diffuse_color);
+                if (ImGui::IsItemActive()) ubo_Materials.SetData(&material); //ubo_Materials.SetUniformVec3("material.diffuse_color", material.diffuse_color);
                 ImGui::ColorEdit3("Specular Color", (float*)&material.specular_color, misc_flags);
-                if (ImGui::IsItemActive()) ubo_Materials.SetUniformVec3("material.specular_color", material.specular_color);
+                if (ImGui::IsItemActive()) ubo_Materials.SetData(&material); //ubo_Materials.SetUniformVec3("material.specular_color", material.specular_color);
                 ImGui::SliderFloat("Specular Shininess", &material.specular_shininess, 0.0f, 100.0f);
-                if (ImGui::IsItemActive()) ubo_Materials.SetUniform1f("material.specular_shininess", material.specular_shininess);
+                if (ImGui::IsItemActive()) ubo_Materials.SetData(&material); //ubo_Materials.SetUniform1f("material.specular_shininess", material.specular_shininess);
                 ImGui::Separator();
 
                 ImGui::SliderFloat3("Camera Position", (float*)&camera_position, -100.0f, 100.0f);
@@ -1088,51 +918,10 @@ int main(int argc, char** argv)
                 }
             }
         }
-
-        
-        if (use_render_buffer)
-        {
-            //frameBuffer.Unbind();
-            if (MULTI_SAMPLE)
-            {
-                //glBindFramebuffer(GL_READ_FRAMEBUFFER, fboMsaaId);
-                //glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
-                //glBlitFramebuffer(0, 0, window.GetWidth(), window.GetHeight(), 0, 0, window.GetWidth(), window.GetHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-            }
-            // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            
-            
-            
-            // clear all relevant buffers
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
-            //glClear(GL_COLOR_BUFFER_BIT);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glDisable(GL_DEPTH_TEST);
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            frameBufferShader.Bind();
-            glActiveTexture(GL_TEXTURE0); // + slot WOW guy didn't do this learnopengl
-
-            //frameBufferShader.SetUniform1i("screenTexture", textureColorbuffer);
-            glBindVertexArray(quadVAO);
-
-            if (MULTI_SAMPLE)
-            {
-                
-                //glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorbuffer);
-                glDrawArrays(GL_TRIANGLES, 0, 6);
-            }
-            else {
-                glBindTexture(GL_TEXTURE_2D, textureColorbuffer);	// use the color attachment texture as the texture of the quad plane
-                glDrawArrays(GL_TRIANGLES, 0, 6);
-            }
-            //GLenum err = glGetError();
-            //std::cout << "GL Error: " << err << std::endl;
-        }
-        
+     
+        canvas.End();
+        canvas.Render();
+      
         window.ContinueLoop();
         //glfwSwapBuffers(window);
         //glfwPollEvents();
@@ -1150,9 +939,6 @@ int main(int argc, char** argv)
         ImGui::DestroyContext();
     }
 
-    //glfwDestroyWindow(window);
-    //glfwTerminate();
-    window.Close();
-    
+    window.Close();   
     return 0;
 }
