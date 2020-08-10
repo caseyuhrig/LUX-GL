@@ -8,3 +8,9 @@ a 3D character to walk in Python, then connecting the Python program with this C
 to run the trained model after the fact.  It will do more, but that's the end goal for this project.
 
 Anyone wishing to chime in is welcome!
+
+### Resources:
+* https://learnopengl.com
+* https://www.thecherno.com
+* http://ogldev.atspace.co.uk
+* https://www.shadertoy.com
