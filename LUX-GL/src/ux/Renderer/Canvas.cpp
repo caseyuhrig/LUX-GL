@@ -10,19 +10,19 @@ namespace lux {
     Canvas::Canvas() 
         : m_ColorAttachment(0), m_DepthAttachment(0), m_VAO(0), m_FBO(0), m_VBO(0), m_Width(0), m_Height(0)
     {
-        m_Shader = ux::CreateRef<Shader>("res/shaders/framebuffer.shader");
+        m_Shader = ux::CreateRef<Shader>("res/shaders/canvas-shader.glsl");
     }
 
     Canvas::~Canvas() 
     {
     }
 
-    void Canvas::Init(uint32_t width, uint32_t height)
+    void Canvas::Init(uint32_t width, uint32_t height, uint32_t samples)
     {
         m_Width = width;
         m_Height = height;
+        m_Samples = samples;
 
-        //auto frameBufferShader = Shader("res/shaders/framebuffer.shader");
         m_Shader->Bind();
         m_Shader->SetUniform1i("screenTexture", 0);
 
@@ -50,7 +50,7 @@ namespace lux {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
         // framebuffer configuration
-  // -------------------------
+        // -------------------------
         //unsigned int framebuffer;
         glGenFramebuffers(1, &m_FBO);
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
@@ -79,7 +79,7 @@ namespace lux {
         else {
             glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorAttachment);
             glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL); // GL_RGBA?
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA8, GL_UNSIGNED_BYTE, NULL); // GL_RGB
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glBindTexture(GL_TEXTURE_2D, 0);

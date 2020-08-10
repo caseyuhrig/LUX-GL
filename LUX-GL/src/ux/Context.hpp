@@ -40,7 +40,7 @@ namespace ux {
                 //return -1;
                 glfwTerminate();
             }
-            UX_LOG_INFO("Status:   Using GL: %s", glGetString(GL_VERSION));
+            UX_LOG_INFO("     Using OpenGL: %s", glGetString(GL_VERSION));
             //UX_LOG_INFO("Status: Using GLEW: %s", glewGetString(GLEW_VERSION));
 
      
@@ -125,8 +125,7 @@ namespace ux {
                 }, 0);
             glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
 #endif
-            // context information
-            // Uniform Buffer Objects (UBO)
+            // Uniform Buffer Object (UBO)
             int max_uniform_buffer_bindings, max_uniform_block_size,
                 max_vertex_uniform_blocks, max_fragment_uniform_blocks,
                 max_geometry_uniform_blocks, gl_max_vertex_uniform_components;
@@ -139,11 +138,29 @@ namespace ux {
             glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &gl_max_vertex_uniform_components);
 
             UX_LOG_INFO("GL_MAX_UNIFORM_BUFFER_BINDINGS: %d", max_uniform_buffer_bindings);
-            std::cout << "GL_MAX_UNIFORM_BUFFER_BINDINGS: " << max_uniform_buffer_bindings << std::endl;
-            std::cout << "GL_MAX_UNIFORM_BLOCK_SIZE: " << max_uniform_block_size << std::endl;
-            std::cout << "GL_MAX_VERTEX_UNIFORM_BLOCKS: " << max_vertex_uniform_blocks << std::endl;
-            std::cout << "GL_MAX_FRAGMENT_UNIFORM_BLOCKS: " << max_fragment_uniform_blocks << std::endl;
-            std::cout << "GL_MAX_GEOMETRY_UNIFORM_BLOCKS : " << max_geometry_uniform_blocks << std::endl;
+            UX_LOG_INFO("GL_MAX_UNIFORM_BUFFER_BINDINGS: %d", max_uniform_buffer_bindings);
+            UX_LOG_INFO("     GL_MAX_UNIFORM_BLOCK_SIZE: %d", max_uniform_block_size);
+            UX_LOG_INFO("  GL_MAX_VERTEX_UNIFORM_BLOCKS: %d", max_vertex_uniform_blocks);
+            UX_LOG_INFO("GL_MAX_FRAGMENT_UNIFORM_BLOCKS: %d", max_fragment_uniform_blocks);
+            UX_LOG_INFO("GL_MAX_GEOMETRY_UNIFORM_BLOCKS: %d", max_geometry_uniform_blocks);
+            // Shader Storage Buffer Object (SSBO)
+            int gl_max_shader_storage_buffer_bindings;
+
+            glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &gl_max_shader_storage_buffer_bindings);
+
+            UX_LOG_INFO("GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS: %d", gl_max_shader_storage_buffer_bindings);
+                //GL_MAX_SHADER_STORAGE_BLOCK_SIZE = 16777216
+                //GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS = 16
+                //GL_MAX_FRAGMENT_SHADER_STORAGE_BLOCKS = 16
+                //GL_MAX_GEOMETRY_SHADER_STORAGE_BLOCKS = 16
+                //GL_MAX_TESS_CONTROL_SHADER_STORAGE_BLOCKS = 16
+                //GL_MAX_TESS_EVALUATION_SHADER_STORAGE_BLOCKS = 16
+                //GL_MAX_COMPUTE_SHADER_STORAGE_BLOCKS = 16
+                //GL_MAX_COMBINED_SHADER_STORAGE_BLOCKS = 16
+
+            //const GLubyte* sExtensions = glGetString(GL_EXTENSIONS);
+
+            //std::cout << sExtensions << std::endl;
         }
 
         void SwapBuffers() const

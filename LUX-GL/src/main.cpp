@@ -61,6 +61,8 @@
 
 // swizzling means rearranging the elements of a vector (kinda).
 
+// Transform Feedback Buffer
+// http://ogldev.atspace.co.uk/www/tutorial28/tutorial28.html
 /*
 Homogeneous coordinates
     Until then, we only considered 3D vertices as a(x, y, z) triplet.
@@ -621,9 +623,15 @@ int main(int argc, char** argv)
     skybox.Init();
 
     auto cubemapShader = Shader("res/shaders/cubemap-shader.glsl");
+    //auto cubemapShader = Shader("res/shaders/cubemap-lighting-shader.glsl");
 
     auto testShader = cubemapShader;
     //auto testShader = shaderBox;
+
+    glDisable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+    //glFrontFace(GL_CCW);
 
     while (window.Loop())
     {
@@ -642,10 +650,13 @@ int main(int argc, char** argv)
         glEnable(GL_LINE_SMOOTH);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glDisable(GL_CULL_FACE);
 
         float time = static_cast<float>(glfwGetTime());
         shaderBox.SetUniform1f("u_time", time);
 
+        testShader.SetUniform1f("u_time", time);
+      
  
         // PERSPECTIVE
 
@@ -659,6 +670,8 @@ int main(int argc, char** argv)
         shaderBox.SetUniformMat4f("u_view", view);
         shaderBox.SetUniformMat4f("u_proj", proj);
         
+        testShader.SetUniformMat4f("u_model", model);
+
         if (show_models)
         {
             shaderBox.SetUniformMat4f("u_model", model);
@@ -730,26 +743,26 @@ int main(int argc, char** argv)
         //shaderQuad.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
               
         // wireframe cube
-        //cube.DrawOutline(renderer, shaderQuad);
-        //ring.Draw(renderer, shaderQuad);
+        cube.DrawOutline(renderer, shaderQuad);
+        ring.Draw(renderer, shaderQuad);
 
         // border
         shaderQuad.SetUniformMat4f("u_MVP", mvpOrtho);
         shaderQuad.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
         lines.Draw(renderer, shaderQuad);
         
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //glEnable(GL_BLEND);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         shaderUX.SetUniformMat4f("u_MVP", mvpOrtho);
         shaderUX.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);    
         scoopedCorner.Draw(renderer, shaderUX);
         horzBar.Draw(renderer, shaderUX);
-        lines2.Draw(renderer, shaderUX); // why won't it draw if this isn't here?
+        //lines2.Draw(renderer, shaderUX); // why won't it draw if this isn't here?
 
         
         skybox.Render(camera_position, proj);
-
+        
 
         if (show_text)
         {

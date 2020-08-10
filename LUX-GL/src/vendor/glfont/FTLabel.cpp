@@ -169,6 +169,7 @@ void FTLabel::recalculateVertices(const char* text, float x, float y, int width,
     glBindTexture(GL_TEXTURE_2D, curTex);
     glUniform1i(_uniformTextureHandle, curTex);
 
+    glBindVertexArray(_vao);
     glEnableVertexAttribArray(0);
 
     // Send the data to the gpu
@@ -281,6 +282,8 @@ void FTLabel::render() {
     glBindTexture(GL_TEXTURE_2D, curTex);
     glUniform1i(_uniformTextureHandle, curTex);
 
+    glBindVertexArray(_vao);
+    //glEnableVertexAttribArray(_vao);
     glEnableVertexAttribArray(0);
 
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Point), 0);

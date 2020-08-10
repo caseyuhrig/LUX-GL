@@ -12,12 +12,12 @@ namespace lux {
         Canvas();
         ~Canvas();
 
-        void Init(uint32_t width, uint32_t height);
+        void Init(uint32_t width, uint32_t height, uint32_t samples = 8);
         void Begin();
         void End();
         void Render() const;
     private:
-        uint32_t m_Samples = 8;
+        uint32_t m_Samples;
         uint32_t m_FBO;
         uint32_t m_VAO;
         uint32_t m_VBO;

@@ -1574,7 +1574,6 @@
     <None Include="res\shaders\box.shader" />
     <None Include="res\shaders\fontFragment.shader" />
     <None Include="res\shaders\fontVertex.shader" />
-    <None Include="res\shaders\framebuffer.shader" />
     <None Include="res\shaders\quad.shader" />
     <None Include="res\shaders\test.shader" />
     <None Include="res\shaders\text.shader" />
@@ -1582,12 +1581,50 @@
     <None Include="res\images\ux-gl-sim-icon.svg" />
     <None Include="res\shaders\skybox-shader.glsl" />
     <None Include="res\shaders\cubemap-shader.glsl" />
+    <None Include="res\shaders\canvas-shader.glsl" />
+    <None Include="res\shaders\cubemap-lighting-shader.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\textures\cartographer-logo-600x600.png">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\images\ux-gl-sim-icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\room\back.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\room\bottom.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\room\front.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\room\left.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\room\right.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\room\top.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\skybox\back.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\skybox\bottom.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\skybox\front.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\skybox\left.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\skybox\right.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\textures\skybox\top.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

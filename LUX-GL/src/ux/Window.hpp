@@ -84,6 +84,15 @@ namespace ux {
                 return;
             }
 
+            //const char* glfwVersion = glfwGetVersionString();
+            std::string glfwVersion = glfwGetVersionString();
+            int glfwMajorVersion, glfwMinorVersion, glfwRevision;
+            glfwGetVersion(&glfwMajorVersion, &glfwMinorVersion, &glfwRevision);
+            UX_LOG_INFO("      GLFW VERSION: %s", glfwVersion);
+            UX_LOG_INFO("GLFW MAJOR VERSION: %d", glfwMajorVersion);
+            UX_LOG_INFO("GLFW MINOR VERSION: %d", glfwMinorVersion);
+            UX_LOG_INFO("     GLFW REVISION: %d", glfwRevision);
+
             GLFWimage icons[1];
             //stbi_set_flip_vertically_on_load(true);
             icons[0].pixels = stbi_load("res/images/ux-gl-sim-icon.png", &icons[0].width, &icons[0].height, 0, STBI_rgb_alpha);

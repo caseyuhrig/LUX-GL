@@ -73,16 +73,27 @@ namespace lux {
         glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
+        
         std::vector<std::string> faces
         {
-            "res/images/skybox/right.jpg",
-            "res/images/skybox/left.jpg",
-            "res/images/skybox/top.jpg",
-            "res/images/skybox/bottom.jpg",
-            "res/images/skybox/front.jpg",
-            "res/images/skybox/back.jpg",
+            "res/textures/skybox/right.jpg",
+            "res/textures/skybox/left.jpg",
+            "res/textures/skybox/top.jpg",
+            "res/textures/skybox/bottom.jpg",
+            "res/textures/skybox/front.jpg",
+            "res/textures/skybox/back.jpg",
         };
+        /*
+        std::vector<std::string> faces
+        {
+            "res/textures/room/right.jpg",
+            "res/textures/room/left.jpg",
+            "res/textures/room/top.jpg",
+            "res/textures/room/bottom.jpg",
+            "res/textures/room/front.jpg",
+            "res/textures/room/back.jpg",
+        };
+        */
         // load textures
         // -------------
         cubemapTexture = LoadCubemap(faces);
@@ -105,16 +116,12 @@ namespace lux {
         shader->SetUniformMat4f("view", view);
         shader->SetUniformMat4f("projection", projection);
         // skybox cube
-        //UX_LOG_DEBUG("Binding VAO: %s", skyboxVAO);
-        //std::cout << "bind " << skyboxVAO << std::endl;
         glBindVertexArray(skyboxVAO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
         glDepthFunc(GL_LESS); // set depth function back to default
-        //UX_LOG_DEBUG("(DONE) Binding VAO: %s", skyboxVAO);
-        //std::cout << "end bind " << skyboxVAO << std::endl;
     }
 
 
@@ -151,7 +158,6 @@ namespace lux {
             UX_LOG_ERROR("Texture failed to load at path: %s", path);
             stbi_image_free(data);
         }
-
         return textureID;
     }
 
