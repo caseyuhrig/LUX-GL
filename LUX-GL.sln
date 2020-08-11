@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29911.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LUX-GL", "LUX-GL\LUX-GL.vcxproj", "{43B4E6C9-6C32-4312-AA1E-39052939E097}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LUX-GL", "LUX-GL\LUX-GL.vcxproj", "{6E77ADEF-04DF-4E39-8EFD-676A9A1B9E95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{43B4E6C9-6C32-4312-AA1E-39052939E097}.Debug|x64.ActiveCfg = Debug|x64
-		{43B4E6C9-6C32-4312-AA1E-39052939E097}.Debug|x64.Build.0 = Debug|x64
-		{43B4E6C9-6C32-4312-AA1E-39052939E097}.Debug|x86.ActiveCfg = Debug|Win32
-		{43B4E6C9-6C32-4312-AA1E-39052939E097}.Debug|x86.Build.0 = Debug|Win32
-		{43B4E6C9-6C32-4312-AA1E-39052939E097}.Release|x64.ActiveCfg = Release|x64
-		{43B4E6C9-6C32-4312-AA1E-39052939E097}.Release|x64.Build.0 = Release|x64
-		{43B4E6C9-6C32-4312-AA1E-39052939E097}.Release|x86.ActiveCfg = Release|Win32
-		{43B4E6C9-6C32-4312-AA1E-39052939E097}.Release|x86.Build.0 = Release|Win32
+		{6E77ADEF-04DF-4E39-8EFD-676A9A1B9E95}.Debug|x64.ActiveCfg = Debug|x64
+		{6E77ADEF-04DF-4E39-8EFD-676A9A1B9E95}.Debug|x64.Build.0 = Debug|x64
+		{6E77ADEF-04DF-4E39-8EFD-676A9A1B9E95}.Debug|x86.ActiveCfg = Debug|Win32
+		{6E77ADEF-04DF-4E39-8EFD-676A9A1B9E95}.Debug|x86.Build.0 = Debug|Win32
+		{6E77ADEF-04DF-4E39-8EFD-676A9A1B9E95}.Release|x64.ActiveCfg = Release|x64
+		{6E77ADEF-04DF-4E39-8EFD-676A9A1B9E95}.Release|x64.Build.0 = Release|x64
+		{6E77ADEF-04DF-4E39-8EFD-676A9A1B9E95}.Release|x86.ActiveCfg = Release|Win32
+		{6E77ADEF-04DF-4E39-8EFD-676A9A1B9E95}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

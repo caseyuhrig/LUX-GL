@@ -18,33 +18,29 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "ux/Window.hpp"
-#include "ux/Cube.h"
-#include "ux/Segment.hpp"
-#include "ux/Lines.hpp"
-#include "ux/TextList.hpp"
-#include "ux/Cuboid.hpp"
-#include "ux/Color.hpp"
-#include "ux/HorzBar.hpp"
-#include "ux/Interface/ScoopedCorner.hpp"
-#include "ux/Ring.hpp"
+#include "lux/Window.hpp"
+#include "lux/Cube.h"
+#include "lux/Segment.hpp"
+#include "lux/Lines.hpp"
+#include "lux/TextList.hpp"
+#include "lux/Cuboid.hpp"
+#include "lux/Color.hpp"
+#include "lux/HorzBar.hpp"
+#include "lux/Interface/ScoopedCorner.hpp"
+#include "lux/Ring.hpp"
 #include "Texture.h"
-#include "ux/Scene/Camera.hpp"
+#include "lux/Scene/Camera.hpp"
+#include "lux/Renderer/Canvas.hpp"
+#include "lux/Renderer/Skybox.hpp"
+#include "lux/Renderer/UniformBuffer.hpp"
 
-#include "ux/Renderer/Canvas.hpp"
-#include "ux/Renderer/Skybox.hpp"
-
-#include "ux/Renderer/UniformBuffer.hpp"
-//#include "ux/Renderer/FrameBuffer.hpp"
 
 #include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 //#define IMAPP_IMPL
 //#include "imgui/ImApp.h"
 //#include "imgui/ImGuizmo.h"
-
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
-
 
 
 

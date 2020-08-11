@@ -15,52 +15,94 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ux\Array.hpp">
+    <ClInclude Include="src\lux\Interface\ScoopedCorner.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Color.hpp">
+    <ClInclude Include="src\lux\Renderer\Canvas.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Context.hpp">
+    <ClInclude Include="src\lux\Renderer\FrameBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Core.hpp">
+    <ClInclude Include="src\lux\Renderer\IndexBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Cube.h">
+    <ClInclude Include="src\lux\Renderer\Renderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Cuboid.hpp">
+    <ClInclude Include="src\lux\Renderer\Shader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\HorzBar.hpp">
+    <ClInclude Include="src\lux\Renderer\ShaderStorageBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Lines.hpp">
+    <ClInclude Include="src\lux\Renderer\Skybox.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Log.hpp">
+    <ClInclude Include="src\lux\Renderer\UniformBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Mesh.hpp">
+    <ClInclude Include="src\lux\Renderer\VertexArray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Ring.hpp">
+    <ClInclude Include="src\lux\Renderer\VertexBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Scene.hpp">
+    <ClInclude Include="src\lux\Renderer\VertexBufferLayout.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Segment.hpp">
+    <ClInclude Include="src\lux\Scene\Camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\TextList.hpp">
+    <ClInclude Include="src\lux\Scene\Layer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Torus.hpp">
+    <ClInclude Include="src\lux\Array.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Window.hpp">
+    <ClInclude Include="src\lux\Color.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Context.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Core.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Cuboid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\HorzBar.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Lines.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Log.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Mesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Ring.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Scene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Segment.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\TextList.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Torus.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\vendor\common\base64.h">
@@ -1047,63 +1089,36 @@
     <ClInclude Include="src\Utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ux\Interface\ScoopedCorner.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\Canvas.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\Skybox.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\ShaderStorageBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Scene\Camera.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Scene\Layer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\Renderer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\Shader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\VertexArray.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\VertexBufferLayout.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\VertexBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\IndexBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\FrameBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ux\Renderer\UniformBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ux\Cube.cpp">
+    <ClCompile Include="src\lux\Renderer\Canvas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ux\Lines.cpp">
+    <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ux\Log.cpp">
+    <ClCompile Include="src\lux\Renderer\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ux\Mesh.cpp">
+    <ClCompile Include="src\lux\Scene\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ux\Ring.cpp">
+    <ClCompile Include="src\lux\Scene\Layer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Lines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Ring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\vendor\common\base64.cpp">
@@ -1158,21 +1173,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ux\Renderer\Canvas.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ux\Renderer\Skybox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ux\Renderer\ShaderStorageBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ux\Scene\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ux\Scene\Layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1579,182 +1579,5 @@
     <None Include="src\vendor\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="docs\ux-interface.svg" />
-    <None Include="imgui.ini" />
-    <None Include="res\shaders\base.shader" />
-    <None Include="res\shaders\basic.shader" />
-    <None Include="res\shaders\box.shader" />
-    <None Include="res\shaders\fontFragment.shader" />
-    <None Include="res\shaders\fontVertex.shader" />
-    <None Include="res\shaders\quad.shader" />
-    <None Include="res\shaders\test.shader" />
-    <None Include="res\shaders\text.shader" />
-    <None Include="res\shaders\ux.shader" />
-    <None Include="res\images\ux-gl-sim-icon.svg" />
-    <None Include="res\shaders\skybox-shader.glsl" />
-    <None Include="res\shaders\cubemap-shader.glsl" />
-    <None Include="res\shaders\canvas-shader.glsl" />
-    <None Include="res\shaders\cubemap-lighting-shader.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\textures\cartographer-logo-600x600.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\images\ux-gl-sim-icon.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\room\back.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\room\bottom.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\room\front.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\room\left.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\room\right.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\room\top.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\skybox\back.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\skybox\bottom.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\skybox\front.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\skybox\left.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\skybox\right.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="res\textures\skybox\top.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="res\audio\bleep.mp3" />
-    <Media Include="res\audio\sound_effect_3.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="res\audio\tlsf\cslaser2.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="res\audio\tlsf\engineloop.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="res\audio\tlsf\explosion3.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="res\audio\tlsf\Laser1.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="res\audio\tlsf\laser2.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="res\audio\tlsf\lockon2.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="res\audio\tlsf\meteor.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="res\audio\tlsf\meteor2.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="res\audio\tlsf\phit2.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="res\audio\tlsf\targetlights.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-  </ItemGroup>
-  <ItemGroup>
-    <Font Include="res\fonts\arial.ttf" />
-    <Font Include="res\fonts\InconsolataSemiCondensed-Medium.ttf" />
-    <Font Include="res\fonts\Inconsolata\Inconsolata-VariableFont_wdth,wght.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\Inconsolata-Black.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\Inconsolata-Bold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-Black.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-Bold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-ExtraBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-ExtraLight.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-Light.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-Medium.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-Regular.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataCondensed-SemiBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-Black.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-Bold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-ExtraBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-ExtraLight.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-Light.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-Medium.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-Regular.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExpanded-SemiBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\Inconsolata-ExtraBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-Black.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-Bold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-ExtraBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-ExtraLight.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-Light.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-Medium.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-Regular.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraCondensed-SemiBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-Black.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-Bold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-ExtraBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-ExtraLight.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-Light.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-Medium.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-Regular.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataExtraExpanded-SemiBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\Inconsolata-ExtraLight.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\Inconsolata-Light.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\Inconsolata-Medium.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\Inconsolata-Regular.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\Inconsolata-SemiBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-Black.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-Bold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-ExtraBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-ExtraLight.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-Light.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-Medium.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-Regular.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiCondensed-SemiBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-Black.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-Bold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-ExtraBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-ExtraLight.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-Light.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-Medium.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-Regular.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataSemiExpanded-SemiBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-Black.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-Bold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-ExtraBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-ExtraLight.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-Light.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-Medium.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-Regular.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraCondensed-SemiBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-Black.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-Bold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-ExtraBold.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-ExtraLight.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-Light.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-Medium.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-Regular.ttf" />
-    <Font Include="res\fonts\Inconsolata\static\InconsolataUltraExpanded-SemiBold.ttf" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="res\fonts\Inconsolata\OFL.txt" />
-    <Text Include="res\fonts\Inconsolata\README.txt" />
   </ItemGroup>
 </Project>
