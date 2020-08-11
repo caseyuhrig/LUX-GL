@@ -2,17 +2,13 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <sstream>
-#include <chrono>
-#include <thread>
-#include <ctime>
 
 //#define SPDLOG_HEADER_ONLY
 //#define SPDLOG_COMPILED_LIB
 //#include "spdlog/spdlog.h";
 // some magic needed to get spdlog working!
+// except it's not working now, build issues.
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -28,11 +24,13 @@
 #include "lux/HorzBar.hpp"
 #include "lux/Interface/ScoopedCorner.hpp"
 #include "lux/Ring.hpp"
-#include "Texture.h"
 #include "lux/Scene/Camera.hpp"
 #include "lux/Renderer/Canvas.hpp"
 #include "lux/Renderer/Skybox.hpp"
 #include "lux/Renderer/UniformBuffer.hpp"
+#include "lux/Time.hpp"
+#include "lux/StringUtils.hpp"
+#include "lux/MatrixUtils.hpp"
 
 
 #include "imgui/imgui.h"
@@ -50,8 +48,7 @@
 
 #include "nlohmann/json.hpp"
 
-//#define FMT_HEADER_ONLY
-//#include "fmt/format.h"
+
 
 
 // If w == 0, the value stored is a vector, if w == 1, the value stored is a point.
@@ -94,44 +91,6 @@ If w == 1, then the vector(x, y, z, 1) is a position in space.
 // gl_FragCoord, gl_FrontFacing, gl_FragDepth
 
 // entt::entity e_Handle { entt::null }; // saving for future reference
-
-namespace lux {
-
-    inline static glm::mat4 rotateAroundAxis(glm::mat4 model, glm::vec3 axis, glm::vec3 angle)
-    {
-        //glm::mat4 rotMat = glm::rotate(glm::mat4(1.0), angle.x, glm::vec3(1.0, 0.0, 0.0));
-        //rotMat = glm::rotate(rotMat, angle.y, glm::vec3(0.0, 1.0, 0.0));
-        //rotMat = glm::rotate(rotMat, angle.z, glm::vec3(0.0, 0.0, 1.0));
-        //rotMat = glm::translate(rotMat, axis);
-        //return rotMat * model;
-        return glm::translate(
-            glm::rotate(
-                glm::rotate(
-                    glm::rotate(glm::mat4(1.0),
-                        angle.x, glm::vec3(1.0, 0.0, 0.0)),
-                    angle.y, glm::vec3(0.0, 1.0, 0.0)),
-                angle.z, glm::vec3(0.0, 0.0, 1.0)),
-            axis) * model;
-    }
-
-    glm::mat4 transform(glm::mat4 root, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotate)
-    {
-        glm::mat4 m2scale = glm::scale(glm::mat4(1.0), scale);
-        glm::mat4 m2trans = glm::translate(glm::mat4(1.0), translate);
-        glm::mat4 m2rotate1 = glm::rotate(glm::mat4(1.0), rotate[0], glm::vec3(1.0f, 0.0f, 0.0f));
-        glm::mat4 m2rotate2 = glm::rotate(glm::mat4(1.0), rotate[1], glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::mat4 m2rotate3 = glm::rotate(glm::mat4(1.0), rotate[2], glm::vec3(0.0f, 0.0f, 1.0f));
-        glm::mat4 matrix = m2rotate3 * m2rotate2 * m2rotate1 * m2trans * m2scale;
-        return root * matrix;
-    }
-
-    std::string to_uppercase(std::string text)
-    {
-        std::transform(text.begin(), text.end(), text.begin(),
-            [](unsigned char c) { return std::toupper(c); });
-        return text;
-    }
-};
 
 
 int main(int argc, char** argv)
@@ -348,7 +307,7 @@ int main(int argc, char** argv)
         float angle = lux::PI2 / sub_cube_count * n;
         lux::Ref<lux::Cube> sub_cube1 = lux::CreateRef<lux::Cube>(glm::vec3(1.0));
         glm::mat4 model3 = glm::scale(glm::mat4(1.0), glm::vec3(1.0));
-        model3 = lux::rotateAroundAxis(model3, axis, glm::vec3(0.0, angle, 0.0));
+        model3 = lux::MatrixUtils::RotateAroundAxis(model3, axis, glm::vec3(0.0, angle, 0.0));
         model3 = glm::translate(model3, glm::vec3(10, 0, 0)); // radius   
 
         sub_cube1->Transformation() = model3;
@@ -362,7 +321,7 @@ int main(int argc, char** argv)
         lux::Ref<lux::Cube> sub_cube2 = lux::CreateRef<lux::Cube>(glm::vec3(1.0));
         glm::mat4 model4 = glm::scale(glm::mat4(1.0), glm::vec3(0.25));
 
-        model4 = lux::rotateAroundAxis(model4, axis, glm::vec3(0.0, angle, 0.0));
+        model4 = lux::MatrixUtils::RotateAroundAxis(model4, axis, glm::vec3(0.0, angle, 0.0));
         model4 = glm::translate(model4, glm::vec3(11.5f, 0, 0)); // radius       
 
         sub_cube2->Transformation() = model4;
@@ -374,7 +333,7 @@ int main(int argc, char** argv)
         float length = lux::random(8.0);
         float angle = lux::random(lux::RADIANS);
 
-        glm::mat4 rm4 = lux::rotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
+        glm::mat4 rm4 = lux::MatrixUtils::RotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
                   rm4 = glm::translate(rm4, glm::vec3(4, 0, 0)); // radius
 
         float radius = 0.05 + lux::random(0.1);
@@ -393,7 +352,7 @@ int main(int argc, char** argv)
         float length = lux::random(5.0);
         float angle = lux::random(lux::RADIANS);
 
-        glm::mat4 rm4 = lux::rotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
+        glm::mat4 rm4 = lux::MatrixUtils::RotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
         rm4 = rm4 * glm::translate(rm4, glm::vec3(8, 0, 0)); // radius
 
         float radius = 0.025 + lux::random(0.1);
@@ -551,8 +510,8 @@ int main(int argc, char** argv)
         renderer.Clear();      
         
         // PERSPECTIVE
-        glm::mat4 model = lux::transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
-        model = lux::transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
+        glm::mat4 model = lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
+        model = lux::MatrixUtils::Transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
         glm::mat4 mvp = proj * view * model;
 
         testShader.SetUniformMat4f("u_view", view);
@@ -631,14 +590,14 @@ int main(int argc, char** argv)
         if (show_text)
         {
             // TODO text can be made faster here!
-            textList.SetText(2, lux::format("MODEL: % 12.6f % 12.6f % 12.6f", mRotate[0], mRotate[1], mRotate[2]));
-            textList.SetText(3, lux::format("LIGHT: % 12.6f % 12.6f % 12.6f", lightPos[0], lightPos[1], lightPos[2]));
-            textList.SetText(4, lux::format("COLOR: %6.4f %1.4f %1.4f %1.4f", color[0], color[1], color[2], color[3]));
+            textList.SetText(2, fmt::sprintf("MODEL: % 12.6f % 12.6f % 12.6f", mRotate[0], mRotate[1], mRotate[2]));
+            textList.SetText(3, fmt::sprintf("LIGHT: % 12.6f % 12.6f % 12.6f", lightPos[0], lightPos[1], lightPos[2]));
+            textList.SetText(4, fmt::sprintf("COLOR: %6.4f %1.4f %1.4f %1.4f", color[0], color[1], color[2], color[3]));
             float msFrame = 1000.0f / ImGui::GetIO().Framerate;
             float frameRate = ImGui::GetIO().Framerate;
-            textList.SetText(5, lux::format("MS/FR: %8.6f", msFrame));
-            textList.SetText(6, lux::format("  FPS: %8.3f", frameRate));
-            textList.SetText(7, lux::to_uppercase(lux::ReadableTime()));
+            textList.SetText(5, fmt::sprintf("MS/FR: %8.6f", msFrame));
+            textList.SetText(6, fmt::sprintf("  FPS: %8.3f", frameRate));
+            textList.SetText(7, lux::StringUtils::ToUppercase(lux::Time::Readable()));
 
             textList.Draw();
         }

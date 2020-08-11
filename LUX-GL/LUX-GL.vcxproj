@@ -180,12 +180,13 @@
     <ClInclude Include="src\lux\Scene\Camera.hpp" />
     <ClInclude Include="src\lux\Scene\Layer.hpp" />
     <ClInclude Include="src\lux\Segment.hpp" />
+    <ClInclude Include="src\lux\StringUtils.hpp" />
     <ClInclude Include="src\lux\TextList.hpp" />
     <ClInclude Include="src\lux\Torus.hpp" />
     <ClInclude Include="src\lux\Window.hpp" />
     <ClInclude Include="src\pch.hpp" />
-    <ClInclude Include="src\Texture.h" />
-    <ClInclude Include="src\Utils.hpp" />
+    <ClInclude Include="src\lux\Renderer\Texture.hpp" />
+    <ClInclude Include="src\lux\Time.hpp" />
     <ClInclude Include="src\vendor\common\base64.h" />
     <ClInclude Include="src\vendor\common\os.h" />
     <ClInclude Include="src\vendor\entt\config\config.h" />
@@ -516,6 +517,7 @@
     <ClCompile Include="src\lux\Cube.cpp" />
     <ClCompile Include="src\lux\Lines.cpp" />
     <ClCompile Include="src\lux\Log.cpp" />
+    <ClCompile Include="src\lux\MatrixUtils.hpp" />
     <ClCompile Include="src\lux\Mesh.cpp" />
     <ClCompile Include="src\lux\Renderer\Canvas.cpp" />
     <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp" />
@@ -525,8 +527,7 @@
     <ClCompile Include="src\lux\Scene\Layer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\pch.cpp" />
-    <ClCompile Include="src\Strange.cpp" />
-    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\lux\Renderer\Texture.cpp" />
     <ClCompile Include="src\vendor\common\base64.cpp" />
     <ClCompile Include="src\vendor\glad\glad.c" />
     <ClCompile Include="src\vendor\glfont\FontAtlas.cpp" />

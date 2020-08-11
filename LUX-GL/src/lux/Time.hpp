@@ -1,17 +1,18 @@
 #pragma once
 
-//#include <time.h>
+#include <string>
 #include <ctime>
 
 
-namespace Utils {
-
-    
+namespace lux {
 
     class Time
     {
     public:
-        struct HMS
+        Time() {}
+        ~Time() = default;
+
+        typedef struct HMS
         {
             int Hour, Minute, Second;
         };
@@ -24,6 +25,14 @@ namespace Utils {
             // to get current time 
             struct tm*  current_time = localtime(&s);
             return { current_time->tm_hour, current_time->tm_min, current_time->tm_sec };
+        }
+
+        static std::string Readable()
+        {
+            time_t result = time(NULL);
+            char str[26];
+            ctime_s(str, sizeof str, &result);
+            return std::string(str);
         }
     };
 }
