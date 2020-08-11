@@ -16,7 +16,7 @@
 //#define GlCall(x) GlClearError();x;ASSERT(GlLogCall(#x,__FILE__,__LINE__))
 
 
-namespace ux {
+namespace lux {
 
 	static const double PI = 3.14159265358979323846264;
 	static const double PI2 = PI * 2.0;
@@ -38,16 +38,7 @@ namespace ux {
 		float Gamma = 1.0f;        //  4     192
 	};
 
-	typedef struct CameraProperties // size =  32
-	{
-		glm::vec3 position;        // 12        0
-		float pad1 = 0;            //  4
-		glm::vec3 look_at;         // 12       16
-		// float pad2 = 0;         //  4
-
-		CameraProperties(glm::vec3 cp, glm::vec3 cla)
-			: position(cp), look_at(cla) {}
-	};
+	
 
 	typedef struct Light           // size =  64
 	{

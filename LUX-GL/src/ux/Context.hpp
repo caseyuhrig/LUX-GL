@@ -9,7 +9,7 @@
 #define UX_ENABLE_DEBUG
 
 
-namespace ux {
+namespace lux {
 
     class Context
     {

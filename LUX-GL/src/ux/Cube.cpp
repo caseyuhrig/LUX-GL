@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-namespace ux {
+namespace lux {
 
 
     Cube::Cube(const glm::vec3& min, const glm::vec3& max, const glm::mat4& transform)

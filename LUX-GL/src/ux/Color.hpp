@@ -3,7 +3,7 @@
 #include "glm/glm.hpp"
 
 
-namespace ux {
+namespace lux {
     
     static const glm::vec4 COLOR_WHITE = { 1.0f, 1.0f, 1.0f, 1.0f };
     static const glm::vec4 COLOR_BLACK = { 0.0f, 0.0f, 0.0f, 1.0f };

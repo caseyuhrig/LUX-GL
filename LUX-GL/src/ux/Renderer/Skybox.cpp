@@ -10,7 +10,7 @@ namespace lux {
 
     Skybox::Skybox()
     {
-        shader = ux::CreateRef<Shader>("res/shaders/skybox-shader.glsl");
+        shader = lux::CreateRef<Shader>("res/shaders/skybox-shader.glsl");
     }
 
 

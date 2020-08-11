@@ -26,7 +26,7 @@
 */
 
 
-namespace ux {
+namespace lux {
 
     class Window {
     private:
@@ -106,7 +106,7 @@ namespace ux {
 
             glfwSetWindowSizeCallback(_window_handle, [](GLFWwindow* window, int width, int height)
                 {
-                    auto* _this = (ux::Window*)glfwGetWindowUserPointer(window);
+                    auto* _this = (Window*)glfwGetWindowUserPointer(window);
                     _this->_window_width = width;
                     _this->_window_height = height;
                     // fire off any events here
@@ -120,7 +120,7 @@ namespace ux {
             glfwSetWindowCloseCallback(_window_handle, [](GLFWwindow* window) {});
             glfwSetWindowContentScaleCallback(_window_handle, [](GLFWwindow* window, float xscale, float yscale)
                 {
-                    auto* _this = (ux::Window*)glfwGetWindowUserPointer(window);
+                    auto* _this = (Window*)glfwGetWindowUserPointer(window);
                     _this->_xscale = xscale;
                     _this->_yscale = yscale;
                     std::cout << "WindowContentScaleCallback " << xscale << " " << yscale << std::endl;
@@ -136,7 +136,7 @@ namespace ux {
                 });
             glfwSetScrollCallback(_window_handle, [](GLFWwindow* window, double xoffset, double yoffset)
                 {
-                    auto* _this = (ux::Window*)glfwGetWindowUserPointer(window);
+                    auto* _this = (Window*)glfwGetWindowUserPointer(window);
                     UX_LOG_INFO("ScrollCallback: %f %f", xoffset, yoffset);
                 });
             glfwSetKeyCallback(_window_handle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -145,7 +145,7 @@ namespace ux {
                 });
             glfwSetFramebufferSizeCallback(_window_handle, [](GLFWwindow* window, int width, int height)
                 {
-                    auto* _this = (ux::Window*)glfwGetWindowUserPointer(window);
+                    auto* _this = (Window*)glfwGetWindowUserPointer(window);
                     _this->_framebuffer_width = width;
                     _this->_framebuffer_height = height;
                     glViewport(0, 0, width, height);
@@ -158,7 +158,7 @@ namespace ux {
             // forever redrawing all the time!
             glfwSetWindowRefreshCallback(_window_handle, [](GLFWwindow* window)
                 {
-                    auto* _this = (ux::Window*)glfwGetWindowUserPointer(window);
+                    auto* _this = (Window*)glfwGetWindowUserPointer(window);
                     std::cout << "WindowRefreshCallback " << _this->_window_width << " " << _this->_window_height << std::endl;
                     // draw
                     glfwSwapBuffers(window);
@@ -259,19 +259,15 @@ namespace ux {
 
         inline inline GLFWwindow* GetNativeWindow() const { return _window_handle; }
 
-        // Still getting myself up to speed with C++, so making notes.
-
-        template<typename N = int>                           // defaults to int return type
-        inline N GetWidth() const {                          // go read about const in class member methods.
-            static_assert(std::is_arithmetic<N>::value,      // assert checked at compile time
-                "Not an arithmetic type");
+        template<typename N = int> 
+        N GetWidth() const {
+            static_assert(std::is_arithmetic<N>::value, "Not an arithmetic type");
             return static_cast<N>(_window_width);
         };
 
         template<typename N = int>
-        inline N GetHeight() const {
-            static_assert(std::is_arithmetic<N>::value, 
-                "Not an arithmetic type");
+        N GetHeight() const {
+            static_assert(std::is_arithmetic<N>::value, "Not an arithmetic type");
             return static_cast<N>(_window_height);
         }
 

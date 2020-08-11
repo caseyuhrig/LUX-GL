@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../Shader.hpp"
-#include "../../ux/Core.hpp"
+#include "Shader.hpp"
+#include "../Core.hpp"
 
 
 namespace lux {
@@ -25,6 +25,6 @@ namespace lux {
         uint32_t m_DepthAttachment;
         uint32_t m_Width;
         uint32_t m_Height;
-        ux::Ref<Shader> m_Shader;
+        Ref<Shader> m_Shader;
     };
 }

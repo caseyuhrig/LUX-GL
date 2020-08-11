@@ -163,19 +163,19 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\FrameBuffer.hpp" />
-    <ClInclude Include="src\IndexBuffer.hpp" />
+    <ClInclude Include="src\ux\Renderer\FrameBuffer.hpp" />
+    <ClInclude Include="src\ux\Renderer\IndexBuffer.hpp" />
     <ClInclude Include="src\pch.hpp" />
-    <ClInclude Include="src\Renderer.hpp" />
-    <ClInclude Include="src\Shader.hpp" />
+    <ClInclude Include="src\ux\Renderer\Renderer.hpp" />
+    <ClInclude Include="src\ux\Renderer\Shader.hpp" />
     <ClInclude Include="src\Texture.h" />
-    <ClInclude Include="src\UniformBuffer.hpp" />
+    <ClInclude Include="src\ux\Renderer\UniformBuffer.hpp" />
     <ClInclude Include="src\Utils.hpp" />
     <ClInclude Include="src\ux\Array.hpp" />
     <ClInclude Include="src\ux\Color.hpp" />
     <ClInclude Include="src\ux\Context.hpp" />
     <ClInclude Include="src\ux\Core.hpp" />
-    <ClInclude Include="src\ux\Core\Layer.hpp" />
+    <ClInclude Include="src\ux\Scene\Layer.hpp" />
     <ClInclude Include="src\ux\Cube.h" />
     <ClInclude Include="src\ux\Cuboid.hpp" />
     <ClInclude Include="src\ux\HorzBar.hpp" />
@@ -183,10 +183,12 @@
     <ClInclude Include="src\ux\Log.hpp" />
     <ClInclude Include="src\ux\Mesh.hpp" />
     <ClInclude Include="src\ux\Interface\ScoopedCorner.hpp" />
+    <ClInclude Include="src\ux\Renderer\ShaderStorageBuffer.hpp" />
     <ClInclude Include="src\ux\Renderer\Canvas.hpp" />
     <ClInclude Include="src\ux\Renderer\Skybox.hpp" />
     <ClInclude Include="src\ux\Ring.hpp" />
     <ClInclude Include="src\ux\Scene.hpp" />
+    <ClInclude Include="src\ux\Scene\Camera.hpp" />
     <ClInclude Include="src\ux\Segment.hpp" />
     <ClInclude Include="src\ux\TextList.hpp" />
     <ClInclude Include="src\ux\Torus.hpp" />
@@ -516,23 +518,25 @@
     <ClInclude Include="src\vendor\nlohmann\json.hpp" />
     <ClInclude Include="src\vendor\OBJ_Loader.h" />
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
-    <ClInclude Include="src\VertexArray.hpp" />
-    <ClInclude Include="src\VertexBuffer.hpp" />
-    <ClInclude Include="src\VertexBufferLayout.hpp" />
+    <ClInclude Include="src\ux\Renderer\VertexArray.hpp" />
+    <ClInclude Include="src\ux\Renderer\VertexBuffer.hpp" />
+    <ClInclude Include="src\ux\Renderer\VertexBufferLayout.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\Strange.cpp" />
     <ClCompile Include="src\Texture.cpp" />
-    <ClCompile Include="src\ux\Core\Layer.cpp" />
+    <ClCompile Include="src\ux\Scene\Layer.cpp" />
     <ClCompile Include="src\ux\Cube.cpp" />
     <ClCompile Include="src\ux\Lines.cpp" />
     <ClCompile Include="src\ux\Log.cpp" />
     <ClCompile Include="src\ux\Mesh.cpp" />
+    <ClCompile Include="src\ux\Renderer\ShaderStorageBuffer.cpp" />
     <ClCompile Include="src\ux\Renderer\Canvas.cpp" />
     <ClCompile Include="src\ux\Renderer\Skybox.cpp" />
     <ClCompile Include="src\ux\Ring.cpp" />
+    <ClCompile Include="src\ux\Scene\Camera.cpp" />
     <ClCompile Include="src\vendor\common\base64.cpp" />
     <ClCompile Include="src\vendor\glad\glad.c" />
     <ClCompile Include="src\vendor\glfont\FontAtlas.cpp" />

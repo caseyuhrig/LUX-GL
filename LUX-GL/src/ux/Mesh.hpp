@@ -3,15 +3,15 @@
 #include "glm/glm.hpp"
 #include "Core.hpp"
 //#include "Color.hpp"
-#include "../VertexBuffer.hpp"
-#include "../IndexBuffer.hpp"
-#include "../Renderer.hpp"
-#include "../Shader.hpp"
+#include "Renderer/VertexBuffer.hpp"
+#include "Renderer/IndexBuffer.hpp"
+#include "Renderer/Renderer.hpp"
+#include "Renderer/Shader.hpp"
 
 
 // CCW is GL front facing.
 
-namespace ux {
+namespace lux {
 
     class Mesh
     {

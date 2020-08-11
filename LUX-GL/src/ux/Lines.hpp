@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Core.hpp"
-#include "../Renderer.hpp"
-#include "../Shader.hpp"
-#include "../VertexBufferLayout.hpp"
+#include "Renderer/Renderer.hpp"
+#include "Renderer/Shader.hpp"
+#include "Renderer/VertexBufferLayout.hpp"
 #include "glm/glm.hpp";
 #include <iostream>
 #include <vector>
@@ -15,7 +15,7 @@ struct Line {
 };
 
 
-namespace ux {
+namespace lux {
 
     class Lines
     {

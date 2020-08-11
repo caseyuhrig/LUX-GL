@@ -3,7 +3,7 @@
 #include "entt/entt.hpp"
 
 
-namespace ux {
+namespace lux {
 
     class Scene
     {

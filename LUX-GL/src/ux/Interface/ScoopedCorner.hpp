@@ -3,7 +3,7 @@
 #include "../Mesh.hpp"
 #include "glm/glm.hpp"
 
-namespace ux {
+namespace lux {
 
     class ScoopedCorner : public Mesh
     {

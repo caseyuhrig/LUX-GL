@@ -5,7 +5,7 @@
 #include "glm/gtx/string_cast.hpp"
 
 
-namespace ux {
+namespace lux {
 
     class Cuboid : public Mesh
     {

@@ -10,7 +10,7 @@ namespace lux {
     {
     public:
         ShaderStorageBuffer(std::string name, unsigned int binding_point, unsigned int _size, const void* data);
-        ~ShaderStorageBuffer() = default;
+        ~ShaderStorageBuffer();
         void Publish(const void* data);
         void Publish(uint32_t offset, uint32_t size, const void* data);
         void Bind() const;

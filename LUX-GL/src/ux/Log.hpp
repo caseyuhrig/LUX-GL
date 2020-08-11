@@ -16,7 +16,7 @@
 
 // make this a spdlog wrapper
 
-namespace ux {
+namespace lux {
 
 	class Log
 	{
@@ -64,7 +64,7 @@ namespace ux {
 
 }
 
-#define UX_LOG_DEBUG(...) ux::Log::LOG_DEBUG(__VA_ARGS__)
-#define UX_LOG_INFO(...) ux::Log::LOG_INFO(__VA_ARGS__)
-#define UX_LOG_ERROR(...) ux::Log::LOG_ERROR(__VA_ARGS__)
-#define UX_LOG_FATAL(...) ux::Log::LOG_FATAL(__VA_ARGS__)
+#define UX_LOG_DEBUG(...) lux::Log::LOG_DEBUG(__VA_ARGS__)
+#define UX_LOG_INFO(...) lux::Log::LOG_INFO(__VA_ARGS__)
+#define UX_LOG_ERROR(...) lux::Log::LOG_ERROR(__VA_ARGS__)
+#define UX_LOG_FATAL(...) lux::Log::LOG_FATAL(__VA_ARGS__)

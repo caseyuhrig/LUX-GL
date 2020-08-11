@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Core.hpp"
-#include "../Renderer.hpp"
-#include "../Shader.hpp"
-#include "../VertexBufferLayout.hpp"
+#include "Renderer/Renderer.hpp"
+#include "Renderer/Shader.hpp"
+#include "Renderer/VertexBufferLayout.hpp"
 #include "glm/gtx/normal.hpp";
 
 
-namespace ux {
+namespace lux {
 
    
 

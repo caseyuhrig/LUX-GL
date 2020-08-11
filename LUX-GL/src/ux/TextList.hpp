@@ -12,7 +12,7 @@
 // gonna re-write the code. reminder to ack. the orig. author.
 // TODO Whenever the window is resized, you should update the window size of your label
 // label->setWindowSize(windowWidth, windowSize);
-namespace ux{
+namespace lux {
 
     class TextList
     {

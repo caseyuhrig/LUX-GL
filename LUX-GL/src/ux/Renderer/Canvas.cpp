@@ -1,8 +1,8 @@
 #include "Canvas.hpp"
 
 #include <glad/glad.h>
-#include "../../Shader.hpp"
-#include "../../ux/Log.hpp"
+#include "Shader.hpp"
+#include "../Log.hpp"
 
 
 namespace lux {
@@ -10,7 +10,7 @@ namespace lux {
     Canvas::Canvas() 
         : m_ColorAttachment(0), m_DepthAttachment(0), m_VAO(0), m_FBO(0), m_VBO(0), m_Width(0), m_Height(0)
     {
-        m_Shader = ux::CreateRef<Shader>("res/shaders/canvas-shader.glsl");
+        m_Shader = lux::CreateRef<Shader>("res/shaders/canvas-shader.glsl");
     }
 
     Canvas::~Canvas() 

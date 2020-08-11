@@ -1,5 +1,5 @@
 
-namespace ux {
+namespace lux {
 
     template <typename T, size_t S>
     class Array {

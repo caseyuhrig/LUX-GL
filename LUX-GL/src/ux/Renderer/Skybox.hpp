@@ -5,8 +5,8 @@
 
 #include <glm/glm.hpp>
 
-#include "../../ux/Core.hpp"
-#include "../../Shader.hpp"
+#include "../Core.hpp"
+#include "Shader.hpp"
 
 
 namespace lux {
@@ -21,7 +21,7 @@ namespace lux {
         unsigned int LoadTexture(const std::string& path);
         unsigned int LoadCubemap(std::vector<std::string> faces);
     private:
-        ux::Ref<Shader> shader;
+        Ref<Shader> shader;
         unsigned int skyboxVAO, skyboxVBO;
         unsigned int cubemapTexture;
     };

@@ -3,7 +3,7 @@
 #include "Mesh.hpp"
 
 
-namespace ux {
+namespace lux {
 
     class HorzBar : public Mesh {
     public:
@@ -14,7 +14,7 @@ namespace ux {
 
         inline void CreateGeometry()
         {
-            //glm::vec4 color = ux::COLOR_AMBER; //GetColor();
+            //glm::vec4 color = lux::COLOR_AMBER; //GetColor();
 
             glm::vec2 texCoord = { 0.0f, 0.0f };
             glm::vec3 normal = { 0.0f, 0.0f, -1.0f };
@@ -40,8 +40,8 @@ namespace ux {
             // draw the arc from <center.x, min.y> to <center.x, max.y>
             for (float angle = angle_start;angle < angle_end;angle += angle_step)
             {
-                float x = center.x + arc_radius * cos(angle * ux::TO_RAD);
-                float y = center.y + arc_radius * sin(angle * ux::TO_RAD);
+                float x = center.x + arc_radius * cos(angle * TO_RAD);
+                float y = center.y + arc_radius * sin(angle * TO_RAD);
                 AddVertex({ x, y, 0.0f }, color, texCoord, normal);
                 AddIndex(0, index, index + 1);
                 index++;

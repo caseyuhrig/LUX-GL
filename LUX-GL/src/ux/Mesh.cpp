@@ -9,7 +9,7 @@
 
 
 
-namespace ux {
+namespace lux {
 
     Mesh::Mesh()
         : min(0), max(0), color(1), transformation(0),

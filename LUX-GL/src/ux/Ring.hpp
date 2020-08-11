@@ -5,7 +5,7 @@
 #include "Mesh.hpp"
 
 
-namespace ux {
+namespace lux {
     class Ring : public Mesh
     {
     public:

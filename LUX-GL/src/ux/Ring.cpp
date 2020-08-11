@@ -3,7 +3,7 @@
 #include "glm/gtx/normal.hpp"
 
 
-namespace ux {  
+namespace lux {  
 
     void Ring::CreateGeometry()
     {
