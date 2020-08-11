@@ -2,18 +2,18 @@
 
 1) Add Include Directories
    * __Configuration Properties >> VC++ Directories >> Include Directories__
-   * .\src\vendor
+   * $(ProjectDir)src\vendor
    * $(SolutionDir)Dependencies\irrKlang\include
    * $(SolutionDir)Dependencies\FT\include
    * $(SolutionDir)Dependencies\GLFW\include
 1) Add Linking Directories
    * __Configuration Properties >> Linker >> General >> Additional Library Directories__
-   * $(SolutionDir)Dependencies/irrKlang\lib-Winx64-visualStudio 
-   * $(SolutionDir)Dependencies/FT/win64 
-   * $(SolutionDir)Dependencies/GLFW/lib-vc2019 
-1) Link opengl33.lib + glfw3.lib
+   * $(SolutionDir)Dependencies\irrKlang\lib-Winx64-visualStudio 
+   * $(SolutionDir)Dependencies\FT\win64 
+   * $(SolutionDir)Dependencies\GLFW\lib-vc2019 
+1) Link opengl32.lib, glfw3.lib, freetype.lib, irrKlang.lib
    * __Configuration Properties >> Linker >> Input >> Additional Dependencies__
-1) Add _CRT_NONSTDC_NO_WARNINGS
+1) Add _CRT_SECURE_NO_WARNINGS
    * __Configuration Properties >> C/C++ >> Preporocessor >> Preprocessor Definitions__
 1) Use /std:c++17 to enable C++17 standard-specific features and behavior.
    * __Configuration Properties >> General >> C++ Language Support __
