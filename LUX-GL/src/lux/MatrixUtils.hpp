@@ -12,7 +12,7 @@ namespace lux {
         MatrixUtils() {}
         ~MatrixUtils() = default;
 
-        static glm::mat4 RotateAroundAxis(glm::mat4 model, glm::vec3 axis, glm::vec3 angle)
+        static const glm::mat4 RotateAroundAxis(const glm::mat4& model, const glm::vec3& axis, const glm::vec3& angle)
         {
             //glm::mat4 rotMat = glm::rotate(glm::mat4(1.0), angle.x, glm::vec3(1.0, 0.0, 0.0));
             //rotMat = glm::rotate(rotMat, angle.y, glm::vec3(0.0, 1.0, 0.0));
@@ -29,14 +29,15 @@ namespace lux {
                 axis) * model;
         }
 
-        static glm::mat4 Transform(glm::mat4 root, glm::vec3 scale, glm::vec3 translate, glm::vec3 rotate)
+        static const glm::mat4& Transform(const glm::mat4& root, const glm::vec3& scale, const glm::vec3& translate, const glm::vec3& rotate)
         {
-            glm::mat4 m2scale = glm::scale(glm::mat4(1.0), scale);
-            glm::mat4 m2trans = glm::translate(glm::mat4(1.0), translate);
-            glm::mat4 m2rotate1 = glm::rotate(glm::mat4(1.0), rotate[0], glm::vec3(1.0f, 0.0f, 0.0f));
-            glm::mat4 m2rotate2 = glm::rotate(glm::mat4(1.0), rotate[1], glm::vec3(0.0f, 1.0f, 0.0f));
-            glm::mat4 m2rotate3 = glm::rotate(glm::mat4(1.0), rotate[2], glm::vec3(0.0f, 0.0f, 1.0f));
-            glm::mat4 matrix = m2rotate3 * m2rotate2 * m2rotate1 * m2trans * m2scale;
+            const auto& identity = glm::mat4(1.0);
+            const glm::mat4& m2scale = glm::scale(identity, scale);
+            const glm::mat4& m2trans = glm::translate(identity, translate);
+            const glm::mat4& m2rotate1 = glm::rotate(identity, rotate.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            const glm::mat4& m2rotate2 = glm::rotate(identity, rotate.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            const glm::mat4& m2rotate3 = glm::rotate(identity, rotate.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            const glm::mat4& matrix = m2rotate3 * m2rotate2 * m2rotate1 * m2trans * m2scale;
             return root * matrix;
         }
     };

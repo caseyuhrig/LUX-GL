@@ -122,6 +122,14 @@ namespace lux {
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
         }
 
+        inline void SetUniform1i(const std::string& name, uint32_t value)
+        {
+            auto field = _layout[name];
+            glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
+            glBufferSubData(GL_UNIFORM_BUFFER, field.offset, field.size, &value);
+            glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        }
+
         inline void AddUniform(std::string name, unsigned int offset, unsigned int size)
         {
             if (_layout.count(name) > 0)

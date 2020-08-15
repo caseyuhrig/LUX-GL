@@ -1092,6 +1092,18 @@
     <ClInclude Include="src\lux\Renderer\Texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\lux\Scene\ImGuiLayer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Scene\LayerStack.cpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Scene\Light.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Scene\Material.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\lux\Renderer\Canvas.cpp">
@@ -1176,6 +1188,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lux\Renderer\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Scene\ImGuiLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Scene\LayerStack.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Scene\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

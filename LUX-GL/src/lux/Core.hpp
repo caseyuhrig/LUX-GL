@@ -40,57 +40,8 @@ namespace lux {
 
 	
 
-	typedef struct Light           // size =  64
-	{
-		glm::vec4 position;        // 16       0
-		glm::vec3 ambient_color;   // 12      16
-		float pad2 = 0;            //  4
-		glm::vec3 diffuse_color;   // 12      32
-		float pad3 = 0;            //  4
-		glm::vec3 specular_color;  // 12      48
-		float pad4 = 0;            //  4
-		//float l_inear;
-	    //float quadratic;
-	    //float radius;
 
-		Light(glm::vec3 p, glm::vec3 a, glm::vec3 d, glm::vec3 s)
-			: position(p, 1.0f), ambient_color(a), diffuse_color(d), specular_color(s)
-		{}
-	};
-
-	/*
-	Every variable has to start at 0 or a 16 byte offset with a size of 16,
-	except float or int.
-	*/
-	typedef struct Material          // size = 64
-	{
-		glm::vec3 ambient_color;     // 12      0
-		float pad1 = 0;              //  4
-		glm::vec3 diffuse_color;     // 12     16
-		float pad2 = 0;              //  4
-		glm::vec3 specular_color;    // 12     32
-		float pad3 = 0;              //  4
-		float specular_shininess;    //  4     48
-		float pad4 = 0;              //  4
-		float pad5 = 0;              //  4
-		float pad6 = 0;              //  4
-		//float ambient_strength = 0.1;
-		//float specular_strength = 0.5;
-
-		// VERY helpful! ...otherwise glm::matrix swizzling between vec3/vec4 and floats make it 
-		// imposible to set via Material = {}
-		Material(glm::vec3 a, glm::vec3 d, glm::vec3 s, float ss)
-			: ambient_color(a), diffuse_color(d), specular_color(s), specular_shininess(ss)
-		{
-			std::cout << "Setting Material: Constructor 1" << std::endl;
-		}
-
-		Material(glm::vec4 a, glm::vec4 d, glm::vec4 s, float ss)
-			: ambient_color(a), diffuse_color(d), specular_color(s), specular_shininess(ss)
-		{
-			std::cout << "Setting Material: Constructor 2" << std::endl;
-		}
-	};
+	
 
 
 	template<typename T>
