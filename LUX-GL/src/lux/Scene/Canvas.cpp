@@ -1,7 +1,7 @@
 #include "Canvas.hpp"
 
 #include <glad/glad.h>
-#include "Shader.hpp"
+#include "../Renderer/Shader.hpp"
 #include "../Log.hpp"
 
 

@@ -159,6 +159,7 @@
     <ClInclude Include="src\lux\Interface\Quad.hpp" />
     <ClInclude Include="src\lux\Interface\TopCar.hpp" />
     <ClInclude Include="src\lux\Interface\RoundedCorner.hpp" />
+    <ClInclude Include="src\lux\Scene\Canvas.hpp" />
     <ClInclude Include="src\lux\Types.hpp" />
     <ClInclude Include="src\lux\Primitive\Cube.h" />
     <ClInclude Include="src\lux\Primitive\Cuboid.hpp" />
@@ -167,7 +168,6 @@
     <ClInclude Include="src\lux\Interface\Lines.hpp" />
     <ClInclude Include="src\lux\Log.hpp" />
     <ClInclude Include="src\lux\Primitive\Mesh.hpp" />
-    <ClInclude Include="src\lux\Renderer\Canvas.hpp" />
     <ClInclude Include="src\lux\Renderer\FrameBuffer.hpp" />
     <ClInclude Include="src\lux\Renderer\IndexBuffer.hpp" />
     <ClInclude Include="src\lux\Renderer\Renderer.hpp" />
@@ -525,8 +525,8 @@
     <ClCompile Include="src\lux\Log.cpp" />
     <ClCompile Include="src\lux\MatrixUtils.hpp" />
     <ClCompile Include="src\lux\Primitive\Mesh.cpp" />
-    <ClCompile Include="src\lux\Renderer\Canvas.cpp" />
     <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp" />
+    <ClCompile Include="src\lux\Scene\Canvas.cpp" />
     <ClCompile Include="src\lux\Scene\Skybox.cpp" />
     <ClCompile Include="src\lux\Primitive\Ring.cpp" />
     <ClCompile Include="src\lux\Scene\Camera.cpp" />

@@ -30,7 +30,7 @@
 #include "lux/Interface/Quad.hpp"
 #include "lux/Primitive/Ring.hpp"
 #include "lux/Scene/Camera.hpp"
-#include "lux/Renderer/Canvas.hpp"
+#include "lux/Scene/Canvas.hpp"
 #include "lux/Scene/Skybox.hpp"
 #include "lux/Renderer/UniformBuffer.hpp"
 #include "lux/Time.hpp"
