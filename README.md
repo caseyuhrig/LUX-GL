@@ -7,6 +7,8 @@ The goal is a 3D simulator with a physics engine (@bulletphysics) that can be us
 a 3D character to walk in Python, then connecting the Python program with this C++ OpenGL simulator/visualizer to watch as it learns and/or
 to run the trained model after the fact.  It will do more, but that's the end goal for this project.
 
+![image](https://user-images.githubusercontent.com/64170049/90424612-3d264300-e073-11ea-8e04-b88c83c8003e.png)
+
 Anyone wishing to chime in is welcome!
 
 ### Resources:
