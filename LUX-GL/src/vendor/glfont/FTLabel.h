@@ -89,7 +89,9 @@ public:
     void drawString(const char* text, float x, float y, float width, float height);
 
     void render();
-
+protected:
+    void BlendingBegin();
+    void BlendingEnd();
 private:
 
     struct Point {

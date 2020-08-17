@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Core.hpp"
-#include "Renderer/Renderer.hpp"
-#include "Renderer/Shader.hpp"
-#include "Renderer/VertexBufferLayout.hpp"
-#include "Renderer/VertexBuffer.hpp"
-#include "Renderer/VertexArray.hpp"
+#include "../Types.hpp"
+#include "../Renderer/Renderer.hpp"
+#include "../Renderer/Shader.hpp"
+#include "../Renderer/VertexBufferLayout.hpp"
+#include "../Renderer/VertexBuffer.hpp"
+#include "../Renderer/VertexArray.hpp"
+
 
 namespace lux {
-
 
     class Cube
     {

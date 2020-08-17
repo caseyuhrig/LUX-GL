@@ -22,8 +22,10 @@ namespace lux {
 
         void Init() const
         {
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDisable(GL_BLEND);
+            //glEnable(GL_BLEND);
+            //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
             glEnable(GL_DEPTH_TEST);
 
             //glDisable(GL_CULL_FACE);
@@ -64,12 +66,12 @@ namespace lux {
         {
             glViewport(x, y, width, height);
         }
-
+        
         void SetClearColor(const glm::vec4& color) const
         {
             glClearColor(color.r, color.g, color.b, color.a);
         }
-
+        
         void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
         {
             Draw(GL_TRIANGLES, va, ib, shader);

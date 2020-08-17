@@ -36,9 +36,6 @@
     <ClInclude Include="src\lux\Renderer\ShaderStorageBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\lux\Renderer\Skybox.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\lux\Renderer\UniformBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -66,40 +63,13 @@
     <ClInclude Include="src\lux\Context.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\lux\Core.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lux\Cube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lux\Cuboid.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lux\HorzBar.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lux\Lines.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\lux\Log.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lux\Mesh.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lux\Ring.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\lux\Scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\lux\Segment.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\lux\TextList.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lux\Torus.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\lux\Window.hpp">
@@ -1104,6 +1074,42 @@
     <ClInclude Include="src\lux\Scene\Material.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\lux\Scene\Skybox.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Interface\HorzBar.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Primitive\Mesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Primitive\Cuboid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Primitive\Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Primitive\Ring.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Primitive\Segment.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Interface\Lines.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Interface\RoundedCorner.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Interface\TopCar.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Interface\Quad.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\lux\Renderer\Canvas.cpp">
@@ -1112,28 +1118,13 @@
     <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lux\Renderer\Skybox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lux\Scene\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lux\Scene\Layer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lux\Cube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lux\Lines.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lux\Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lux\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lux\Ring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\vendor\common\base64.cpp">
@@ -1197,6 +1188,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lux\Scene\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Scene\Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Primitive\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Primitive\Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Primitive\Ring.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Interface\Lines.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

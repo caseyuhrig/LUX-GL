@@ -1,23 +1,31 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "Core.hpp"
+#include "../Types.hpp"
 //#include "Color.hpp"
-#include "Renderer/VertexBuffer.hpp"
-#include "Renderer/IndexBuffer.hpp"
-#include "Renderer/Renderer.hpp"
-#include "Renderer/Shader.hpp"
+#include "../Renderer/VertexBuffer.hpp"
+#include "../Renderer/IndexBuffer.hpp"
+#include "../Renderer/Renderer.hpp"
+#include "../Renderer/Shader.hpp"
 
 
 // CCW is GL front facing.
 
 namespace lux {
 
+    enum class CornerPosition {
+        TopLeft = 1,
+        BottomLeft = 2,
+        TopRight = 3,
+        BottomRight = 4
+    };
+
     class Mesh
     {
     public:
         Mesh();
-        // TODO Remove transformation from constructor.
+        //Mesh(const glm::vec3& min, const glm::vec3& max, const glm::mat4& transformation = glm::mat4(1.0f));
+        // TODO Remove transformation constructor.
         Mesh(const glm::vec3& min, const glm::vec3& max, const glm::mat4& transformation = glm::mat4(1.0f));
         // TODO Research what ~Dest() = default does!
         ~Mesh() = default;
@@ -61,10 +69,34 @@ namespace lux {
          * TODO Rename p1,p2,p3 to a,b,c
          * TODO Remove color, need to find another way to attach color data without storing in the mesh object.
          */
-        void AddTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const glm::vec3& normal, const glm::vec4 color);
+        void AddTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const glm::vec3& normal, const glm::vec4& color);
         // Adds a triangle and calculates the normal automatically.
         //void AddTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const bool smooth, const glm::vec4 color);
         //void AddTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3);
+        void AddQuad(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const glm::vec3& p4,
+                     const glm::vec3& normal, const glm::vec4& color);
+
+        void AddEllipse(const glm::vec2& center, const glm::vec2& radius, 
+                        const float startAngle, const float endAngle, const float step,
+                        const glm::vec3& normal, const glm::vec4& color);
+
+        void AddHorzBar(const glm::vec2& min, const glm::vec2& max, const glm::vec3& normal, const glm::vec4& color);
+
+        void AddRoundedCorner(const CornerPosition& position, const glm::vec2& min, const glm::vec2& max, 
+                              const glm::vec3& normal, const glm::vec4& color);
+
+        void AddScoopedCorner(const CornerPosition& position, const glm::vec2& min, const glm::vec2& max,
+                              const glm::vec3& normal, const glm::vec4& color);
+
+        void AddTopCar(const glm::vec2& min, const glm::vec2& max,
+            float radius, float scoopRadius,
+            float sideWidth, float horzHeight,
+            const glm::vec3& normal, const glm::vec4& color);
+
+        void AddBottomCar(const glm::vec2& min, const glm::vec2& max,
+            float radius, float scoopRadius,
+            float sideWidth, float horzHeight,
+            const glm::vec3& normal, const glm::vec4& color);
     private:
         Ref<VertexArray> va;
         Ref<VertexBuffer> vb;

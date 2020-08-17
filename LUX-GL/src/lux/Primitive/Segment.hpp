@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core.hpp"
-#include "Renderer/Renderer.hpp"
-#include "Renderer/Shader.hpp"
-#include "Renderer/VertexBufferLayout.hpp"
+#include "../Types.hpp"
+#include "../Renderer/Renderer.hpp"
+#include "../Renderer/Shader.hpp"
+#include "../Renderer/VertexBufferLayout.hpp"
 #include "glm/gtx/normal.hpp";
 
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "../Core.hpp"
+#include "../Types.hpp"
 #include "../Renderer/UniformBuffer.hpp"
 
 

@@ -16,19 +16,22 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include "lux/Window.hpp"
-#include "lux/Cube.h"
-#include "lux/Segment.hpp"
-#include "lux/Lines.hpp"
+#include "lux/Primitive/Cube.h"
+#include "lux/Primitive/Segment.hpp"
+#include "lux/Interface/Lines.hpp"
 #include "lux/TextList.hpp"
-#include "lux/Cuboid.hpp"
+#include "lux/Primitive/Cuboid.hpp"
 #include "lux/Color.hpp"
 #include "lux/Scene/Material.hpp"
-#include "lux/HorzBar.hpp"
+#include "lux/Interface/HorzBar.hpp"
 #include "lux/Interface/ScoopedCorner.hpp"
-#include "lux/Ring.hpp"
+#include "lux/Interface/RoundedCorner.hpp"
+#include "lux/Interface/TopCar.hpp"
+#include "lux/Interface/Quad.hpp"
+#include "lux/Primitive/Ring.hpp"
 #include "lux/Scene/Camera.hpp"
 #include "lux/Renderer/Canvas.hpp"
-#include "lux/Renderer/Skybox.hpp"
+#include "lux/Scene/Skybox.hpp"
 #include "lux/Renderer/UniformBuffer.hpp"
 #include "lux/Time.hpp"
 #include "lux/StringUtils.hpp"
@@ -99,41 +102,12 @@ If w == 1, then the vector(x, y, z, 1) is a position in space.
 
 int main(int argc, char** argv)
 {
-    bool animate = true;
-    bool show_text = false;
-    bool use_imgui = true;
-    bool show_models = true;
-
-
     auto window = lux::Window("LUX/GL", 1500, 900);
     window.Center();
 
 
-    
 
 
-    auto cube = lux::Cube(glm::vec3(1.0f));
-
-    auto segment = lux::Segment(0.5f, 1.0f, 0.0f, 45.0f, 0.125f);
-
-    auto segment2 = lux::Segment(1.25f, 1.5f, 0.0f, 15.0f, 0.125f);
-
-
- 
-
-    
-
-    //auto texture = Texture("res/textures/cartographer-logo-600x600.png");
-    //texture.Bind();
-    //shader.SetUniform1i("u_Texture", 0);
-
-    auto shader = lux::Shader("res/shaders/basic.shader");
-    auto shaderQuad = lux::Shader("res/shaders/quad.shader");
-    auto shaderBox = lux::Shader("res/shaders/box.shader");
-    auto shaderBase = lux::Shader("res/shaders/base.shader");
-    auto shaderBase2 = lux::Shader("res/shaders/base.shader");
-    auto shaderText = lux::Shader("res/shaders/text.shader");
-    auto shaderUX = lux::Shader("res/shaders/ux.shader");
 
   
 
@@ -148,8 +122,8 @@ int main(int argc, char** argv)
     glm::vec2 rotateXY = glm::vec2(0.0, glm::radians(0.0));
 
     float scale2 = 1.0f;
-    glm::vec3 translate2 = { 0.0f, 0.0f, 0.0f };
-    glm::vec3 rotate2 = { 0.938f, 0.469f, 0.0f };
+    glm::vec3 translate2 = { 0.0f, 0.896f, 0.0f };
+    glm::vec3 rotate2 = { 0.375f, 0.469f, 0.0f };
     
 
     float rotator = 0.0;
@@ -205,34 +179,16 @@ int main(int argc, char** argv)
     ubo_Lights.SetData(lights);
 
 
-   
-    
 
-  
-  
-    /*
-    lux::Material material = {
-        { 0.348f, 0.348f, 0.348f, 1.0f },    // ambient color
-        { 0.608f, 0.608f, 0.608f, 1.0f },    // diffuse color
-        { 0.5f, 0.5f, 0.5f, 1.0f },          // specular color
-        32.0f                                // specular shininess
-    }; 
-
-    
-    auto ubo_Materials = lux::UniformBuffer("MaterialProperties", 4, 64, &material);
-    ubo_Materials.AddUniform("material.ambient_color", 0, 12);
-    ubo_Materials.AddUniform("material.diffuse_color", 16, 12);
-    ubo_Materials.AddUniform("material.specular_color", 32, 12);
-    ubo_Materials.AddUniform("material.specular_shininess", 48, 4);
-    */
 
     auto defaultMaterial = lux::Material();
   
 
 
     lux::Renderer renderer;
+    //renderer.SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
-    lux::ImGuiLayer imguiLayer = lux::ImGuiLayer(&window);
+    
 
 
     uint32_t ACTIVE_CAMERA = 0;
@@ -245,13 +201,9 @@ int main(int argc, char** argv)
     camera.Publish();
 
 
+    
 
-    imguiLayer.SetCamera(&camera);
-    imguiLayer.SetMaterial(&defaultMaterial);
-    imguiLayer.SetLights(&light1, &ubo_Lights);
-    imguiLayer.SetShaderBase(&shaderBase);
-    imguiLayer.Set1(&scale, &translate, &mRotate);
-    imguiLayer.Set2(&scale2, &translate2, &rotate2);
+    
 
 
     lux::SceneProperties scenes[1] = {
@@ -280,29 +232,17 @@ int main(int argc, char** argv)
     auto lightCube2 = lux::Cube(glm::vec3(1.0f, 1.0f, 1.0f));
 
 
-
+    /*
     auto lines = lux::Lines();
-    //lines.add(glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-    //lines.add(glm::vec3(0.5, 0, 0), glm::vec3(0.5, 1, 0));
     lines.add(glm::vec3(0.0f, window.GetFramebufferWidth() - 1, 0.0f), glm::vec3(window.GetFramebufferWidth() - 1, window.GetFramebufferHeight() - 1, 0.0f)); // TOP
     lines.add(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(window.GetFramebufferWidth() - 1, 0.0f, 0.0f)); // BOTTOM
     lines.add(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, window.GetFramebufferHeight() - 1, 0.0f)); // LEFT
     lines.add(glm::vec3(window.GetFramebufferWidth() - 1, 0.0f, 0.0f), glm::vec3(window.GetFramebufferWidth() - 1, window.GetFramebufferHeight() - 1, 0.0f)); // RIGHT
     lines.commit();
-
-    auto lines2 = lux::Lines();
-    lines2.createCircle(2.0, 360);
-
-    auto ring = lux::Lines();
-    ring.createRing(2.2, 2.3, 0.1, 180);
-
-    auto triangles = lux::Ring(2.2, 2.3, 0.1, 180);
-    triangles.Build();
-
-
-
+    */
+  
  
-    auto textList = lux::TextList(50, 50, window.GetFramebufferWidth(), window.GetFramebufferHeight());
+    auto textList = lux::TextList(110, 600, window.GetFramebufferWidth(), window.GetFramebufferHeight());
     textList.AddFont(0, "res/fonts/Inconsolata/static/InconsolataCondensed-Medium.ttf");
     textList.AddFont(1, "res/fonts/Inconsolata/static/InconsolataCondensed-Light.ttf");
     textList.AddText(0, 0, 24, 24, "LUX/GL v0.12a");
@@ -317,7 +257,6 @@ int main(int argc, char** argv)
 
 
 
-    //std::vector<ux::Ref<ux::Cube>> sub_cubes;
     std::array<lux::Ref<lux::Cube>, 260> sub_cubes;
 
     size_t sub_cube_count = 20;
@@ -382,23 +321,18 @@ int main(int argc, char** argv)
         moreCubes[n] = moreCube;
     }
 
-    
-
-
-    auto cuboid = lux::Cuboid(glm::vec3(-0.2f), glm::vec3(0.2f), glm::mat4(1.0f));
-    cuboid.Build();
-
-
-
-
-    glm::vec4 amber = lux::COLOR_AMBER;
-    amber.a = 0.8;
-
-    float yy = window.GetFramebufferHeight() - 152;
-    auto horzBar = lux::HorzBar(glm::vec2(164.0f, yy - 20), glm::vec2(400.0f, yy));
-    horzBar.SetColor(amber);
-    horzBar.Build();
    
+
+
+    auto shaderBox = lux::Shader("res/shaders/box.shader");
+
+    // used for the lights
+    auto shaderBase = lux::Shader("res/shaders/base.shader");
+    auto shaderBase2 = lux::Shader("res/shaders/base.shader");
+
+    auto shaderText = lux::Shader("res/shaders/text.shader");
+    auto shaderUX = lux::Shader("res/shaders/ux.shader");
+
 
  
     glm::mat4 modelLight = glm::translate(glm::mat4(1.0), lightPos);
@@ -473,9 +407,51 @@ int main(int argc, char** argv)
     canvas.Init(window.GetWidth(), window.GetHeight());
 
 
+    // 2D Primitive UI layer
+
+    float yy = window.GetFramebufferHeight() - 152;
+
+    glm::vec4 amber = lux::COLOR_AMBER;
+    amber.a = 0.8;
+
     auto scoopedCorner = lux::ScoopedCorner(glm::vec2(10.0f, 10.0f), 50.0f, amber);
     scoopedCorner.Build();
 
+    auto roundedCorner = lux::RoundedCorner(lux::CornerPosition::TopRight, glm::vec2(70.0f, 10.0f), 50.0f, amber);
+    roundedCorner.Build();
+
+    auto roundedCorner2 = lux::RoundedCorner(lux::CornerPosition::TopLeft, glm::vec2(130.0f, 10.0f), 50.0f, amber);
+    roundedCorner2.Build();
+
+    auto topCar = lux::TopCar(glm::vec2(10.0f, 100.0f), glm::vec2(900.0f, 890.0f), amber);
+    topCar.Build();
+
+    auto backgroundQuad = lux::Quad(glm::vec3(10.0f, 150.04, 0.0f), glm::vec2(200.0f, 200.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
+    backgroundQuad.Build();
+
+
+
+    auto skybox = lux::Skybox();
+    skybox.Init();
+
+    //auto cubemapShader = lux::Shader("res/shaders/cubemap-shader.glsl");
+    auto cubemapShader = lux::Shader("res/shaders/cubemap-lighting-shader.glsl");
+
+    //auto testShader = cubemapShader;
+    auto testShader = shaderBox;
+
+
+
+    lux::ImGuiLayer imguiLayer = lux::ImGuiLayer(&window);
+    imguiLayer.SetCamera(&camera);
+    imguiLayer.SetMaterial(&defaultMaterial);
+    imguiLayer.SetLights(&light1, &ubo_Lights);
+    imguiLayer.SetShaderBase(&shaderBase);
+    imguiLayer.Set1(&scale, &translate, &mRotate);
+    imguiLayer.Set2(&scale2, &translate2, &rotate2);
+    //imguiLayer.SetCubemapSwapFunction([?] {
+    //    testShader = cubemapShader;
+    //});
 
     // LAYERS + IMGUI
     lux::LayerStack layers = lux::LayerStack();  
@@ -484,14 +460,7 @@ int main(int argc, char** argv)
 
 
 
-    auto skybox = lux::Skybox();
-    skybox.Init();
-
-    auto cubemapShader = lux::Shader("res/shaders/cubemap-shader.glsl");
-    //auto cubemapShader = Shader("res/shaders/cubemap-lighting-shader.glsl");
-
-    //auto testShader = cubemapShader;
-    auto testShader = shaderBox;
+  
 
     // https://www.youtube.com/watch?v=5HWCsmE9DrE
     //std::async(std::launch::async, [] {});
@@ -500,6 +469,12 @@ int main(int argc, char** argv)
     testShader.SetUniformMat4f("u_view", camera.GetView());
     testShader.SetUniformMat4f("u_proj", camera.GetProjection());
 
+
+
+    auto segment = lux::Segment(0.5f, 1.0f, 0.0f, 45.0f, 2.0f);
+    auto segment2 = lux::Segment(1.25f, 1.5f, 0.0f, 15.0f, 1.0f);
+
+  
 
     while (window.Loop())
     {
@@ -540,7 +515,7 @@ int main(int argc, char** argv)
         }
         
         testShader.SetUniformMat4f("u_model", model);
-        emitterMesh.Draw(renderer, testShader);
+        //emitterMesh.Draw(renderer, testShader);
         
         //testShader.SetUniformMat4f("u_model", model);
         segment.Draw(renderer, testShader);
@@ -558,40 +533,24 @@ int main(int argc, char** argv)
         }
         
         
-
-
-        // note this used shaderBase!!!
         lightCube.Draw(renderer, shaderBase);
         lightCube2.Draw(renderer, shaderBase2);
-        
 
 
-        /*
-        shaderQuad.Bind();
-        shaderQuad.SetUniformMat4f("u_MVP", mvp);
-        shaderQuad.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);           
-        // wireframe cube
-        cube.DrawOutline(renderer, shaderQuad);
-        ring.Draw(renderer, shaderQuad);
-        */
-
-        // border
-        /*
-        shaderQuad.SetUniformMat4f("u_MVP", mvpOrtho);
-        shaderQuad.SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
-        lines.Draw(renderer, shaderQuad);
-        */
-
-        
+        //backgroundQuad.Draw(renderer, shaderUX);
         scoopedCorner.Draw(renderer, shaderUX);
-        horzBar.Draw(renderer, shaderUX);
+        roundedCorner.Draw(renderer, shaderUX);
+        roundedCorner2.Draw(renderer, shaderUX);
+        //horzBar.Draw(renderer, shaderUX);
+        topCar.Draw(renderer, shaderUX);
         
 
-        
-        //skybox.Render(camera_position, proj);
+
+        if (imguiLayer.useSkybox)
+            skybox.Render(camera.GetPosition(), camera.GetProjection());
         
 
-        if (show_text)
+        if (imguiLayer.showText)
         {
             // TODO text can be made faster here!
             textList.SetText(2, fmt::sprintf("MODEL: % 12.6f % 12.6f % 12.6f", mRotate[0], mRotate[1], mRotate[2]));
@@ -606,10 +565,12 @@ int main(int argc, char** argv)
             textList.Draw();
         }
 
+        //backgroundQuad.Draw(renderer, shaderUX);
+
         layers.Draw();
 
 
-        if (animate)
+        if (imguiLayer.animate)
         {
             lightPos += lightInc;
 
@@ -617,25 +578,16 @@ int main(int argc, char** argv)
             {
                 lightInc.x = -lightInc.x;
             }
-            //ubo_Awesome.SetUniform("ux_light_pos", glm::vec4(lightPos, 1.0));
             ubo_Lights.SetUniformVec4("lights[0].position", glm::vec4(lightPos, 1.0));
             shaderBase.Bind();
             shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lightPos));
 
             glm::vec3 lp2 = glm::vec3(1.0f, lightPos.y, lightPos.x);
-            //glm::mat4 lp2m = lux::rotateAroundAxis(glm::mat4(1.0f), axis, mRotate);
 
             ubo_Lights.SetUniformVec4("lights[1].position", glm::vec4(lp2, 1.0f));
             shaderBase2.Bind();
             shaderBase2.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lp2));
-            //shaderBase2.SetUniformMat4f("u_model", lp2m);
-            /*
-            mRotate += (0.00025, 0.00025, 0.00025);
-            if (mRotate.x >= lux::PI2)
-            {
-                mRotate = glm::vec3(0.0);
-            }
-            */
+
             if (rotator_increment > 0.0)
             {
                 rotator += rotator_increment;

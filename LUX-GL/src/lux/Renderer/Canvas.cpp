@@ -143,6 +143,7 @@ namespace lux {
         // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+ 
     void Canvas::Render() const
     {
         // frameBuffer.Init(); canvas.Init();
@@ -157,7 +158,8 @@ namespace lux {
           // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
         // clear all relevant buffers
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // set clear color to white (not really necessery actually, since we won't be able to see behind the quad anyways)
+        // TODO Add Clean Color into the framebuffer!
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // set clear color to 1 so blending works properly
         //glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);

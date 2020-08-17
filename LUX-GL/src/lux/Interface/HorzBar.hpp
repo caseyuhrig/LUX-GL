@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Mesh.hpp"
+#include "../Primitive/Mesh.hpp"
 
 
 namespace lux {

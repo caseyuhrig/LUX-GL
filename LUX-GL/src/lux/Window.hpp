@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "Context.hpp"
-#include "Core.hpp"
+#include "Types.hpp"
 
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"

@@ -38,6 +38,13 @@ namespace lux {
             _lights_UBO = lightsUniform;
         }
         void SetShaderBase(Shader* shader) { _shader_base = shader; }
+
+        void SetCubemapSwapFunction(void (*callback_function)(void));
+
+        bool useSkybox = false;
+        bool useCubemap = false;
+        bool animate = true;
+        bool showText = true;
     private:
         Window* _window;
         Camera* _camera;
@@ -53,5 +60,7 @@ namespace lux {
         float* _scale2;
         glm::vec3* _translate2;
         glm::vec3* _rotate2;
+
+        
     };
 }

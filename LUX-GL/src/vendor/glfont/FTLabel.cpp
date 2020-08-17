@@ -158,8 +158,8 @@ void FTLabel::recalculateVertices(const char* text, float x, float y, int width,
         indent = 0;
     }
     glUseProgram(_programId);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    BlendingBegin();
 
     unsigned int curTex = _fontAtlas[_pixelSize]->getTexId();
     glActiveTexture(GL_TEXTURE0 + curTex);
@@ -182,7 +182,8 @@ void FTLabel::recalculateVertices(const char* text, float x, float y, int width,
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glDisable(GL_BLEND);
+    BlendingEnd();
+
     glUseProgram(0);
 }
 
@@ -271,9 +272,9 @@ void FTLabel::recalculateVertices(const char* text, float x, float y) {
 
 void FTLabel::render() {
     glUseProgram(_programId);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    BlendingBegin();
+    
     GLuint curTex = _fontAtlas[_pixelSize]->getTexId();
     glActiveTexture(GL_TEXTURE0 + curTex);
 
@@ -294,8 +295,61 @@ void FTLabel::render() {
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glDisable(GL_BLEND);
+    BlendingEnd();
+    
     glUseProgram(0);
+}
+
+void FTLabel::BlendingBegin()
+{
+    //glDisable(GL_BLEND);
+    //glEnable(GL_ALPHA_TEST);
+    //glAlphaFunc(GL_GREATER, 0.92f); // Or some fitting threshold for your texture
+
+    
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE); // OK //takes 3/4 of the src and add it to the entire dest color
+    //glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA); // OK same as GL_SRC_ALPHA, GL_ONE
+    //glBlendFunc(GL_ONE, GL_SRC_ALPHA); // almost it
+    
+    //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+    
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA);
+    //glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
+    //glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA); // does the oposite I'm looking for
+    //glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
+    
+    //glBlendFunc(GL_ONE, GL_DST_ALPHA);
+    //glBlendFunc(GL_ZERO, GL_ZERO);
+    //glBlendFunc(GL_SRC_COLOR, GL_DST_ALPHA);
+    //glBlendFunc(GL_DST_COLOR, GL_ONE);
+    //glBlendFunc(GL_SRC_COLOR, GL_ONE);
+    //glBlendFunc(GL_DST_ALPHA, GL_DST_ONE_MINUS_DST_ALPHA);
+    //glBlendFuncSeparate(GL_ZERO, GL_ONE, GL_ONE, GL_ZERO);
+    //glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ZERO);
+    //glBlendFuncSeparate(GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA);
+
+    // allthe below look good except??
+    // GL_ONE or GL_DST_ALPHA or GL_ONE_MINUS_CONSTANT_COLOR or GL_ONE_MINUS_CONSTANT_ALPHA
+
+    //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
+    //glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendColor(1.0f, 1.0f, 1.0f, 1.0f);
+    //glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+    //glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+    //glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    //glDisable(GL_MULTISAMPLE);
+    //glDisable(GL_BLEND);
+}
+
+
+void FTLabel::BlendingEnd()
+{
+    glDisable(GL_BLEND);
 }
 
 std::vector<std::string> FTLabel::splitText(const char* text) {

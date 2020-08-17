@@ -5,8 +5,8 @@
 
 #include <glm/glm.hpp>
 
-#include "../Core.hpp"
-#include "Shader.hpp"
+#include "../Types.hpp"
+#include "../Renderer/Shader.hpp"
 
 
 namespace lux {

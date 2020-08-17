@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Shader.hpp"
-#include "../Core.hpp"
+#include "../Types.hpp"
 
 
 namespace lux {

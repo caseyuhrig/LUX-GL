@@ -35,6 +35,11 @@ namespace lux {
         //ImGui::StyleColorsClassic();
     }
 
+    void ImGuiLayer::SetCubemapSwapFunction(void (*callback_function)(void))
+    {
+        callback_function();
+    }
+
     void ImGuiLayer::End()
     {
 
@@ -100,6 +105,12 @@ namespace lux {
             ImGui::ColorEdit3("Light Specular", (float*)&_light->specular_color, misc_flags);
             if (ImGui::IsItemActive()) _lights_UBO->SetUniformVec3("lights[0].specular_color", _light->specular_color);
             ImGui::SliderFloat3("Light Increment", (float*)&lightInc, -2.0f, 2.0f);
+            ImGui::Separator();
+            ImGui::Checkbox("Use Skybox", (bool*)&useSkybox); ImGui::SameLine();
+            ImGui::Checkbox("Use Cubemap", (bool*)&useCubemap);
+            ImGui::Separator();
+            ImGui::Checkbox("Animate", (bool*)&animate); ImGui::SameLine();
+            ImGui::Checkbox("Show Text", (bool*)&showText);
             /*
             ImGui::ColorEdit3("s_color1", (float*)&color, misc_flags);
             //if (ImGui::IsItemActive()) ubo_Super.SetUniform("s_color1", color);
