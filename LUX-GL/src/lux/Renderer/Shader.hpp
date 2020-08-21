@@ -6,6 +6,7 @@
 #include <sstream>
 #include <unordered_map>
 #include "glm/glm.hpp"
+#include "../Log.hpp"
 
 
 // https://www.khronos.org/opengl/wiki/GLSL_Object
@@ -132,7 +133,7 @@ namespace lux {
 
             int location = glGetUniformLocation(programID, name.c_str());
             if (location == -1)
-                std::cout << "Warning: uniform '" << name << "' doesn't exist!" << std::endl;
+                UX_LOG_FATAL("Warning: uniform '%s' doesn't exist!", name.c_str());
 
             m_UniformLocationCache[name] = location;
             return location;

@@ -10,7 +10,7 @@ namespace lux {
     Canvas::Canvas() 
         : m_ColorAttachment(0), m_DepthAttachment(0), m_VAO(0), m_FBO(0), m_VBO(0), m_Width(0), m_Height(0)
     {
-        m_Shader = lux::CreateRef<Shader>("res/shaders/canvas-shader.glsl");
+        
     }
 
     Canvas::~Canvas() 
@@ -22,9 +22,17 @@ namespace lux {
         m_Width = width;
         m_Height = height;
         m_Samples = samples;
+        bool multisample = m_Samples > 1;
+
+        if (multisample) 
+            m_Shader = lux::CreateRef<Shader>("res/shaders/canvas-shader-MSAA.glsl");
+        else 
+            m_Shader = lux::CreateRef<Shader>("res/shaders/canvas-shader.glsl");
 
         m_Shader->Bind();
-        m_Shader->SetUniform1i("screenTexture", 0);
+        m_Shader->SetUniform1i("u_ScreenTexture", 0); // +slot?
+        if (multisample)
+            m_Shader->SetUniform1i("u_Samples", m_Samples);
 
         float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
             // positions   // texCoords
@@ -36,9 +44,7 @@ namespace lux {
             1.0f, -1.0f,  1.0f, 0.0f,
             1.0f,  1.0f,  1.0f, 1.0f
         };
-        // screen quad VAO
-        //unsigned int quadVAO;
-        //unsigned int quadVBO;
+        // screen quad VAO and VBO
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
         glBindVertexArray(m_VAO);
@@ -50,44 +56,69 @@ namespace lux {
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
         // framebuffer configuration
-        // -------------------------
-        //unsigned int framebuffer;
         glGenFramebuffers(1, &m_FBO);
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-        // create a color attachment texture
-        //unsigned int textureColorbuffer, m_DepthAttachment;
-        //glGenTextures(1, &textureColorbuffer);  
-        if (m_Samples > 1)
+
+        uint32_t RGB_FORMAT = GL_RGBA16F;
+        //uint32_t RGB_FORMAT = GL_RGBA8;
+        
+        if (multisample)
         {
             glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_ColorAttachment);
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
-            glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA8, m_Width, m_Height, GL_FALSE);
-            //glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            //glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            if (RGB_FORMAT == GL_RGBA16F)
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA16F, m_Width, m_Height, GL_FALSE);
+            else
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA8, m_Width, m_Height, GL_FALSE);
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment, 0);
-
+            /*
+            glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_BrightnessAttachment);
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
+            if (RGB_FORMAT == GL_RGBA16F)
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA16F, m_Width, m_Height, GL_FALSE);
+            else
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA8, m_Width, m_Height, GL_FALSE);
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+            */
 
             glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_DepthAttachment);
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment);
             glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_DEPTH24_STENCIL8, m_Width, m_Height, GL_FALSE);
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment, 0);
             //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment, 0); // REMOVE
             glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_DepthAttachment, 0);
         }
         else {
+            // color attachment
             glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorAttachment);
             glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA8, GL_UNSIGNED_BYTE, NULL); // GL_RGB
+            if (RGB_FORMAT == GL_RGBA16F)
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGBA, GL_FLOAT, nullptr);
+            else
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glBindTexture(GL_TEXTURE_2D, 0);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorAttachment, 0);
-
+            // brightness color attachment
+            glCreateTextures(GL_TEXTURE_2D, 1, &m_BrightnessAttachment);
+            glBindTexture(GL_TEXTURE_2D, m_BrightnessAttachment);
+            if (RGB_FORMAT == GL_RGBA16F)
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGBA, GL_FLOAT, nullptr);
+            else
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            // depth attachment
             glCreateTextures(GL_TEXTURE_2D, 1, &m_DepthAttachment);
             glBindTexture(GL_TEXTURE_2D, m_DepthAttachment);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_Width, m_Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, m_Width, m_Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_ColorAttachment, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_BrightnessAttachment, 0);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment, 0);
             glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_DepthAttachment, 0);
         }
@@ -124,51 +155,45 @@ namespace lux {
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
         }
 */
+        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+        glDrawBuffers(2, attachments);
+
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             UX_LOG_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
-        else UX_LOG_DEBUG("FB GOOD!");
+        else UX_LOG_INFO("Framebuffer GOOD!");
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        std::cout << "m_ColorAttachment: " << m_ColorAttachment << std::endl;
+        //std::cout << "m_ColorAttachment: " << m_ColorAttachment << std::endl;
     }
 
 
-    void Canvas::Begin()
+    void Canvas::Bind() const
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
+        //renderer->Clear();
+        glEnable(GL_DEPTH_TEST);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+        //glDrawBuffers(2, attachments);
     }
 
-    void Canvas::End()
+    void Canvas::Unbind() const
     {
-        // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
  
-    void Canvas::Render() const
+    void Canvas::Draw() const
     {
-        // frameBuffer.Init(); canvas.Init();
-          // framebuffer.Bind(); canvas.Bind();
-          // renderer.Clear();
-          // <draw>
-          // frameBuffer.UnBind(); canvas.UnBind();
-          // renderer.Clear();
-          // renderer.DisableDepthTest();
-          // frameBuffer.Draw();    canvas.Draw();
-
-          // now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        // clear all relevant buffers
-        // TODO Add Clean Color into the framebuffer!
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // set clear color to 1 so blending works properly
-        //glClear(GL_COLOR_BUFFER_BIT);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        m_Shader->Bind();
-        //m_Shader.SetUniform1i("screenTexture", textureColorbuffer);
-        glActiveTexture(GL_TEXTURE0); // + slot WOW guy didn't do this learnopengl         
+        //renderer->Clear();
+        //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glEnable(GL_BLEND);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        // disable blending, does not work with HDR! RGBA16F
+        //glDisable(GL_BLEND);
+        m_Shader->Bind();     
         glBindVertexArray(m_VAO);
+        glActiveTexture(GL_TEXTURE0); // + slot
         if (m_Samples > 1) glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
         else glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);	// use the color attachment texture as the texture of the quad plane
         glDrawArrays(GL_TRIANGLES, 0, 6);

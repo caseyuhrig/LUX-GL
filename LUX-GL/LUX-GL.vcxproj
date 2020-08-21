@@ -78,11 +78,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)src\vendor;$(SolutionDir)Dependencies\irrKlang\include;$(SolutionDir)Dependencies\FT\include;$(SolutionDir)Dependencies\GLFW\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)src\vendor;$(SolutionDir)Dependencies\irrKlang\include;$(SolutionDir)Dependencies\FT\include;$(SolutionDir)Dependencies\GLFW\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)src\vendor;$(SolutionDir)Dependencies\irrKlang\include;$(SolutionDir)Dependencies\FT\include;$(SolutionDir)Dependencies\GLFW\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)src\vendor;$(SolutionDir)Dependencies\irrKlang\include;$(SolutionDir)Dependencies\FT\include;$(SolutionDir)Dependencies\GLFW\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -159,7 +159,9 @@
     <ClInclude Include="src\lux\Interface\Quad.hpp" />
     <ClInclude Include="src\lux\Interface\TopCar.hpp" />
     <ClInclude Include="src\lux\Interface\RoundedCorner.hpp" />
+    <ClInclude Include="src\lux\Renderer\Timer.hpp" />
     <ClInclude Include="src\lux\Scene\Canvas.hpp" />
+    <ClInclude Include="src\lux\Scene\Scene.hpp" />
     <ClInclude Include="src\lux\Types.hpp" />
     <ClInclude Include="src\lux\Primitive\Cube.h" />
     <ClInclude Include="src\lux\Primitive\Cuboid.hpp" />
@@ -179,7 +181,6 @@
     <ClInclude Include="src\lux\Renderer\VertexBuffer.hpp" />
     <ClInclude Include="src\lux\Renderer\VertexBufferLayout.hpp" />
     <ClInclude Include="src\lux\Primitive\Ring.hpp" />
-    <ClInclude Include="src\lux\Scene.hpp" />
     <ClInclude Include="src\lux\Scene\Camera.hpp" />
     <ClInclude Include="src\lux\Scene\ImGuiLayer.hpp" />
     <ClInclude Include="src\lux\Scene\Layer.hpp" />
@@ -553,6 +554,7 @@
     <ClCompile Include="src\vendor\stb_image\stp_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\canvas-shader-MSAA.glsl" />
     <None Include="src\vendor\glm\detail\func_common.inl" />
     <None Include="src\vendor\glm\detail\func_common_simd.inl" />
     <None Include="src\vendor\glm\detail\func_exponential.inl" />

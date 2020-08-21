@@ -286,9 +286,9 @@ namespace lux {
 
         }
 
-        inline bool Loop() const { return !glfwWindowShouldClose(_window_handle); }
+        inline bool ShouldClose() const { return glfwWindowShouldClose(_window_handle); }
 
-        inline void ContinueLoop() const
+        inline void SwapBuffers() const
         {          
             _context->SwapBuffers();
             glfwPollEvents();

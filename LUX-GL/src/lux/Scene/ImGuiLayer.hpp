@@ -33,9 +33,9 @@ namespace lux {
         void SetMaterial(Material* material) { 
             _material = material;
         }
-        void SetLights(Light* light, UniformBuffer* lightsUniform) {
-            _light = light;
-            _lights_UBO = lightsUniform;
+        void SetLights(Lights* lights) {
+            _lights = lights;
+          
         }
         void SetShaderBase(Shader* shader) { _shader_base = shader; }
 
@@ -48,7 +48,7 @@ namespace lux {
     private:
         Window* _window;
         Camera* _camera;
-        Light* _light;
+        Lights* _lights;
         Material* _material;
         UniformBuffer* _lights_UBO;
         Shader* _shader_base;

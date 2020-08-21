@@ -12,7 +12,7 @@ namespace lux {
         MatrixUtils() {}
         ~MatrixUtils() = default;
 
-        static const glm::mat4 RotateAroundAxis(const glm::mat4& model, const glm::vec3& axis, const glm::vec3& angle)
+        static const glm::mat4& RotateAroundAxis(const glm::mat4& model, const glm::vec3& axis, const glm::vec3& angle)
         {
             //glm::mat4 rotMat = glm::rotate(glm::mat4(1.0), angle.x, glm::vec3(1.0, 0.0, 0.0));
             //rotMat = glm::rotate(rotMat, angle.y, glm::vec3(0.0, 1.0, 0.0));

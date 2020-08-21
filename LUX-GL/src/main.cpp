@@ -29,10 +29,12 @@
 #include "lux/Interface/TopCar.hpp"
 #include "lux/Interface/Quad.hpp"
 #include "lux/Primitive/Ring.hpp"
+#include "lux/Scene/Scene.hpp"
 #include "lux/Scene/Camera.hpp"
 #include "lux/Scene/Canvas.hpp"
 #include "lux/Scene/Skybox.hpp"
 #include "lux/Renderer/UniformBuffer.hpp"
+#include "lux/Renderer/Timer.hpp"
 #include "lux/Time.hpp"
 #include "lux/StringUtils.hpp"
 #include "lux/MatrixUtils.hpp"
@@ -112,7 +114,7 @@ int main(int argc, char** argv)
   
 
 
-    glm::vec3 axis = { 0.0, 0.0, 0.0 };
+    
 
     
     float scale = 3.0f; // 5.0 1.0; //0.125;  
@@ -126,16 +128,19 @@ int main(int argc, char** argv)
     glm::vec3 rotate2 = { 0.375f, 0.469f, 0.0f };
     
 
-    float rotator = 0.0;
-    float rotator_increment = 0.0; //0.001;
+    // REGISTRY -----------------------------------------------
+    entt::registry registry;
 
-    glm::vec4 color = { 0.2, 0.2, 0.2, 1.0 };
+
+    glm::mat4 model = lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
+    model = lux::MatrixUtils::Transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
+    
 
 
     // lighting
     //glm::vec3 lightPos = glm::vec3(-24.0, 1.0, 1.0);
     glm::vec3 lightPos = glm::vec3(13.0, 17.0, 1.0);
-    glm::vec3 lightInc = glm::vec3(0.045, 0.0, 0.0);
+    glm::vec3 lightInc = glm::vec3(1.0, 0.0, 0.0);
 
     glm::vec4 light_color = { 1.0, 1.0, 1.0, 1.0 };
     glm::vec4 light_ambient = { 0.2, 0.2, 0.2, 1.0 };
@@ -143,41 +148,27 @@ int main(int argc, char** argv)
     glm::vec4 light_specular = { 0.2, 0.2, 0.2, 1.0 };
 
 
-    lux::Light light1 = {
+    lux::LightProperties light1 = lux::LightProperties(
         lightPos,
         light_ambient,
         light_diffuse,
         light_specular
-    };
+    );
 
-    lux::Light light2 = {
+    lux::LightProperties light2 = lux::LightProperties(
         glm::vec3(1.0f, 1.0f, -24.0f),
         light_ambient,
         light_diffuse,
         light_specular
-    };
+    );
 
-    lux::Light lights[2] = { 
+    lux::LightProperties lightProps[2] = {
         light1, 
         light2 
     };
 
-    //std::cout << "Lights Size: " << sizeof(lights) << std::endl;
-
-    auto ubo_Lights = lux::UniformBuffer("LightProperties", 3, 128, &lights);
-    ubo_Lights.AddUniform("lights[0].position", 0, 16);
-    ubo_Lights.AddUniform("lights[0].ambient_color", 16, 12);
-    ubo_Lights.AddUniform("lights[0].diffuse_color", 32, 12);
-    ubo_Lights.AddUniform("lights[0].specular_color", 48, 12);
-
-    ubo_Lights.AddUniform("lights[1].position", 64, 16);
-    ubo_Lights.AddUniform("lights[1].ambient_color", 80, 12);
-    ubo_Lights.AddUniform("lights[1].diffuse_color", 96, 12);
-    ubo_Lights.AddUniform("lights[1].specular_color", 112, 12);
-
-
-    ubo_Lights.SetData(lights);
-
+  
+    auto lights = lux::Lights(lightProps);
 
 
 
@@ -186,44 +177,21 @@ int main(int argc, char** argv)
 
 
     lux::Renderer renderer;
-    //renderer.SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+    renderer.SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
     
 
 
     uint32_t ACTIVE_CAMERA = 0;
 
-    lux::Camera camera = lux::Camera(glm::vec3(0.0f,0.0f,50.0f), glm::vec3(0.0f,0.0f,0.0f));
+    auto camera = lux::Camera(glm::vec3(0.0f,0.0f,50.0f), glm::vec3(0.0f,0.0f,0.0f));
     camera.SetAspectRatio(window.GetAspectRatio());
     camera.SetViewportSize(window.GetFramebufferWidth(), window.GetFramebufferHeight());
-    //glm::mat4 view = camera.GetView();
-    //glm::mat4 proj = camera.GetProjection();
     camera.Publish();
-
-
     
 
-    
-
-
-    lux::SceneProperties scenes[1] = {
-
-           glm::mat4(1.0f),
-           camera.GetView(),
-           camera.GetProjection(),
-           renderer.Gamma()
-    };
-
-
-    auto ubo_SceneProperties = lux::UniformBuffer("SceneProperties", 6, 208, &scenes);
-    ubo_SceneProperties.AddUniform("scenes[0].model", 0, 64);
-    ubo_SceneProperties.AddUniform("scenes[0].view", 64, 64);
-    ubo_SceneProperties.AddUniform("scenes[0].proj", 128, 64);
-    ubo_SceneProperties.AddUniform("scenes[0].gamma", 192, 4);
-
-
-
-
+    auto scene = lux::Scene(camera);
+    scene.Publish();
     
 
 
@@ -231,15 +199,6 @@ int main(int argc, char** argv)
     auto lightCube = lux::Cube(glm::vec3(1.0f, 1.0f, 1.0f));
     auto lightCube2 = lux::Cube(glm::vec3(1.0f, 1.0f, 1.0f));
 
-
-    /*
-    auto lines = lux::Lines();
-    lines.add(glm::vec3(0.0f, window.GetFramebufferWidth() - 1, 0.0f), glm::vec3(window.GetFramebufferWidth() - 1, window.GetFramebufferHeight() - 1, 0.0f)); // TOP
-    lines.add(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(window.GetFramebufferWidth() - 1, 0.0f, 0.0f)); // BOTTOM
-    lines.add(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, window.GetFramebufferHeight() - 1, 0.0f)); // LEFT
-    lines.add(glm::vec3(window.GetFramebufferWidth() - 1, 0.0f, 0.0f), glm::vec3(window.GetFramebufferWidth() - 1, window.GetFramebufferHeight() - 1, 0.0f)); // RIGHT
-    lines.commit();
-    */
   
  
     auto textList = lux::TextList(110, 600, window.GetFramebufferWidth(), window.GetFramebufferHeight());
@@ -256,6 +215,7 @@ int main(int argc, char** argv)
 
 
 
+    glm::vec3 axis = { 0.0, 0.0, 0.0 };
 
     std::array<lux::Ref<lux::Cube>, 260> sub_cubes;
 
@@ -283,7 +243,13 @@ int main(int argc, char** argv)
         model4 = glm::translate(model4, glm::vec3(11.5f, 0, 0)); // radius       
 
         sub_cube2->Transformation() = model4;
-        sub_cubes[n + 20] = sub_cube2;
+        //sub_cubes[n + 20] = sub_cube2;
+
+        lux::Cuboid s_cube = lux::Cuboid(glm::vec3(-0.5), glm::vec3(0.5), glm::mat4(1));
+        s_cube.Build();
+        auto entity = registry.create();
+        registry.emplace<lux::Mesh>(entity, s_cube);
+        registry.emplace<glm::mat4>(entity, model4); // *sub_cube2->Transformation());
     }
     sub_cube_count = 180;
     for (size_t n = 0;n < sub_cube_count;n++)
@@ -296,9 +262,18 @@ int main(int argc, char** argv)
 
         float radius = 0.05 + lux::random(0.1);
         lux::Ref<lux::Cube> sub_cube2 = lux::CreateRef<lux::Cube>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), rm4);
-
         sub_cube2->Transformation() = glm::mat4(1.0);
-        sub_cubes[n + 80] = sub_cube2;
+        //sub_cubes[n + 80] = sub_cube2;
+
+
+        //lux::Ref<lux::Cuboid> sub_cube2 = lux::CreateRef<lux::Cuboid>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), rm4);
+        //lux::Cuboid s_cube = lux::Cuboid(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), rm4);
+        lux::Cuboid s_cube = lux::Cuboid(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1));
+        s_cube.Build();
+
+        auto entity = registry.create();
+        registry.emplace<lux::Mesh>(entity, s_cube);
+        registry.emplace<glm::mat4>(entity, rm4); // *sub_cube2->Transformation());
     }
 
 
@@ -314,11 +289,18 @@ int main(int argc, char** argv)
         rm4 = rm4 * glm::translate(rm4, glm::vec3(8, 0, 0)); // radius
 
         float radius = 0.025 + lux::random(0.1);
-        lux::Ref<lux::Cuboid> moreCube = lux::CreateRef<lux::Cuboid>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1.0f));
-        moreCube->Build();
+        //lux::Ref<lux::Cuboid> moreCube = lux::CreateRef<lux::Cuboid>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1.0f));
+        //moreCube->Build();
 
-        moreCube->SetTransformation(rm4);
-        moreCubes[n] = moreCube;
+        //moreCube->SetTransformation(rm4);
+        //moreCubes[n] = moreCube;
+
+        lux::Cuboid moreCube = lux::Cuboid(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1.0f));
+        moreCube.Build();
+
+        auto entity = registry.create();
+        registry.emplace<lux::Mesh>(entity, moreCube);
+        registry.emplace<glm::mat4>(entity, rm4);
     }
 
    
@@ -382,34 +364,39 @@ int main(int argc, char** argv)
     emitterMesh.Load("Cube_Cube.003", "res/meshes/emitter.obj");
     //emitterMesh.Load("head_Cube", "res/meshes/Toon-Female-blockout.obj");
     emitterMesh.Build();
-    
 
+    {
+        //auto entity = registry.create();
+        //registry.emplace<lux::Mesh>(entity, emitterMesh);
+        //registry.emplace<glm::mat4>(entity, glm::mat4(1));
+    }
 
+    //glm::mat4 out = registry.get<glm::mat4>(entity);
+
+    //std::cout << "OUT: " << glm::to_string(out) << std::endl;
 
     /*
-    entt::registry registry;
-
-    auto entity = registry.create();
-
-    registry.emplace<glm::vec3>(entity, 10.0f, 10.0f, 10.0f);
-
-    glm::vec3 out = registry.get<glm::vec3>(entity);
-
-    std::cout << "OUT: " << glm::to_string(out) << std::endl;
-
-    registry.destroy(entity);
+    for (auto sub_cube : sub_cubes)
+    {
+        //testShader.SetUniformMat4f("u_model", model * sub_cube->Transformation());
+        //sub_cube->Draw(renderer, testShader);
+        auto entity = registry.create();
+        registry.emplace<lux::Mesh>(entity, sub_cube);
+        registry.emplace<glm::mat4>(entity, model * sub_cube->Transformation());
+    }
     */
+    
 
  
 
 
     lux::Canvas canvas = lux::Canvas();
-    canvas.Init(window.GetWidth(), window.GetHeight());
+    canvas.Init(window.GetWidth(), window.GetHeight(), 8);
 
 
     // 2D Primitive UI layer
 
-    float yy = window.GetFramebufferHeight() - 152;
+    
 
     glm::vec4 amber = lux::COLOR_AMBER;
     amber.a = 0.8;
@@ -433,6 +420,7 @@ int main(int argc, char** argv)
 
     auto skybox = lux::Skybox();
     skybox.Init();
+    skybox.SetCamera(camera);
 
     //auto cubemapShader = lux::Shader("res/shaders/cubemap-shader.glsl");
     auto cubemapShader = lux::Shader("res/shaders/cubemap-lighting-shader.glsl");
@@ -445,7 +433,7 @@ int main(int argc, char** argv)
     lux::ImGuiLayer imguiLayer = lux::ImGuiLayer(&window);
     imguiLayer.SetCamera(&camera);
     imguiLayer.SetMaterial(&defaultMaterial);
-    imguiLayer.SetLights(&light1, &ubo_Lights);
+    imguiLayer.SetLights(&lights);
     imguiLayer.SetShaderBase(&shaderBase);
     imguiLayer.Set1(&scale, &translate, &mRotate);
     imguiLayer.Set2(&scale2, &translate2, &rotate2);
@@ -472,11 +460,49 @@ int main(int argc, char** argv)
 
 
     auto segment = lux::Segment(0.5f, 1.0f, 0.0f, 45.0f, 2.0f);
+    segment.Build();
+    for (float angle = 0.0; angle< 360.0; angle += 90.0)
+    {
+        auto entity = registry.create();
+        registry.emplace<lux::Mesh>(entity, segment);
+        registry.emplace<glm::mat4>(entity, glm::rotate(glm::mat4(1), angle * lux::TO_RADf, glm::vec3(0.0, 1.0, 0.0)));
+    }
+
+
     auto segment2 = lux::Segment(1.25f, 1.5f, 0.0f, 15.0f, 1.0f);
+    segment2.Build();
+    for (float angle = 0.0f;angle < 360.0f;angle += 20.0f)
+    {
+        auto entity = registry.create();
+        registry.emplace<lux::Mesh>(entity, segment2);
+        registry.emplace<glm::mat4>(entity, glm::rotate(glm::mat4(1), angle * lux::TO_RADf, glm::vec3(0.0, 1.0, 0.0)));
+    }
 
-  
 
-    while (window.Loop())
+    auto timestep = lux::Timer();
+
+
+    //void* someFunc = []() { 1 + 1; };
+
+    std::function<void()> someFunc = [=]() -> void { 
+    
+        std::cout << "Hello world!" << std::endl;
+    };
+
+    someFunc();
+    someFunc();
+
+    // TODO, add the timestep and canvas into the window.Loop()
+
+    // while(window.Render()) {} ???
+    // while (renderer.Running()) {}
+    // while (renderer.Rendering()) {}
+
+    //glm::mat4 model = lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
+    //model = lux::MatrixUtils::Transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
+    //glm::mat4 mvp = camera.GetViewProjection() * model;
+
+    while (!window.ShouldClose())
     {
         /*
         if (sound1) {
@@ -484,52 +510,34 @@ int main(int argc, char** argv)
             sound1->setPosition(soundPos);
         }
         */
-   
-        canvas.Begin();
-        renderer.Clear();      
         
+        canvas.Bind();
+        renderer.Clear();
+        // TODO use the timestep
+        testShader.SetUniform1f("u_time", renderer.GetTime());
+
         glm::mat4 model = lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
         model = lux::MatrixUtils::Transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
-        //glm::mat4 mvp = proj * view * model;
         glm::mat4 mvp = camera.GetViewProjection() * model;
 
-       
-        testShader.SetUniformMat4f("u_model", model);
-        testShader.SetUniform1f("u_time", renderer.GetTime());
+      
         //cubemapShader.SetUniformMat4f("view", view);
         //cubemapShader.SetUniformMat4f("projection", proj);
         //cubemapShader.SetUniformMat4f("model", model * sub_cube->Transformation());
  
-        //cuboid.Draw(renderer, shaderBox);
+      
 
-        for (auto sub_cube : sub_cubes)
-        {
-            testShader.SetUniformMat4f("u_model", model * sub_cube->Transformation());
-            sub_cube->Draw(renderer, testShader); 
-        }
-        
-        for (auto moreCube : moreCubes)
-        {
-            testShader.SetUniformMat4f("u_model", model * moreCube->GetTransformation());
-            moreCube->Draw(renderer, testShader);
-        }
-        
-        testShader.SetUniformMat4f("u_model", model);
-        //emitterMesh.Draw(renderer, testShader);
-        
-        //testShader.SetUniformMat4f("u_model", model);
-        segment.Draw(renderer, testShader);
-        testShader.SetUniformMat4f("u_model", glm::rotate(model, (float)(90.0 * lux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-        segment.Draw(renderer, testShader);
-        testShader.SetUniformMat4f("u_model", glm::rotate(model, (float)(180.0 * lux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-        segment.Draw(renderer, testShader);
-        testShader.SetUniformMat4f("u_model", glm::rotate(model, (float)(270.0 * lux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-        segment.Draw(renderer, testShader);
+        // make Cube inherit from Cuboid
+    
 
-        for (float ang = 0.0f;ang < 360.0f;ang += 20.0f)
+        auto view = registry.view<lux::Mesh, glm::mat4>();
+        for (auto entity : view) 
         {
-            testShader.SetUniformMat4f("u_model", glm::rotate(model, (float)(ang * lux::TO_RAD), glm::vec3(0.0, 1.0, 0.0)));
-            segment2.Draw(renderer, testShader);
+            auto& mesh = view.get<lux::Mesh>(entity);
+            auto& transformation = view.get<glm::mat4>(entity);
+
+            testShader.SetUniformMat4f("u_model", model * transformation);
+            mesh.Draw(renderer, testShader);
         }
         
         
@@ -537,21 +545,24 @@ int main(int argc, char** argv)
         lightCube2.Draw(renderer, shaderBase2);
 
 
-        //backgroundQuad.Draw(renderer, shaderUX);
-        scoopedCorner.Draw(renderer, shaderUX);
-        roundedCorner.Draw(renderer, shaderUX);
-        roundedCorner2.Draw(renderer, shaderUX);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //scoopedCorner.Draw(renderer, shaderUX);
+        //roundedCorner.Draw(renderer, shaderUX);
+        //roundedCorner2.Draw(renderer, shaderUX);
         //horzBar.Draw(renderer, shaderUX);
         topCar.Draw(renderer, shaderUX);
+        glDisable(GL_BLEND);
+
+
+
+        //if (imguiLayer.useSkybox)
+        //    skybox.Draw();
         
 
-
-        if (imguiLayer.useSkybox)
-            skybox.Render(camera.GetPosition(), camera.GetProjection());
-        
-
-        if (imguiLayer.showText)
+        //if (imguiLayer.showText)
         {
+            glm::vec4 color = { 0.2, 0.2, 0.2, 1.0 };
             // TODO text can be made faster here!
             textList.SetText(2, fmt::sprintf("MODEL: % 12.6f % 12.6f % 12.6f", mRotate[0], mRotate[1], mRotate[2]));
             textList.SetText(3, fmt::sprintf("LIGHT: % 12.6f % 12.6f % 12.6f", lightPos[0], lightPos[1], lightPos[2]));
@@ -565,45 +576,39 @@ int main(int argc, char** argv)
             textList.Draw();
         }
 
-        //backgroundQuad.Draw(renderer, shaderUX);
-
         layers.Draw();
 
 
-        if (imguiLayer.animate)
+        //if (imguiLayer.animate)
         {
-            lightPos += lightInc;
+            // 130 = distance, 4 = seconds
+            //lightPos.x += (lightInc.x * (130.0f / (2.0f / timestep)));
+            //lightPos.x += lightInc.x * timestep.GetIncrement(130.0f, 4.0f);
+            timestep.PingPong(lightPos.x, lightInc.x, -65.0f, 65.0f, 130.0f, 4.0f);
 
-            if (lightPos.x > 65.0f || lightPos.x < -65.0f)
-            {
-                lightInc.x = -lightInc.x;
-            }
-            ubo_Lights.SetUniformVec4("lights[0].position", glm::vec4(lightPos, 1.0));
+            //std::cout << "Timestep: " << timestep << std::endl;
+            //std::cout << "LP.x " << lightPos.x << std::endl;
+
+            lights.SetPosition(0, lightPos);
             shaderBase.Bind();
             shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lightPos));
 
             glm::vec3 lp2 = glm::vec3(1.0f, lightPos.y, lightPos.x);
 
-            ubo_Lights.SetUniformVec4("lights[1].position", glm::vec4(lp2, 1.0f));
+            //ubo_Lights.SetUniformVec4("lights[1].position", glm::vec4(lp2, 1.0f));
+            lights.SetPosition(1, lp2);
             shaderBase2.Bind();
             shaderBase2.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lp2));
-
-            if (rotator_increment > 0.0)
-            {
-                rotator += rotator_increment;
-                if (0.0f > rotator > lux::RADIANS)
-                {
-                    rotator_increment *= -1;
-                }
-            }
         }
      
-        canvas.End();
-        canvas.Render();
+        canvas.Unbind();
+
+        renderer.Clear();
+        canvas.Draw();
       
-        window.ContinueLoop();
-        //glfwSwapBuffers(window);
-        //glfwPollEvents();
+        window.SwapBuffers();
+
+        timestep.Update();
     }
     
     // cleanup audio
@@ -612,6 +617,10 @@ int main(int argc, char** argv)
 
     layers.End();
 
+    //registry.destroy(entity);
+    //registry.destroy();
+
     window.Close();   
+
     return 0;
 }

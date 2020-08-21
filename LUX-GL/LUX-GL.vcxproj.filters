@@ -63,9 +63,6 @@
     <ClInclude Include="src\lux\Log.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\lux\Scene.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\lux\TextList.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1110,6 +1107,12 @@
     <ClInclude Include="src\lux\Scene\Canvas.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\lux\Renderer\Timer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Scene\Scene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp">
@@ -1609,5 +1612,6 @@
     <None Include="src\vendor\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="res\shaders\canvas-shader-MSAA.glsl" />
   </ItemGroup>
 </Project>

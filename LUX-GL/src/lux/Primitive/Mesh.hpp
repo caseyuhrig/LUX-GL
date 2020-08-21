@@ -50,14 +50,14 @@ namespace lux {
         }
         void Load(const std::string& mesh_name, const std::string& file_path);
         // TODO Possibly remove transformation and color.  Entity vars!
-        inline glm::mat4 GetTransformation() { return transformation; }
+        inline glm::mat4 GetTransformation() const { return transformation; }
         inline void SetTransformation(const glm::mat4& trans) { this->transformation = trans; }
-        inline glm::vec4 GetColor() { return color; }
+        inline glm::vec4 GetColor() const { return color; }
         inline void SetColor(const glm::vec4& color) { this->color = color; }
     protected:
         glm::vec3 min, max; // mesh bounds
         glm::mat4 transformation;
-        glm::vec4 color;
+        glm::vec4 color = glm::vec4(1);
         std::vector<float> vertices;
         std::vector<unsigned int> indicies;
         void AddIndex(unsigned int i1, unsigned int i2, unsigned int i3);

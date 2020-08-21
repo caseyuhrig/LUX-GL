@@ -86,11 +86,12 @@ namespace lux {
             ImGui::SliderFloat("Z Near", &_camera->GetZNear(), 0.01f, 2000.0f);
             ImGui::SliderFloat("Z Far", &_camera->GetZFar(), 0.01f, 2000.0f);
             
-            glm::vec3 lightInc = glm::vec3(0.045, 0.0, 0.0);
-            glm::vec3 lpos = _light->position;
+            //glm::vec3 lightInc = glm::vec3(0.045, 0.0, 0.0);
+            //glm::vec3 lpos = _lights->GetPosition(0);
 
             ImGui::Separator();
-            ImGui::SliderFloat3("Light Position", (float*)&_light->position, -100.0f, 100.0f);
+            //ImGui::SliderFloat3("Light Position", (float*)&_lights->GetPosition(0), -100.0f, 100.0f);
+            /*
             if (ImGui::IsItemActive()) {
                 _lights_UBO->SetUniformVec4("lights[0].position", glm::vec4(lpos, 1.0f));
                 //ubo_Awesome.SetUniform("ux_light_pos", glm::vec4(lightPos, 1.0f));
@@ -105,12 +106,15 @@ namespace lux {
             ImGui::ColorEdit3("Light Specular", (float*)&_light->specular_color, misc_flags);
             if (ImGui::IsItemActive()) _lights_UBO->SetUniformVec3("lights[0].specular_color", _light->specular_color);
             ImGui::SliderFloat3("Light Increment", (float*)&lightInc, -2.0f, 2.0f);
+            */
             ImGui::Separator();
             ImGui::Checkbox("Use Skybox", (bool*)&useSkybox); ImGui::SameLine();
             ImGui::Checkbox("Use Cubemap", (bool*)&useCubemap);
             ImGui::Separator();
             ImGui::Checkbox("Animate", (bool*)&animate); ImGui::SameLine();
             ImGui::Checkbox("Show Text", (bool*)&showText);
+            //ImGui::SliderFloat("Gamma", &renderer.Gamma(), 0.0f, 5.0f);
+            //if (ImGui::IsItemActive()) ubo_SceneProperties.SetUniform1f("scenes[0].gamma", renderer.Gamma());
             /*
             ImGui::ColorEdit3("s_color1", (float*)&color, misc_flags);
             //if (ImGui::IsItemActive()) ubo_Super.SetUniform("s_color1", color);
@@ -134,7 +138,7 @@ namespace lux {
                 //break;
             }
 
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            //ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             /*
             int m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
             float m_SnapValue = 0.5f;

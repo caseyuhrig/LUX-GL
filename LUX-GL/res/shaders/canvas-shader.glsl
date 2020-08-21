@@ -15,36 +15,19 @@ void main()
 
 #shader fragment
 #version 450 core
-//precision highp float;
-//precision highp float;
-//precision highp int;
-//precision highp sampler2D;
 
 layout(location = 0) out vec4 FragColor;
 
 in vec2 TexCoords;
 
-//uniform sampler2D screenTexture;
-uniform sampler2DMS screenTexture;
+uniform sampler2D u_ScreenTexture;
 
-
-vec4 MultiSampleTexture(sampler2DMS tex, ivec2 texCoord, int samples)
-{
-    vec4 result = vec4(0.0);
-    for (int i = 0; i < samples; i++)
-        result += texelFetch(tex, texCoord, i);
-
-    result /= float(samples);
-    return result;
-}
 
 void main()
 {
-    ivec2 texSize = textureSize(screenTexture);
-    ivec2 texCoord = ivec2(TexCoords * texSize);
-    FragColor = MultiSampleTexture(screenTexture, texCoord, 8);
-    //FragColor = vec4(1.0,0.0,0.0,1.0);
-    //FragColor = texture(screenTexture, TexCoords).rgba;
+    //ivec2 texSize = textureSize(u_ScreenTexture);
+    //ivec2 texCoord = ivec2(TexCoords * texSize);
+    FragColor = texture(u_ScreenTexture, TexCoords).rgba;
 }
 
 

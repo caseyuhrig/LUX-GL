@@ -65,6 +65,7 @@ namespace lux {
             for (size_t n = 0;n < vb_size;n += 6) {
                 glm::vec3 point = { verticesBox[n], verticesBox[n + 1], verticesBox[n + 2] };
                 point = transformation * glm::vec4(point, 1.0);
+                //point = glm::vec4(point, 1.0) * transformation;
                 //verticesBox[n] = point.x;
                 //verticesBox[n + 1] = point.y;
                 //verticesBox[n + 2] = point.z;

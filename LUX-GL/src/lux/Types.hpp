@@ -30,19 +30,6 @@ namespace lux {
 	static const float TO_RADf = PIf / 180.0f;
 	static const float TO_DEGf = 180.0f / PIf;
 
-	typedef struct SceneProperties // size = 208
-	{
-		glm::mat4 Model;           // 64       0
-		glm::mat4 View;            // 64      64
-		glm::mat4 Proj;            // 64     128
-		float Gamma = 1.0f;        //  4     192
-	};
-
-	
-
-
-	
-
 
 	template<typename T>
 	using Scope = std::unique_ptr<T>;

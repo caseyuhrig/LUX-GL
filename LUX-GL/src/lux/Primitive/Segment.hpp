@@ -1,64 +1,38 @@
 #pragma once
 
-#include "../Types.hpp"
-#include "../Renderer/Renderer.hpp"
-#include "../Renderer/Shader.hpp"
-#include "../Renderer/VertexBufferLayout.hpp"
-#include "glm/gtx/normal.hpp";
+#include <glm/gtx/normal.hpp>
+
+#include "lux/Types.hpp"
+#include "lux/Primitive/Mesh.hpp"
+#include "lux/Renderer/Renderer.hpp"
+#include "lux/Renderer/Shader.hpp"
+#include "lux/Renderer/VertexBufferLayout.hpp"
 
 
 namespace lux {
 
    
 
-    class Segment
+    class Segment : public Mesh
     {
-    private:
-        float* vertices;
-        unsigned int* indicies;
-        Ref<VertexArray> va;
-        Ref<VertexBuffer> vb;
-        Ref<VertexBufferLayout> layout;
-        Ref<IndexBuffer> ib;
-        // LINES
-        Ref<VertexArray> vaLines;
-        Ref<VertexBuffer> vbLines;
-        Ref<VertexBufferLayout> layoutLines;
-        Ref<IndexBuffer> ibLines;
-        void set_vertices(float vertices[], unsigned int index, float x, float y, float z, float nx, float ny, float nz)
-        {
-            vertices[index] = x;
-            vertices[index + 1] = y;
-            vertices[index + 2] = z;
-            vertices[index + 3] = nx;
-            vertices[index + 4] = ny;
-            vertices[index + 5] = nz;
-
-        }
-
-        void set_vertices(float vertices[], unsigned int index, glm::vec3 point, glm::vec3 normal)
-        {
-            set_vertices(vertices, index, point.x, point.y, point.z, normal.x, normal.y, normal.z);
-        }
-       
     public:
         Segment(const float inner_radius, const float outer_radius,
             const float start_angle, const float end_angle,
-            const float thickness)
+            const float thickness) 
+            : inner_radius(inner_radius), outer_radius(outer_radius), 
+            start_angle(start_angle), end_angle(end_angle),
+            thickness(thickness)
         {
-            
+        }
+
+        void CreateGeometry() override
+        {
             // @weird For some reason the normals have to be flipped in opposite directions if smooth or flat lighting is used!
             unsigned int smooth = GL_SMOOTH;
             unsigned int steps = 8;
             float ang_step = (end_angle - start_angle) / steps;
 
-            unsigned int floats_per_vertex = 6;
-            unsigned int repeats = 4;
-            unsigned int num_vertices = (steps * repeats * floats_per_vertex + 12) * 4; // 4 points per quad here!, confusing.
-            vertices = new float[num_vertices];
-
-            unsigned int num_indicies = steps * repeats * 6 + 12; // 6 points make up a quad because 2 tri per quad
-            indicies = new unsigned int[num_indicies];
+            
             // mins
             float min_x = 10000.0f, min_y = -thickness / 2.0f, min_z = 10000.0f;
             float max_x = -10000.0f, max_y = thickness / 2.0f, max_z = -10000.0f;
@@ -97,44 +71,13 @@ namespace lux {
                 glm::vec3 b = glm::vec3(outer_radius * cos((ang + ang_step) * TO_RAD), y_top, outer_radius * sin((ang + ang_step) * TO_RAD));
                 glm::vec3 c = glm::vec3(inner_radius * cos((ang + ang_step) * TO_RAD), y_top, inner_radius * sin((ang + ang_step) * TO_RAD));
                 glm::vec3 d = glm::vec3(inner_radius * cos(ang * TO_RAD), y_top, inner_radius * sin(ang * TO_RAD));
-
-                set_vertices(vertices, index, a, normal_top);
-                set_vertices(vertices, index + 6, b, normal_top);
-                set_vertices(vertices, index + 12, c, normal_top);
-                set_vertices(vertices, index + 18, d, normal_top);
-
-                indicies[idx] = i;
-                indicies[idx + 1] = i + 1;
-                indicies[idx + 2] = i + 2;
-
-                indicies[idx + 3] = i + 0;
-                indicies[idx + 4] = i + 2;
-                indicies[idx + 5] = i + 3;
-
-                index += 24;
-                idx += 6;
-                i += 4;
+               
+                AddQuad(a, b, c, d, normal_top, color);
 
                 // BOTTOM
 
                 a.y = b.y = c.y = d.y = y_bottom;
-
-                set_vertices(vertices, index, a, normal_bottom);
-                set_vertices(vertices, index + 6, b, normal_bottom);
-                set_vertices(vertices, index + 12, c, normal_bottom);
-                set_vertices(vertices, index + 18, d, normal_bottom);
-
-                indicies[idx] = i;
-                indicies[idx + 1] = i + 1;
-                indicies[idx + 2] = i + 2;
-
-                indicies[idx + 3] = i + 0;
-                indicies[idx + 4] = i + 2;
-                indicies[idx + 5] = i + 3;
-
-                index += 24;
-                idx += 6;
-                i += 4;
+                AddQuad(a, b, c, d, normal_bottom, color);
             }
 
             for (float ang = start_angle; ang < end_angle; ang += ang_step)
@@ -148,30 +91,18 @@ namespace lux {
 
                     if (smooth == GL_SMOOTH)
                     {
-                        set_vertices(vertices, index, a, -glm::normalize(a));
-                        set_vertices(vertices, index + 6, b, -glm::normalize(b));
-                        set_vertices(vertices, index + 12, c, -glm::normalize(c));
-                        set_vertices(vertices, index + 18, d, -glm::normalize(d));
+                        glm::vec3 normal = -glm::triangleNormal(a, b, c);
+                        //set_vertices(vertices, index, a, -glm::normalize(a));
+                        //set_vertices(vertices, index + 6, b, -glm::normalize(b));
+                        //set_vertices(vertices, index + 12, c, -glm::normalize(c));
+                        //set_vertices(vertices, index + 18, d, -glm::normalize(d));
+                        AddQuad(a, b, c, d, normal, color);
                     }
                     else {
-                        glm::vec3 normal = glm::triangleNormal(a, b, c);
-                        set_vertices(vertices, index, a, normal);
-                        set_vertices(vertices, index + 6, b, normal);
-                        set_vertices(vertices, index + 12, c, normal);
-                        set_vertices(vertices, index + 18, d, normal);
+                        glm::vec3 normal = -glm::triangleNormal(a, b, c);
+                       
+                        AddQuad(a, b, c, d, normal, color);
                     }
-
-                    indicies[idx] = i;
-                    indicies[idx + 1] = i + 1;
-                    indicies[idx + 2] = i + 2;
-
-                    indicies[idx + 3] = i + 0;
-                    indicies[idx + 4] = i + 2;
-                    indicies[idx + 5] = i + 3;
-
-                    index += 24;
-                    idx += 6;
-                    i += 4;
                 }
                 // OUTER
                 {
@@ -182,32 +113,17 @@ namespace lux {
 
                     if (smooth == GL_SMOOTH)
                     {
-                        set_vertices(vertices, index, a, glm::normalize(a));
-                        set_vertices(vertices, index + 6, b, glm::normalize(b));
-                        set_vertices(vertices, index + 12, c, glm::normalize(c));
-                        set_vertices(vertices, index + 18, d, glm::normalize(d));
+                        glm::vec3 normal = glm::triangleNormal(a, b, c);
+                        //set_vertices(vertices, index, a, glm::normalize(a));
+                        //set_vertices(vertices, index + 6, b, glm::normalize(b));
+                        //set_vertices(vertices, index + 12, c, glm::normalize(c));
+                        //set_vertices(vertices, index + 18, d, glm::normalize(d));
+                        AddQuad(a, b, c, d, normal, color);
                     }
                     else {
-                        glm::vec3 normal = -glm::triangleNormal(a, b, c);
-                        //printf("A: %.6f %.6f %.6f\n", a.x, a.y, a.z);
-                        //printf("N: %.6f %.6f %.6f\n", normal.x, normal.y, normal.z);
-                        set_vertices(vertices, index, a, normal);
-                        set_vertices(vertices, index + 6, b, normal);
-                        set_vertices(vertices, index + 12, c, normal);
-                        set_vertices(vertices, index + 18, d, normal);
+                        glm::vec3 normal = glm::triangleNormal(a, b, c);
+                        AddQuad(a, b, c, d, normal, color);
                     }
-
-                    indicies[idx] = i;
-                    indicies[idx + 1] = i + 1;
-                    indicies[idx + 2] = i + 2;
-
-                    indicies[idx + 3] = i + 0;
-                    indicies[idx + 4] = i + 2;
-                    indicies[idx + 5] = i + 3;
-
-                    index += 24;
-                    idx += 6;
-                    i += 4;
                 }
             }
 
@@ -223,24 +139,9 @@ namespace lux {
                 glm::vec3 c = glm::vec3(inner_radius * cos(ang * TO_RAD), y_top, inner_radius * sin(ang * TO_RAD));
                 glm::vec3 d = glm::vec3(inner_radius * cos(ang * TO_RAD), y_bottom, inner_radius * sin(ang * TO_RAD));
 
-                glm::vec3 normal = glm::triangleNormal(a + offset, b + offset, c + offset);
-
-                set_vertices(vertices, index, a, normal);
-                set_vertices(vertices, index + 6, b, normal);
-                set_vertices(vertices, index + 12, c, normal);
-                set_vertices(vertices, index + 18, d, normal);
-
-                indicies[idx] = i;
-                indicies[idx + 1] = i + 1;
-                indicies[idx + 2] = i + 2;
-
-                indicies[idx + 3] = i + 0;
-                indicies[idx + 4] = i + 2;
-                indicies[idx + 5] = i + 3;
-
-                index += 24;
-                idx += 6;
-                i += 4;
+                // TODO !!! I believe just the x normal needs to be inversed.
+                glm::vec3 normal = -glm::triangleNormal(a + offset, b + offset, c + offset);
+                AddQuad(a, b, c, d, normal, color);
             }
 
             // DRAW THE 2 TRIANGLES FOR THE END ANGLE FACE
@@ -257,54 +158,15 @@ namespace lux {
                 glm::vec3 c = glm::vec3(inner_radius * cos(ang * TO_RAD), y_top, inner_radius * sin(ang * TO_RAD));
                 glm::vec3 d = glm::vec3(inner_radius * cos(ang * TO_RAD), y_bottom, inner_radius * sin(ang * TO_RAD));
 
-                glm::vec3 normal = -glm::triangleNormal(a + offset, b + offset, c + offset); // WAS NEGATIVE
-
-                set_vertices(vertices, index, a, normal);
-                set_vertices(vertices, index + 6, b, normal);
-                set_vertices(vertices, index + 12, c, normal);
-                set_vertices(vertices, index + 18, d, normal);
-
-                indicies[idx] = i;
-                indicies[idx + 1] = i + 1;
-                indicies[idx + 2] = i + 2;
-
-                indicies[idx + 3] = i + 0;
-                indicies[idx + 4] = i + 2;
-                indicies[idx + 5] = i + 3;
-
-                index += 24;
-                idx += 6;
-                i += 4;
+                glm::vec3 normal = glm::triangleNormal(a + offset, b + offset, c + offset); // WAS NEGATIVE
+                AddQuad(a, b, c, d, normal, color);
             }
 
-
-            //std::cout << "num_vertices: " << num_vertices << std::endl;
-            //std::cout << "Index Count: " << index << std::endl;
-            //std::cout << "num_indices: " << num_indicies << std::endl;
-            //std::cout << "IDX Count: " << idx << std::endl;
-
-            va = CreateRef<VertexArray>();
-            // 6 = 3 coord xyz and 3 normal xyz, 36 = # verticies
-            //vb = CreateRef<VertexBuffer>(vertices, 6 * 36 * sizeof(float));
-            vb = CreateRef<VertexBuffer>(vertices, index * sizeof(float));
-            layout = CreateRef<VertexBufferLayout>();
-            layout->Push<float>(3);
-            layout->Push<float>(3);
-            va->AddBuffer(*vb, *layout);
-            ib = CreateRef<IndexBuffer>(indicies, idx);
         }
-
-     
-        void Draw(const Renderer& renderer, const Shader& shader) const
-        {
-            renderer.Draw(GL_TRIANGLES, *va, *ib, shader);
-        }
-
-        ~Segment()
-        {
-            delete vertices;
-            delete indicies;
-        }
+    private:
+        float inner_radius, outer_radius;
+        float start_angle, end_angle;
+        float thickness;
     };
 
 }

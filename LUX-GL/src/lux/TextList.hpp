@@ -49,13 +49,13 @@ namespace lux {
             _fonts.emplace(fontID, font);
         }
 
-        void SetText(unsigned int labelID, const std::string& text)
+        void SetText(unsigned int labelID, const std::string& text) const
         {
             auto label = _labels.at(labelID);
             label->setText2(text);
         }
 
-        void Draw()
+        void Draw() const
         {
             for (auto label : _labels)
                 label->render();

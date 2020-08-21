@@ -57,7 +57,7 @@ namespace lux {
        
         const glm::mat4& GetView() const { return _props.view; }
         const glm::mat4& GetProjection() const { return _props.projection; }
-        const glm::mat4& GetViewProjection() const { return _props.projection * _props.view; }
+        const glm::mat4& GetViewProjection() const { return m_ViewProjection; } //return _props.projection * _props.view;
         const glm::vec3& GetPosition() const { return _props.position; }
         const glm::vec3& GetLookAt() const { return _props.look_at; }
         const float& GetZNear() const { return _props.z_near; }
@@ -66,7 +66,8 @@ namespace lux {
         float& GetZFar() { return _props.z_far; }
 
         
-        void SetViewportSize(uint32_t width, uint32_t height) {
+        void SetViewportSize(uint32_t width, uint32_t height)
+        {
             _props.viewport_width = width;
             _props.viewport_height = height;
             PublishViewportSize();
@@ -79,12 +80,13 @@ namespace lux {
             PublishAspectRatio();
         }
 
-        void PublishViewportSize() { 
+        void PublishViewportSize() const 
+        { 
             _ubo->SetUniform1i("cameras[0].viewport_width", _props.viewport_width); 
             _ubo->SetUniform1i("cameras[0].viewport_height", _props.viewport_height);
         }
 
-        void PublishAspectRatio() { _ubo->SetUniform1f("cameras[0].aspect_ratio", _props.aspect_ratio); }
+        void PublishAspectRatio() const { _ubo->SetUniform1f("cameras[0].aspect_ratio", _props.aspect_ratio); }
         void Publish() { _ubo->SetData(&_props); }
     private:
         void UpdateView()
@@ -93,8 +95,10 @@ namespace lux {
             _props.view = glm::lookAt(_props.position,     // Camera position in world space
                 _props.look_at,      // look at origin
                 glm::vec3(0, 1, 0)); // Head is up (set to 0, -1, 0 to look upside down)
+            m_ViewProjection = _props.projection * _props.view;
         }
         CameraProperties _props;
         Ref<UniformBuffer> _ubo;
+        glm::mat4 m_ViewProjection;
     };
 }
