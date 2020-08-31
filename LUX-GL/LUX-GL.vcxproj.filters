@@ -1113,6 +1113,21 @@
     <ClInclude Include="src\lux\Scene\Scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\lux\Scene\LcarsLayer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Sound.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Primitive\Plane.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Renderer\Cubemap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Scene\Shadows.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp">
@@ -1613,5 +1628,8 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="res\shaders\canvas-shader-MSAA.glsl" />
+    <None Include="res\shaders\point_shadows.glsl" />
+    <None Include="res\shaders\point_shadows_depth.glsl" />
+    <None Include="res\shaders\visualize_normals.glsl" />
   </ItemGroup>
 </Project>

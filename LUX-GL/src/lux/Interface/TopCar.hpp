@@ -8,6 +8,7 @@ namespace lux {
     class TopCar : public Mesh
     {
     public:
+        TopCar() {}
         TopCar(const glm::vec2& min, const glm::vec2& max, 
                float sideWidth, float horzHeight, float radius, float scoopRadius, const glm::vec4& color)
             : Mesh(glm::vec3(min, 0.0f), glm::vec3(max, 0.0f)), 

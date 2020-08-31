@@ -23,6 +23,9 @@ namespace lux {
         float aspect_ratio;        //  4      240
         //float z_near = 0.01f;
         //float z_far = 2000.0;
+
+        //glm::vec3 Position;
+        //glm::vec3 LookAt;
 	};                             //  size = 244 (256)
 
     class Camera
@@ -34,7 +37,7 @@ namespace lux {
         {
             _props.position = position;
             _props.look_at = lookAt;
-            _props.z_far = 2000.0f;
+            _props.z_far = 120.0f; //2000.0f;
             _props.z_near = 0.01f;
             // 5 = binding point
             _ubo = lux::CreateRef<UniformBuffer>("CameraProperties", 5, 256, &_props);
@@ -53,9 +56,10 @@ namespace lux {
         }
         ~Camera() = default;
 
-        
+      
        
         const glm::mat4& GetView() const { return _props.view; }
+        //glm::mat4& GetView() { return _props.view; }
         const glm::mat4& GetProjection() const { return _props.projection; }
         const glm::mat4& GetViewProjection() const { return m_ViewProjection; } //return _props.projection * _props.view;
         const glm::vec3& GetPosition() const { return _props.position; }
@@ -64,39 +68,55 @@ namespace lux {
         float& GetZNear() { return _props.z_near; }
         const float& GetZFar() const { return _props.z_far; }
         float& GetZFar() { return _props.z_far; }
+        const uint32_t& GetViewportWidth() const { return _props.viewport_width; }
+        //uint32_t& GetViewportWidth() { return _props.viewport_width; }
+        const uint32_t& GetViewportHeight() const { return _props.viewport_width; }
 
         
-        void SetViewportSize(uint32_t width, uint32_t height)
+        void SetViewportSize(const uint32_t& width, const uint32_t& height)
         {
             _props.viewport_width = width;
             _props.viewport_height = height;
+            _props.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+            UpdateView();
             PublishViewportSize();
+            PublishAspectRatio();
         }
-
+        /*
         void SetAspectRatio(float aspectRatio)
         {
             _props.aspect_ratio = aspectRatio;
             UpdateView();
             PublishAspectRatio();
         }
-
+        */
         void PublishViewportSize() const 
-        { 
+        {
             _ubo->SetUniform1i("cameras[0].viewport_width", _props.viewport_width); 
             _ubo->SetUniform1i("cameras[0].viewport_height", _props.viewport_height);
         }
 
         void PublishAspectRatio() const { _ubo->SetUniform1f("cameras[0].aspect_ratio", _props.aspect_ratio); }
-        void Publish() { _ubo->SetData(&_props); }
-    private:
+        void Publish() const { _ubo->SetData(&_props); }
+        /*
+        glm::mat4 GetUpsideDownView()
+        {
+            return glm::lookAt(_props.position,     // Camera position in world space
+                _props.look_at,      // look at origin
+                glm::vec3(0, -1, 0)); // Head is up (set to 0, -1, 0 to look upside down)
+        }
+        */
+
         void UpdateView()
         {
-            _props.projection = glm::infinitePerspective(glm::radians(55.0f), _props.aspect_ratio, _props.z_near);
+            //_props.projection = glm::infinitePerspective(glm::radians(55.0f), _props.aspect_ratio, _props.z_near);
+            _props.projection = glm::perspective(glm::radians(55.0f), _props.aspect_ratio, _props.z_near, _props.z_far);
             _props.view = glm::lookAt(_props.position,     // Camera position in world space
                 _props.look_at,      // look at origin
                 glm::vec3(0, 1, 0)); // Head is up (set to 0, -1, 0 to look upside down)
             m_ViewProjection = _props.projection * _props.view;
         }
+    private:
         CameraProperties _props;
         Ref<UniformBuffer> _ubo;
         glm::mat4 m_ViewProjection;

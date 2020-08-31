@@ -106,9 +106,9 @@ namespace lux {
             unsigned int gs = 0;
             if (geometryShader.length() > 0)
             {
-                //std::cout << geometryShader << std::endl;
-                //gs = CompileShader(GL_GEOMETRY_SHADER, geometryShader);
-                //glAttachShader(program, gs);
+                std::cout << geometryShader << std::endl;
+                gs = _CompileShader(GL_GEOMETRY_SHADER, geometryShader);
+                glAttachShader(program, gs);
             }
             glAttachShader(program, vs);
             glAttachShader(program, fs);

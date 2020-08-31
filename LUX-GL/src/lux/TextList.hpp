@@ -28,6 +28,8 @@ namespace lux {
         //std::vector<std::unique_ptr<FTLabel>> _labels;
         std::vector<std::shared_ptr<FTLabel>> _labels;
     public:
+        TextList() {}
+
         TextList(int x, int y, int width, int height) : _x(x), _y(y), _width(width), _height(height), _y_pos(y)
         {
         }

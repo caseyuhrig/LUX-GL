@@ -4,8 +4,8 @@
 //#include <cstdint>
 //#include <memory>
 
-#include "../Core.hpp"
-#include "../Log.hpp"
+#include "lux/Types.hpp"
+#include "lux/Log.hpp"
 
 
 // http://www.lighthouse3d.com/tutorials/opengl-selection-tutorial/

@@ -19,6 +19,13 @@ namespace lux {
         void Begin();
         void End();
 
+        void SetCubeTransforms(glm::vec3* scaleCube, glm::vec3* translateCube, glm::vec3* rotateCube)
+        {
+            m_ScaleCube = scaleCube;
+            m_TranslateCube = translateCube;
+            m_RotateCube = rotateCube;
+        }
+
         void Set1(float* scale, glm::vec3* translate, glm::vec3* rotate) {
             _scale1 = scale;
             _translate1 = translate;
@@ -37,10 +44,12 @@ namespace lux {
             _lights = lights;
           
         }
+        void SetLightPos(glm::vec3* lightPos) { m_LightPos = lightPos; }
         void SetShaderBase(Shader* shader) { _shader_base = shader; }
 
         void SetCubemapSwapFunction(void (*callback_function)(void));
 
+        bool useShadows = true;
         bool useSkybox = false;
         bool useCubemap = false;
         bool animate = true;
@@ -52,6 +61,12 @@ namespace lux {
         Material* _material;
         UniformBuffer* _lights_UBO;
         Shader* _shader_base;
+
+        glm::vec3* m_LightPos;
+
+        glm::vec3* m_ScaleCube;
+        glm::vec3* m_TranslateCube;
+        glm::vec3* m_RotateCube;
 
         float* _scale1;
         glm::vec3* _translate1;

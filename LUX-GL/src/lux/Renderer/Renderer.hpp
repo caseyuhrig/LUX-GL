@@ -53,7 +53,6 @@ namespace lux {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
-        float GetTime() { return static_cast<float>(glfwGetTime()); }
         float& Gamma() { return gamma; }
 
     private:

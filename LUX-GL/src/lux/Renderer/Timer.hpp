@@ -52,7 +52,7 @@ namespace lux {
 			return length / (duration / m_DeltaTime);
 		}
 
-		inline void PingPong(float& value, float& direction, const float& min, const float& max, const float& length, const float& duration) const
+		inline float PingPong(float& value, float& direction, const float& min, const float& max, const float& length, const float& duration) const
 		{
 			//value += direction * (length / (duration / m_DeltaTime));
 			//clamp, floor
@@ -76,6 +76,7 @@ namespace lux {
 				return;
 			}
 			*/
+			return value;
 		}
 
 

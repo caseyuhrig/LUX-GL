@@ -184,18 +184,17 @@ namespace lux {
  
     void Canvas::Draw() const
     {
-        //renderer->Clear();
-        //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //glEnable(GL_BLEND);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        // disable blending, does not work with HDR! RGBA16F
-        //glDisable(GL_BLEND);
         m_Shader->Bind();     
         glBindVertexArray(m_VAO);
         glActiveTexture(GL_TEXTURE0); // + slot
         if (m_Samples > 1) glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
         else glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);	// use the color attachment texture as the texture of the quad plane
+        
+        /*
+        glActiveTexture(GL_TEXTURE0);
+        if (m_Samples > 1) glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_BrightnessAttachment);
+        else glBindTexture(GL_TEXTURE_2D, m_BrightnessAttachment);	// use the color attachment texture as the texture of the quad plane
+        */
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }

@@ -63,13 +63,18 @@ namespace lux {
             */
             ImGui::SliderFloat("M1 Scale", _scale1, 1.0f, 50.0f);
             ImGui::SliderFloat3("M1 Translate", (float*)_translate1, -20.0f, 20.0f);
-            ImGui::SliderFloat3("M1 Rotate", (float*)_rotate1, 0.0f, lux::PI2);
+            ImGui::SliderFloat3("M1 Rotate", (float*)_rotate1, 0.0f, lux::PI2f);
             ImGui::Separator();
             ImGui::SliderFloat("M2 Scale", _scale2, 1.0f, 50.0f);
             ImGui::SliderFloat3("M2 Translate", (float*)_translate2, -20.0f, 20.0f);
-            ImGui::SliderFloat3("M2 Rotate", (float*)_rotate2, 0.0f, lux::PI2);
+            ImGui::SliderFloat3("M2 Rotate", (float*)_rotate2, 0.0f, lux::PI2f);
             ImGui::Separator();
-            
+
+            ImGui::SliderFloat3("Cube Scale", (float*)m_ScaleCube, 1.0f, 10.0f);
+            ImGui::SliderFloat3("Cube Translate", (float*)m_TranslateCube, -10.0f, 10.0f);
+            ImGui::SliderFloat3("Cube Rotate", (float*)m_RotateCube, 0.0f, lux::PI2f);
+            ImGui::Separator();
+
             // MATERIAL
             ImGui::ColorEdit3("Ambient Color", (float*)&_material->GetAmbientColor(), misc_flags);
             if (ImGui::IsItemActive()) _material->PublishAmbientColor(); 
@@ -82,16 +87,19 @@ namespace lux {
             ImGui::Separator();
             
             ImGui::SliderFloat3("Camera Position", (float*)&_camera->GetPosition(), -100.0f, 100.0f);
+            if (ImGui::IsItemActive()) { _camera->UpdateView(); }
             ImGui::SliderFloat3("Camera Look At", (float*)&_camera->GetLookAt(), -100.0f, 100.0f);
+            if (ImGui::IsItemActive()) { _camera->UpdateView(); }
             ImGui::SliderFloat("Z Near", &_camera->GetZNear(), 0.01f, 2000.0f);
             ImGui::SliderFloat("Z Far", &_camera->GetZFar(), 0.01f, 2000.0f);
             
             //glm::vec3 lightInc = glm::vec3(0.045, 0.0, 0.0);
             //glm::vec3 lpos = _lights->GetPosition(0);
-
+            
             ImGui::Separator();
-            //ImGui::SliderFloat3("Light Position", (float*)&_lights->GetPosition(0), -100.0f, 100.0f);
+            ImGui::SliderFloat3("Light Position", (float*)m_LightPos, -100.0f, 100.0f);
             /*
+            ImGui::SliderFloat3("Light Position", (float*)&_lights->GetPosition(0), -100.0f, 100.0f);
             if (ImGui::IsItemActive()) {
                 _lights_UBO->SetUniformVec4("lights[0].position", glm::vec4(lpos, 1.0f));
                 //ubo_Awesome.SetUniform("ux_light_pos", glm::vec4(lightPos, 1.0f));
@@ -108,8 +116,9 @@ namespace lux {
             ImGui::SliderFloat3("Light Increment", (float*)&lightInc, -2.0f, 2.0f);
             */
             ImGui::Separator();
-            ImGui::Checkbox("Use Skybox", (bool*)&useSkybox); ImGui::SameLine();
-            ImGui::Checkbox("Use Cubemap", (bool*)&useCubemap);
+            ImGui::Checkbox("Skybox", (bool*)&useSkybox); ImGui::SameLine();
+            ImGui::Checkbox("Cubemap", (bool*)&useCubemap);
+            ImGui::Checkbox("Shadows", (bool*)&useShadows);
             ImGui::Separator();
             ImGui::Checkbox("Animate", (bool*)&animate); ImGui::SameLine();
             ImGui::Checkbox("Show Text", (bool*)&showText);

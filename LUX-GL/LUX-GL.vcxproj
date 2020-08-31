@@ -159,9 +159,14 @@
     <ClInclude Include="src\lux\Interface\Quad.hpp" />
     <ClInclude Include="src\lux\Interface\TopCar.hpp" />
     <ClInclude Include="src\lux\Interface\RoundedCorner.hpp" />
+    <ClInclude Include="src\lux\Primitive\Plane.hpp" />
+    <ClInclude Include="src\lux\Renderer\Cubemap.hpp" />
     <ClInclude Include="src\lux\Renderer\Timer.hpp" />
     <ClInclude Include="src\lux\Scene\Canvas.hpp" />
+    <ClInclude Include="src\lux\Scene\LcarsLayer.hpp" />
     <ClInclude Include="src\lux\Scene\Scene.hpp" />
+    <ClInclude Include="src\lux\Scene\Shadows.hpp" />
+    <ClInclude Include="src\lux\Sound.hpp" />
     <ClInclude Include="src\lux\Types.hpp" />
     <ClInclude Include="src\lux\Primitive\Cube.h" />
     <ClInclude Include="src\lux\Primitive\Cuboid.hpp" />
@@ -555,6 +560,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\canvas-shader-MSAA.glsl" />
+    <None Include="res\shaders\point_shadows.glsl" />
+    <None Include="res\shaders\point_shadows_depth.glsl" />
+    <None Include="res\shaders\visualize_normals.glsl" />
     <None Include="src\vendor\glm\detail\func_common.inl" />
     <None Include="src\vendor\glm\detail\func_common_simd.inl" />
     <None Include="src\vendor\glm\detail\func_exponential.inl" />
