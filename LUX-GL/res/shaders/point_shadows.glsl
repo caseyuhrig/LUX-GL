@@ -171,6 +171,7 @@ void main()
     if(brightness > 1.0)
         BrightColor = vec4(FragColor.rgb, 1.0);
     else
-        BrightColor = vec4(1.25, 0.0, 0.0, 1.0); // black
+        BrightColor = vec4(0.0, 0.0, 0.0, 1.0); // black
 
+    //BrightColor = FragColor;
 }

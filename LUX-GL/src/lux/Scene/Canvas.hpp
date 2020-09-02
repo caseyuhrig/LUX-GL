@@ -27,5 +27,12 @@ namespace lux {
         uint32_t m_Width;
         uint32_t m_Height;
         Ref<Shader> m_Shader;
+        Ref<Shader> m_ShaderBlur;
+        Ref<Shader> m_ShaderBloomFinal;
+
+        uint32_t pingpongFBO[2];
+        uint32_t pingpongColorbuffers[2];
+        bool m_Bloom = true;
+        float m_Exposure = 1.0f;
     };
 }

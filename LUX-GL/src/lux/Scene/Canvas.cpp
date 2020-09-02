@@ -22,6 +22,16 @@ namespace lux {
         m_Width = width;
         m_Height = height;
         m_Samples = samples;
+
+        m_ShaderBlur = lux::CreateRef<Shader>("res/shaders/shader-blur.glsl");
+        m_ShaderBloomFinal = lux::CreateRef<Shader>("res/shaders/shader-bloom_final.glsl");
+
+        m_ShaderBlur->Bind();
+        m_ShaderBlur->SetUniform1i("image", 0);
+        m_ShaderBloomFinal->Bind();
+        m_ShaderBloomFinal->SetUniform1i("scene", 0);
+        m_ShaderBloomFinal->SetUniform1i("bloomBlur", 1);
+
         bool multisample = m_Samples > 1;
 
         if (multisample) 
@@ -71,15 +81,15 @@ namespace lux {
             else
                 glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA8, m_Width, m_Height, GL_FALSE);
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-            /*
+            
             glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_BrightnessAttachment);
-            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_BrightnessAttachment);
             if (RGB_FORMAT == GL_RGBA16F)
                 glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA16F, m_Width, m_Height, GL_FALSE);
             else
                 glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA8, m_Width, m_Height, GL_FALSE);
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-            */
+            
 
             glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_DepthAttachment);
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment);
@@ -87,6 +97,7 @@ namespace lux {
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D_MULTISAMPLE, m_BrightnessAttachment, 0);
             //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment, 0); // REMOVE
             glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_DepthAttachment, 0);
         }
@@ -164,6 +175,28 @@ namespace lux {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         //std::cout << "m_ColorAttachment: " << m_ColorAttachment << std::endl;
+
+
+        // ping-pong-framebuffer for blurring
+        //unsigned int pingpongFBO[2];
+        //unsigned int pingpongColorbuffers[2];
+        glGenFramebuffers(2, pingpongFBO);
+        glGenTextures(2, pingpongColorbuffers);
+        for (unsigned int i = 0; i < 2; i++)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
+            glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[i]);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGBA, GL_FLOAT, NULL);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongColorbuffers[i], 0);
+            // also check if framebuffers are complete (no need for depth buffer)
+            if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+                std::cout << "Framebuffer not complete!" << std::endl;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
 
@@ -184,17 +217,54 @@ namespace lux {
  
     void Canvas::Draw() const
     {
-        m_Shader->Bind();     
+        //m_Shader->Bind();     
         glBindVertexArray(m_VAO);
         glActiveTexture(GL_TEXTURE0); // + slot
-        if (m_Samples > 1) glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
-        else glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);	// use the color attachment texture as the texture of the quad plane
+        //if (m_Samples > 1) glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
+        //else glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
+        //glDrawArrays(GL_TRIANGLES, 0, 6);
         
+        
+
         /*
         glActiveTexture(GL_TEXTURE0);
         if (m_Samples > 1) glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_BrightnessAttachment);
         else glBindTexture(GL_TEXTURE_2D, m_BrightnessAttachment);	// use the color attachment texture as the texture of the quad plane
         */
+        // 2. blur bright fragments with two-pass Gaussian Blur 
+        // --------------------------------------------------
+        bool horizontal = true, first_iteration = true;
+        unsigned int amount = 10;
+        m_ShaderBlur->Bind();
+        for (unsigned int i = 0; i < amount; i++)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
+            m_ShaderBlur->SetUniform1i("horizontal", horizontal);
+            glBindTexture(GL_TEXTURE_2D, first_iteration ? m_BrightnessAttachment : pingpongColorbuffers[!horizontal]);  // bind texture of other framebuffer (or scene if first iteration)
+            //renderQuad();
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            horizontal = !horizontal;
+            if (first_iteration)
+                first_iteration = false;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        //return;
+
+        // 3. now render floating point color buffer to 2D quad and tonemap HDR colors to default framebuffer's (clamped) color range
+        // --------------------------------------------------------------------------------------------------------------------------
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_ShaderBloomFinal->Bind();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
+        m_ShaderBloomFinal->SetUniform1i("bloom", m_Bloom);
+        m_ShaderBloomFinal->SetUniform1f("exposure", m_Exposure);
+
+        //glEnable(GL_BLEND);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+        //glDisable(GL_BLEND);
     }
 }

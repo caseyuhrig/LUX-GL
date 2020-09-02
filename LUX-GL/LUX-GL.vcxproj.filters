@@ -1631,5 +1631,7 @@
     <None Include="res\shaders\point_shadows.glsl" />
     <None Include="res\shaders\point_shadows_depth.glsl" />
     <None Include="res\shaders\visualize_normals.glsl" />
+    <None Include="res\shaders\shader-blur.glsl" />
+    <None Include="res\shaders\shader-bloom_final.glsl" />
   </ItemGroup>
 </Project>

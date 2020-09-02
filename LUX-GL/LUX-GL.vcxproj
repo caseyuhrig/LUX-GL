@@ -562,6 +562,8 @@
     <None Include="res\shaders\canvas-shader-MSAA.glsl" />
     <None Include="res\shaders\point_shadows.glsl" />
     <None Include="res\shaders\point_shadows_depth.glsl" />
+    <None Include="res\shaders\shader-bloom_final.glsl" />
+    <None Include="res\shaders\shader-blur.glsl" />
     <None Include="res\shaders\visualize_normals.glsl" />
     <None Include="src\vendor\glm\detail\func_common.inl" />
     <None Include="src\vendor\glm\detail\func_common_simd.inl" />

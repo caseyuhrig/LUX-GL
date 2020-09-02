@@ -326,7 +326,7 @@ int main(int argc, char** argv)
 
 
     lux::Canvas canvas = lux::Canvas();
-    canvas.Init(window.GetWidth(), window.GetHeight(), 8);
+    canvas.Init(window.GetWidth(), window.GetHeight(), 1);
 
 
     auto skybox = lux::Skybox();
@@ -488,6 +488,12 @@ int main(int argc, char** argv)
             //simpleDepthShader->SetUniformMat4f("model", model);
             //plane.Draw(renderer, *simpleDepthShader);
 
+            shaderBase.SetUniformMat4f("u_proj", camera.GetProjection());
+            shaderBase.SetUniformMat4f("u_view", camera.GetView());
+            shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lightPos));
+            //shader->SetUniformMat4f("model", glm::translate(glm::mat4(1.0), lightPos));
+            lightCube.Draw(renderer, shaderBase);
+
             //glDisable(GL_CULL_FACE);
         }
         //glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -584,7 +590,9 @@ int main(int argc, char** argv)
         glm::vec3 lp2 = glm::vec3(1.0f, lightPos.y, lightPos.x);
         lights.SetPosition(1, lp2);
         */
-        
+        //glDisable(GL_BLEND);
+        //glEnable(GL_BLEND);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         layers.Draw();
         /*
         ImGui::Begin("Lights");
