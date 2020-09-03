@@ -17,6 +17,7 @@ namespace lux {
         void Unbind() const;
         void Draw() const;
     private:
+        bool m_Multisample;
         uint32_t m_Samples;
         uint32_t m_FBO;
         uint32_t m_VAO;
@@ -34,5 +35,11 @@ namespace lux {
         uint32_t pingpongColorbuffers[2];
         bool m_Bloom = true;
         float m_Exposure = 1.0f;
+
+        uint32_t m_BloomFBO;
+        uint32_t m_Bloom_ColorAttachment;
+
+        uint32_t m_MSAA_FBO;
+        uint32_t m_MSAA_ColorAttachment;
     };
 }

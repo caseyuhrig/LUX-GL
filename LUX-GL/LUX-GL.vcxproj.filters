@@ -1633,5 +1633,7 @@
     <None Include="res\shaders\visualize_normals.glsl" />
     <None Include="res\shaders\shader-blur.glsl" />
     <None Include="res\shaders\shader-bloom_final.glsl" />
+    <None Include="res\shaders\shader-bloom_final-MSAA.glsl" />
+    <None Include="res\shaders\shader-blur-MSAA.glsl" />
   </ItemGroup>
 </Project>

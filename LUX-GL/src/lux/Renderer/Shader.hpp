@@ -81,6 +81,7 @@ namespace lux {
             glGetShaderiv(id, GL_COMPILE_STATUS, &result);
             if (result == GL_FALSE)
             {
+                std::cout << source << std::endl;
                 std::cout << "ERROR IN SHADER MAGIC!" << std::endl;
                 int length;
                 glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
@@ -106,7 +107,7 @@ namespace lux {
             unsigned int gs = 0;
             if (geometryShader.length() > 0)
             {
-                std::cout << geometryShader << std::endl;
+                //std::cout << geometryShader << std::endl;
                 gs = _CompileShader(GL_GEOMETRY_SHADER, geometryShader);
                 glAttachShader(program, gs);
             }

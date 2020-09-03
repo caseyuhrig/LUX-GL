@@ -326,7 +326,7 @@ int main(int argc, char** argv)
 
 
     lux::Canvas canvas = lux::Canvas();
-    canvas.Init(window.GetWidth(), window.GetHeight(), 1);
+    canvas.Init(window.GetWidth(), window.GetHeight(), 8);
 
 
     auto skybox = lux::Skybox();
@@ -604,6 +604,8 @@ int main(int argc, char** argv)
         */
         canvas.Unbind();
         renderer.Clear();
+
+
         canvas.Draw();
 
         window.SwapBuffers();
