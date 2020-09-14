@@ -10,6 +10,7 @@ namespace lux {
     {
     public:
         Canvas();
+        Canvas(uint32_t width, uint32_t height, uint32_t samples = 8);
         ~Canvas();
 
         void Init(uint32_t width, uint32_t height, uint32_t samples = 8);

@@ -23,6 +23,10 @@ namespace lux {
             start_angle(start_angle), end_angle(end_angle),
             thickness(thickness)
         {
+            // same as Build(). EXCEPT you have to be VERY careful in doing this because
+            // c++ will not call overridden functions if this class is overridden.  That
+            // is why this is not in the parent Mesh classes constructor!!!
+            Build();
         }
 
         void CreateGeometry() override

@@ -98,6 +98,10 @@ namespace lux {
             
             ImGui::Separator();
             ImGui::SliderFloat3("Light Position", (float*)m_LightPos, -100.0f, 100.0f);
+            
+            ImGui::Separator();
+            ImGui::SliderInt("Shadow Samples", m_ShadowSamples, 1.0f, 100.0f);
+            ImGui::SliderFloat("Shadow Bias", m_ShadowBias, 0.0f, 1.0f);
             /*
             ImGui::SliderFloat3("Light Position", (float*)&_lights->GetPosition(0), -100.0f, 100.0f);
             if (ImGui::IsItemActive()) {

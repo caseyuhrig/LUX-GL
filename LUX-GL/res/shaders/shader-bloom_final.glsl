@@ -37,7 +37,6 @@ void main()
         hdrColor += bloomColor; // additive blending
         // tone mapping
         result = vec3(1.0) - exp(-hdrColor * exposure);
-
     }
     //vec3 result = hdrColor;
     // also gamma correct while we're at it       

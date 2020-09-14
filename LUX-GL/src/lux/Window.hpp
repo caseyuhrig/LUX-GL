@@ -104,26 +104,28 @@ namespace lux {
 
             glfwSetWindowUserPointer(_window_handle, this);
 
-            glfwSetWindowSizeCallback(_window_handle, [](GLFWwindow* window, int width, int height)
+            glfwSetWindowSizeCallback(_window_handle, [](GLFWwindow* window, int width, int height) //mutable
                 {
-                    auto* _this = (Window*)glfwGetWindowUserPointer(window);
-                    _this->_window_width = width;
-                    _this->_window_height = height;
-                    // fire off any events here
-                    std::cout << "WindowSizeCallback: " << width << " " << height << std::endl;
+                    //_window_width = 0;
+                    //auto* _this = (Window*)glfwGetWindowUserPointer(window);
+                    //_this->_window_width = width;
+                    //_this->_window_height = height;
 
-                    glfwSetWindowAspectRatio(window, width, height);
+                    // fire off any events here
+                    //std::cout << "WindowSizeCallback: " << width << " " << height << std::endl;
+
+                    //glfwSetWindowAspectRatio(window, width, height);
 
                     // swap the buffer when we resize in realtime!
-                    glfwSwapBuffers(window);
+                    //glfwSwapBuffers(window);
                 });
             glfwSetWindowCloseCallback(_window_handle, [](GLFWwindow* window) {});
             glfwSetWindowContentScaleCallback(_window_handle, [](GLFWwindow* window, float xscale, float yscale)
                 {
-                    auto* _this = (Window*)glfwGetWindowUserPointer(window);
-                    _this->_xscale = xscale;
-                    _this->_yscale = yscale;
-                    std::cout << "WindowContentScaleCallback " << xscale << " " << yscale << std::endl;
+                    //auto* _this = (Window*)glfwGetWindowUserPointer(window);
+                    //_this->_xscale = xscale;
+                    //_this->_yscale = yscale;
+                    //std::cout << "WindowContentScaleCallback " << xscale << " " << yscale << std::endl;
                 });
             glfwSetCursorPosCallback(_window_handle, [](GLFWwindow* window, double xpos, double ypos)
                 {
@@ -131,17 +133,17 @@ namespace lux {
                 });
             glfwSetMouseButtonCallback(_window_handle, [](GLFWwindow* window, int button, int action, int mods)
                 {
-                    std::cout << "MouseButtonCallback " << std::endl;
-                    UX_LOG_INFO("MouseButtonCallback");
+                    //std::cout << "MouseButtonCallback " << std::endl;
+                    //UX_LOG_INFO("MouseButtonCallback");
                 });
             glfwSetScrollCallback(_window_handle, [](GLFWwindow* window, double xoffset, double yoffset)
                 {
-                    auto* _this = (Window*)glfwGetWindowUserPointer(window);
-                    UX_LOG_INFO("ScrollCallback: %f %f", xoffset, yoffset);
+                    //auto* _this = (Window*)glfwGetWindowUserPointer(window);
+                    //UX_LOG_INFO("ScrollCallback: %f %f", xoffset, yoffset);
                 });
             glfwSetKeyCallback(_window_handle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
                 {
-                    UX_LOG_DEBUG("Pressed: %d", key);
+                    //UX_LOG_DEBUG("Pressed: %d", key);
                 });
             glfwSetFramebufferSizeCallback(_window_handle, [](GLFWwindow* window, int width, int height)
                 {
@@ -150,6 +152,8 @@ namespace lux {
                     _this->_framebuffer_height = height;
                     glViewport(0, 0, width, height);
                     // TODO set the aspect ratio so the window doesn't get scewed.
+                    //      Update the camera setting and whot-not.  Need to register
+                    //      a listener from the main program.
                     std::cout << "FramebufferSizeCallback " << width << " " << height << std::endl;
                 });
 
@@ -158,10 +162,10 @@ namespace lux {
             // forever redrawing all the time!
             glfwSetWindowRefreshCallback(_window_handle, [](GLFWwindow* window)
                 {
-                    auto* _this = (Window*)glfwGetWindowUserPointer(window);
-                    std::cout << "WindowRefreshCallback " << _this->_window_width << " " << _this->_window_height << std::endl;
+                    //auto* _this = (Window*)glfwGetWindowUserPointer(window);
+                    //std::cout << "WindowRefreshCallback " << _this->_window_width << " " << _this->_window_height << std::endl;
                     // draw
-                    glfwSwapBuffers(window);
+                    //glfwSwapBuffers(window);
                 });
 
             //glfwSetWindowFocusCallback

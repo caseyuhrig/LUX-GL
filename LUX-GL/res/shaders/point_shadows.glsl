@@ -50,6 +50,8 @@ uniform vec3 viewPos;
 
 uniform float far_plane;
 uniform bool shadows;
+uniform float u_bias;
+uniform int u_samples;
 
 
 // array of offset direction for sampling
@@ -101,8 +103,8 @@ float ShadowCalculation(vec3 fragPos)
 
     
     float shadow = 0.0;
-    float bias = 0.05; //0.05 0.15;
-    int samples = 20; // 200
+    float bias = u_bias; //0.05; //0.05 0.15;
+    int samples = u_samples; //20; // 200
     float viewDistance = length(viewPos - fragPos);
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
     for(int i = 0; i < samples; ++i)
@@ -154,25 +156,15 @@ void main()
     vec3 specular = spec * lightColor;    
     // calculate shadow
     float shadow = shadows ? ShadowCalculation(fs_in.FragPos) : 0.0;
-    //float shadow = ShadowCalculation(fs_in.FragPos);
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
-    //vec3 lightingRed = (ambient + (diffuse + specular)) * color;
-    
-    //lighting[0] = lightingRed[0] * 1.5;
-    
+
+
     FragColor = vec4(lighting, 1.0);
-    //FragColor = CloDep(fs_in.FragPos);
-    //float s = 1.0 - shadow;
-    //FragColor = vec4(s,s,s, 1.0);
-    //FragColor = vec4(shadow, shadow, shadow, 1.0);
-    //FragColor = vec4(vec3(closestDepth / far_plane), 1.0);
+
     
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > 1.0)
         BrightColor = vec4(FragColor.rgb, 1.0);
-        //BrightColor = vec4(1.5, 0.0, 0.0, 1.0);
     else
         BrightColor = vec4(0.0, 0.0, 0.0, 1.0); // black
-
-    //BrightColor = FragColor;
 }

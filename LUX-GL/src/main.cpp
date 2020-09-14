@@ -11,7 +11,7 @@
 // some magic needed to get spdlog working!
 // except it's not working now, build issues.
 
-#define GLM_SWIZZLE
+#define GLM_FORCE_SWIZZLE
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -194,89 +194,94 @@ int main(int argc, char** argv)
 
     glm::vec3 axis = { 0.0, 0.0, 0.0 };
 
-    std::array<lux::Ref<lux::Cube>, 260> sub_cubes;
 
-    
-    size_t sub_cube_count = 20;
-    for (size_t n = 0;n < sub_cube_count;n++)
+
+
+    for (size_t n = 0;n < 20;n++)
     {
-        float angle = lux::PI2f / sub_cube_count * n;
-        lux::Ref<lux::Cube> sub_cube1 = lux::CreateRef<lux::Cube>(glm::vec3(1.0));
+        float angle = lux::PI2f / 20 * n;
+
         glm::mat4 model3 = glm::scale(glm::mat4(1.0), glm::vec3(1.0));
         model3 = lux::MatrixUtils::RotateAroundAxis(model3, axis, glm::vec3(0.0, angle, 0.0));
         model3 = glm::translate(model3, glm::vec3(10, 0, 0)); // radius   
 
-        sub_cube1->Transformation() = model3;
-        sub_cubes[n] = sub_cube1;
+        auto s_cube = lux::Cuboid(glm::vec3(-0.5), glm::vec3(0.5), glm::mat4(1));
 
+        auto entity = registry.create();
+        registry.emplace<lux::Mesh>(entity, s_cube);
+        registry.emplace<glm::mat4>(entity, model3);
     }
-    sub_cube_count = 60;
-    for (size_t n = 0;n < sub_cube_count;n++)
+
+    for (size_t n = 0;n < 60;n++)
     {
-        float angle = lux::PI2f / sub_cube_count * n;
-        lux::Ref<lux::Cube> sub_cube2 = lux::CreateRef<lux::Cube>(glm::vec3(1.0));
+        float angle = lux::PI2f / 60 * n;
+        
         glm::mat4 model4 = glm::scale(glm::mat4(1.0), glm::vec3(0.25));
 
         model4 = lux::MatrixUtils::RotateAroundAxis(model4, axis, glm::vec3(0.0, angle, 0.0));
-        model4 = glm::translate(model4, glm::vec3(11.5f, 0, 0)); // radius       
+        model4 = glm::translate(model4, glm::vec3(11.5f, 0, 0)); // radius             
 
-        sub_cube2->Transformation() = model4;
-
-        lux::Cuboid s_cube = lux::Cuboid(glm::vec3(-0.5), glm::vec3(0.5), glm::mat4(1));
-        s_cube.Build();
+        auto s_cube = lux::Cuboid(glm::vec3(-0.5), glm::vec3(0.5), glm::mat4(1));
+        
         auto entity = registry.create();
         registry.emplace<lux::Mesh>(entity, s_cube);
         registry.emplace<glm::mat4>(entity, model4); // *sub_cube2->Transformation());
     }
     
-    
-    sub_cube_count = 180;
-    for (size_t n = 0;n < sub_cube_count;n++)
+    for (size_t n = 0;n < 180;n++)
     {
-        float length = lux::random<float>(8.0);
-        float angle = lux::random<float>(lux::RADIANS);
+        float length = lux::random(8.0f);
+        float angle = lux::random(lux::RADIANSf);
 
         glm::mat4 rm4 = lux::MatrixUtils::RotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
                   rm4 = glm::translate(rm4, glm::vec3(4, 0, 0)); // radius
 
-        float radius = 0.05 + lux::random<float>(0.1);
-        lux::Ref<lux::Cube> sub_cube2 = lux::CreateRef<lux::Cube>(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), rm4);
-        sub_cube2->Transformation() = glm::mat4(1.0);
+        float radius = 0.05 + lux::random(0.1f);
 
-        lux::Cuboid s_cube = lux::Cuboid(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1));
-        s_cube.Build();
+        auto s_cube = lux::Cuboid(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1));
 
         auto entity = registry.create();
         registry.emplace<lux::Mesh>(entity, s_cube);
-        registry.emplace<glm::mat4>(entity, rm4); // *sub_cube2->Transformation());
+        registry.emplace<glm::mat4>(entity, rm4);
     }
     
-
-    
-    const int moreCount = 300;
-    std::array<lux::Ref<lux::Cuboid>, moreCount> moreCubes;
-    for (size_t n = 0;n < moreCount;n++)
+    for (size_t n = 0;n < 300;n++)
     {
-        float length = lux::random(5.0);
-        float angle = lux::random(lux::RADIANS);
+        float length = lux::random(5.0f);
+        float angle = lux::random(lux::RADIANSf);
 
         glm::mat4 rm4 = lux::MatrixUtils::RotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
         rm4 = rm4 * glm::translate(rm4, glm::vec3(8, 0, 0)); // radius
 
-        float radius = 0.025 + lux::random(0.1);
+        float radius = 0.025f + lux::random(0.1f);
 
-        auto moreCube = lux::Cuboid(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1.0f));
-        moreCube.Build();
+        auto moreCube = lux::Cuboid(glm::vec3(0.5f, -radius, -radius), glm::vec3(0.5f + length, radius, radius), glm::mat4(1.0f));
 
         auto entity = registry.create();
         registry.emplace<lux::Mesh>(entity, moreCube);
+        registry.emplace<glm::mat4>(entity, rm4);
+    }
+
+    // the angled ones
+    for (size_t n = 0;n < 100;n++)
+    {
+        float length = lux::random(5.0f);
+        float angle = lux::random(lux::RADIANSf);
+        float radius = lux::random(0.1f);
+
+        auto bar = lux::Cuboid(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1.0f));
+
+        glm::mat4 rm4 = lux::MatrixUtils::RotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.2));
+        rm4 = glm::translate(rm4, glm::vec3(4, 0, 0));
+
+        auto entity = registry.create();
+        registry.emplace<lux::Mesh>(entity, bar);
         registry.emplace<glm::mat4>(entity, rm4);
     }
     
    
 
     auto cube = lux::Cuboid(glm::vec3(-0.5), glm::vec3(0.5), glm::mat4(1.0));
-    cube.Build();
     {
         auto entity = registry.create();
         registry.emplace<lux::Mesh>(entity, cube);
@@ -312,7 +317,6 @@ int main(int argc, char** argv)
     emitterMesh.Load("Cube_Cube.003", "res/meshes/emitter.obj");
     //emitterMesh.Load("head_Cube", "res/meshes/Toon-Female-blockout.obj");
     emitterMesh.Build();
-
     {
         //auto entity = registry.create();
         //registry.emplace<lux::Mesh>(entity, emitterMesh);
@@ -325,12 +329,10 @@ int main(int argc, char** argv)
  
 
 
-    lux::Canvas canvas = lux::Canvas();
-    canvas.Init(window.GetWidth(), window.GetHeight(), 8);
+    auto canvas = lux::Canvas(window.GetWidth(), window.GetHeight(), 8);
 
 
     auto skybox = lux::Skybox();
-    skybox.Init();
     skybox.SetCamera(camera);
     {
         auto entity = registry.create();
@@ -377,6 +379,13 @@ int main(int argc, char** argv)
     //    testShader = cubemapShader;
     //});
 
+    
+    int shadow_samples = 10;
+    float shadow_bias = 0.3;
+
+    imguiLayer.SetShadowSamples(&shadow_samples);
+    imguiLayer.SetShadowBias(&shadow_bias);
+
     lux::LcarsLayer lcarsLayer = lux::LcarsLayer(&window, renderer, mRotate);
     lcarsLayer.SetLights(lights);
     lcarsLayer.SetRotate(mRotate);
@@ -390,16 +399,9 @@ int main(int argc, char** argv)
 
 
 
-  
-
-    
-
-
-
 
     
     auto segment = lux::Segment(0.5f, 1.0f, 0.0f, 45.0f, 2.0f);
-    segment.Build();
     for (float angle = 0.0; angle< 360.0; angle += 90.0)
     {
         auto entity = registry.create();
@@ -409,7 +411,6 @@ int main(int argc, char** argv)
 
 
     auto segment2 = lux::Segment(1.25f, 1.5f, 0.0f, 15.0f, 1.0f);
-    segment2.Build();
     for (float angle = 0.0f;angle < 360.0f;angle += 20.0f)
     {
         auto entity = registry.create();
@@ -417,16 +418,16 @@ int main(int argc, char** argv)
         registry.emplace<glm::mat4>(entity, glm::rotate(glm::mat4(1), angle * lux::TO_RADf, glm::vec3(0.0, 1.0, 0.0)));
     }
     
-
+    /*
     auto plane = lux::Plane(20, -5, 10);
     plane.SetColor(glm::vec4(1.0f));
     plane.Build();
     {
-        //auto entity = registry.create();
-        //registry.emplace<lux::Mesh>(entity, plane);
-        //registry.emplace<glm::mat4>(entity, glm::mat4(1));
+        auto entity = registry.create();
+        registry.emplace<lux::Mesh>(entity, plane);
+        registry.emplace<glm::mat4>(entity, glm::mat4(1));
     }
-
+    */
     
 
  
@@ -440,14 +441,22 @@ int main(int argc, char** argv)
 
     
     auto shadows = lux::Shadows(camera);
-    shadows.Init();
+    //shadows.Init();
    
-   
-    auto shader = shadows.GetShader();
+    // TODO move this out of the Shadows class, no reason to get the Shader from that location.
+    //auto shader = shadows.GetShader();
+    auto shader = lux::Shader("res/shaders/point_shadows.glsl");
+    shader.SetUniform1i("shadows", true);
+    // TODO, want to remove this, hmm?
     auto simpleDepthShader = shadows.GetDepthShader();
 
     auto shaderVisualizeNormals = lux::Shader("res/shaders/visualize_normals.glsl");
     
+    //camera.SetViewportSize(window.GetFramebufferWidth(), window.GetFramebufferHeight());
+    //camera.Publish();
+
+    
+  
 
     while (!window.ShouldClose())
     {
@@ -456,85 +465,55 @@ int main(int argc, char** argv)
         glm::mat4 mvp = camera.GetViewProjection() * model;
 
         
-
-        // render
-        // ------
         renderer.Clear();
-        //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        
-        shadows.Before(lightPos);
-       
+     
+
+        // 1. Render everything that casts a shadow.
+        shadows.Bind(lightPos);      
         {
-            
-            //glEnable(GL_CULL_FACE);
             auto entityView = registry.view<lux::Mesh, glm::mat4>();
             for (auto entity : entityView)
             {
                 auto& mesh = entityView.get<lux::Mesh>(entity);
                 auto& transformation = entityView.get<glm::mat4>(entity);
-                //glm::mat4 transformation = lux::MatrixUtils::Transform(glm::mat4(1.0f), scaleCube, translateCube, rotateCube);
 
-                //testShader.SetUniformMat4f("u_model", model * transformation);
-                //mesh.Draw(renderer, testShader);
-
-                //glm::mat4 trans = model * glm::scale(glm::mat4(1), scaleCube); // *translateCube* rotateCube;
-
-                simpleDepthShader->SetUniformMat4f("model", model * transformation);
+                shadows.SetModelTransformation(model * transformation);
+                //simpleDepthShader->SetUniformMat4f("model", model * transformation);
                 mesh.Draw(renderer, *simpleDepthShader);
             }
-            
-            //simpleDepthShader->SetUniformMat4f("model", model);
-            //plane.Draw(renderer, *simpleDepthShader);
-
-            shaderBase.SetUniformMat4f("u_proj", camera.GetProjection());
-            shaderBase.SetUniformMat4f("u_view", camera.GetView());
-            shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lightPos));
-            //shader->SetUniformMat4f("model", glm::translate(glm::mat4(1.0), lightPos));
-            lightCube.Draw(renderer, shaderBase);
-
-            //glDisable(GL_CULL_FACE);
         }
-        //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        shadows.After();
-        //glEnable(GL_CULL_FACE);
-        // 2. render scene as normal 
-        // -------------------------
+        shadows.UnBind();
 
+
+
+        // 2. render scene as normal
         glViewport(0, 0, window.GetFramebufferWidth(), window.GetFramebufferHeight());
-
 
         canvas.Bind();
         renderer.Clear();
         // TODO use the timestep
         testShader.SetUniform1f("u_time", timestep);
 
-        //glm::mat4 model = lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
-        //model = lux::MatrixUtils::Transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
-        //glm::mat4 mvp = camera.GetViewProjection() * model;
-
-
-        //glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        //glm::mat4 projection = camera.GetProjection();
-        //glm::mat4 view = camera.GetViewMatrix();
-        //glm::mat4 view = camera.GetView();
-        shader->Bind();
-        shader->SetUniform1i("depthMap", 1);
-        shader->SetUniformMat4f("projection", camera.GetProjection());
-        shader->SetUniformMat4f("view", camera.GetView());
-        // set lighting uniforms
-        shader->SetUniformVec3f("lightPos", lightPos);
-        shader->SetUniformVec3f("viewPos", camera.GetPosition());
-        //shader->SetUniform1i("shadows", shadows);
-        shader->SetUniform1f("far_plane", camera.GetZFar());
-
-
-        
         //cubemapShader.SetUniformMat4f("view", view);
         //cubemapShader.SetUniformMat4f("projection", proj);
         //cubemapShader.SetUniformMat4f("model", model * sub_cube->Transformation());
- 
+
+        shader.Bind();
+        
+        shader.SetUniformMat4f("projection", camera.GetProjection());
+        shader.SetUniformMat4f("view", camera.GetView());
+        // set lighting uniforms
+        shader.SetUniformVec3f("lightPos", lightPos);
+        shader.SetUniformVec3f("viewPos", camera.GetPosition());
+        //shader->SetUniform1i("shadows", shadows);
+        shader.SetUniform1f("far_plane", camera.GetZFar());
+
+        shader.SetUniform1f("u_bias", shadow_bias);
+        shader.SetUniform1i("u_samples", shadow_samples);
+
+        //shader->BindAndActivateTexture(); // do the below 3 lines
+        shader.SetUniform1i("depthMap", 1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, shadows.GetDepthCubemap());
         {
@@ -543,17 +522,9 @@ int main(int argc, char** argv)
             {
                 auto& mesh = entityView.get<lux::Mesh>(entity);
                 auto& transformation = entityView.get<glm::mat4>(entity);
-                //glm::mat4 transformation = lux::MatrixUtils::Transform(glm::mat4(1.0f), scaleCube, translateCube, rotateCube);
 
-                auto transform = model * transformation;
-
-                //testShader.SetUniformMat4f("u_model", model * transformation);
-                //mesh.Draw(renderer, testShader);
-                
-
-                shader->SetUniformMat4f("model", transform);
-                //shader.SetUniform1i("reverse_normals", 0);
-                mesh.Draw(renderer, *shader);
+                shader.SetUniformMat4f("model", model * transformation);
+                mesh.Draw(renderer, shader);
 
                 /*
                 shaderVisualizeNormals.SetUniformMat4f("projection", camera.GetProjection());
@@ -562,13 +533,6 @@ int main(int argc, char** argv)
                 mesh.Draw(renderer, shaderVisualizeNormals);
                 */
             }
-            //glDisable(GL_CULL_FACE);
-            //shader.SetUniform1i("reverse_normals", 1);
-
-            //shader->SetUniformMat4f("model", model);
-            //plane.Draw(renderer, *shader);
-
-            //glEnable(GL_CULL_FACE);
         }
 
         //shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lights.GetPosition(0).xyz()));
@@ -576,7 +540,11 @@ int main(int argc, char** argv)
         shaderBase.SetUniformMat4f("u_view", camera.GetView());
         shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lightPos));
         //shader->SetUniformMat4f("model", glm::translate(glm::mat4(1.0), lightPos));
+
+        //glEnable(GL_BLEND);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         lightCube.Draw(renderer, shaderBase);
+        //glDisable(GL_BLEND);
 
         //shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lights.GetPosition(1).xyz()));
         //lightCube2.Draw(renderer, shaderBase);
@@ -590,21 +558,15 @@ int main(int argc, char** argv)
         glm::vec3 lp2 = glm::vec3(1.0f, lightPos.y, lightPos.x);
         lights.SetPosition(1, lp2);
         */
-        //glDisable(GL_BLEND);
-        //glEnable(GL_BLEND);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        layers.Draw();
-        /*
-        ImGui::Begin("Lights");
-        ImGui::SliderFloat3("Light Position", (float*)&lightPos, -100.0f, 100.0f);
-        //if (ImGui::IsItemActive()) {
-        //    _lights_UBO->SetUniformVec4("lights[0].position", glm::vec4(lpos, 1.0f));
-        //}
-        ImGui::End();
-        */
-        canvas.Unbind();
-        renderer.Clear();
 
+        layers.Draw();
+       
+        canvas.Unbind();
+
+
+
+
+        renderer.Clear();
 
         canvas.Draw();
 

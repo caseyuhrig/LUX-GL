@@ -36,6 +36,10 @@ namespace lux {
             _translate2 = translate;
             _rotate2 = rotate;
         }
+
+        void SetShadowSamples(int* shadowSamples) { m_ShadowSamples = shadowSamples; }
+        void SetShadowBias(float* shadowBias) { m_ShadowBias = shadowBias; }
+
         void SetCamera(Camera* camera) { _camera = camera; }
         void SetMaterial(Material* material) { 
             _material = material;
@@ -76,6 +80,7 @@ namespace lux {
         glm::vec3* _translate2;
         glm::vec3* _rotate2;
 
-        
+        float* m_ShadowBias;
+        int* m_ShadowSamples;
     };
 }

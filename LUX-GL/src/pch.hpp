@@ -1,5 +1,7 @@
 #pragma once
 
+#define GLM_SWIZZLE
+
 #include <glad/glad.h>                       // Cross platform link between your graphics card and OpenGL.
 #include <GLFW/glfw3.h>
 

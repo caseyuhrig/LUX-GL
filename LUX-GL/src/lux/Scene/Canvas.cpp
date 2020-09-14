@@ -8,12 +8,14 @@
 namespace lux {
 
     Canvas::Canvas() 
-        : m_ColorAttachment(0), m_DepthAttachment(0), m_VAO(0), m_FBO(0), m_VBO(0), m_Width(0), m_Height(0)
+        : m_ColorAttachment(0), m_DepthAttachment(0), m_VAO(0), m_FBO(0), m_VBO(0), m_Width(0), m_Height(0) {}
+
+    Canvas::Canvas(uint32_t width, uint32_t height, uint32_t samples)
     {
-        
+        Init(width, height, samples);
     }
 
-    Canvas::~Canvas() 
+    Canvas::~Canvas()
     {
     }
 
@@ -382,9 +384,11 @@ namespace lux {
         //glEnable(GL_MULTISAMPLE);
         //glEnable(GL_BLEND);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        //glDisable(GL_BLEND);
+        glDisable(GL_BLEND);
 
         // NOW RENDER TO THE DEFAULT FB
         /*

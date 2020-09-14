@@ -42,8 +42,7 @@ vec4 textureMS(sampler2DMS tex, ivec2 texCoord, int samples)
 }
 
 void main()
-{   
-  
+{
         ivec2 texSize = textureSize(scene);
         ivec2 texCoord = ivec2(TexCoords * texSize);
 
@@ -58,9 +57,12 @@ void main()
             // tone mapping
             result = vec3(1.0) - exp(-hdrColor * exposure);
             //result = vec3(1.0, 0.0, 0.0);
+            //FragColor = vec4(result, 1.0);
+            FragColor = vec4(hdrColor, 1.0);
         }
-        
-        FragColor = vec4(result, 1.0);
+        else {
+            FragColor = vec4(result, 1.0);
+        }
    
 }
 

@@ -39,8 +39,14 @@ namespace lux {
         void PublishGeometry() const;
         void Build()
         {
-            CreateGeometry();
-            PublishGeometry();
+            if (!m_Built)
+            {
+                CreateGeometry();
+                PublishGeometry();
+                m_Built = true;
+            }
+            else
+                UX_LOG_INFO("Build() has already been called...  SKIPPING");
         }
         inline size_t GetVertexCount() { return vertices.size(); }
         void Draw(const Renderer& renderer, const Shader& shader) const
@@ -60,6 +66,7 @@ namespace lux {
         glm::vec4 color = glm::vec4(1);
         std::vector<float> vertices;
         std::vector<unsigned int> indicies;
+        bool m_Built = false;
         void AddIndex(unsigned int i1, unsigned int i2, unsigned int i3);
         void AddVertex(const glm::vec3& position, const glm::vec4& color, const glm::vec2& texCoord, const glm::vec3& normal);
         /**
@@ -102,5 +109,6 @@ namespace lux {
         Ref<VertexBuffer> vb;
         Ref<VertexBufferLayout> layout;
         Ref<IndexBuffer> ib;
+        
     };
 }
