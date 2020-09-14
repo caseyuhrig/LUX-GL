@@ -16,6 +16,14 @@ namespace lux {
             Build();
         }
 
+        Cuboid(const glm::vec3& size) 
+            : Mesh(glm::vec3(-size.x/2.0f, -size.y/2.0f, -size.z/2.0f), 
+                   glm::vec3(size.x/2.0f, size.y/2.0f, size.z/2.0f), 
+                   glm::mat4(1.0f))
+        {
+            Build();
+        }
+
         void CreateGeometry() override
         {
             float verticesBox[] = {

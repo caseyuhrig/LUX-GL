@@ -1080,9 +1080,6 @@
     <ClInclude Include="src\lux\Primitive\Cuboid.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\lux\Primitive\Cube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\lux\Primitive\Ring.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1209,9 +1206,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lux\Primitive\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lux\Primitive\Cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lux\Primitive\Ring.cpp">

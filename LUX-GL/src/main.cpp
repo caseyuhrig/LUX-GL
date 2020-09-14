@@ -17,7 +17,6 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include "lux/Window.hpp"
-#include "lux/Primitive/Cube.h"
 #include "lux/Primitive/Segment.hpp"
 #include "lux/Primitive/Plane.hpp"
 #include "lux/Interface/Lines.hpp"
@@ -166,8 +165,8 @@ int main(int argc, char** argv)
   
     auto lights = lux::Lights(lightProps);
 
-    auto lightCube = lux::Cube(glm::vec3(1.0f, 1.0f, 1.0f));
-    auto lightCube2 = lux::Cube(glm::vec3(1.0f, 1.0f, 1.0f));
+    auto lightCube = lux::Cuboid(glm::vec3(1.0f, 1.0f, 1.0f));
+    auto lightCube2 = lux::Cuboid(glm::vec3(1.0f, 1.0f, 1.0f));
 
 
     auto defaultMaterial = lux::Material();
