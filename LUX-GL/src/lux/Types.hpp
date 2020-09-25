@@ -53,4 +53,8 @@ namespace lux {
 		return static_cast <T> (rand()) / static_cast <T> (RAND_MAX / max);
 	}
 
+	typedef struct RectXY
+	{
+		long x1, y1, x2, y2;
+	};
 }

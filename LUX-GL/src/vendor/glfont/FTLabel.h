@@ -8,7 +8,7 @@
 #include "GLFont.h"
 
 #include <string>
-#include <memory> // for use of shared_ptr
+#include <memory>
 #include <map>
 #include <vector>
 
@@ -57,7 +57,7 @@ public:
 
     // Setters
     void setText(char* text);
-    void setText2(std::string text);
+    void setText2(const std::string& text);
     void setPosition(float x, float y);
     void setSize(int width, int height);
     void setFont(std::shared_ptr<GLFont> ftFace);
@@ -69,7 +69,7 @@ public:
     void appendFontFlags(int flags);
 
     // Getters
-    std::string getText();
+    const std::string& getText();
     float getX();
     float getY();
     int getWidth();
@@ -83,10 +83,10 @@ public:
 
     // Print the specified text on the screen starting at coords x, y
     // NOTE: params x and y should be x and y offsets in **window** coordinates (0, 0 is at the top left corner)
-    void drawString(const char *text, float x, float y);
+    //void drawString(const char *text, float x, float y);
     // Overloaded method: params width and height specify bounding box of the text
     // - Pass 0 as the value for width and/or height to specify no limit
-    void drawString(const char* text, float x, float y, float width, float height);
+    //void drawString(const char* text, float x, float y, float width, float height);
 
     void render();
 protected:
@@ -95,10 +95,10 @@ protected:
 private:
 
     struct Point {
-        GLfloat x; // x offset in window coordinates
-        GLfloat y; // y offset in window coordinates
-        GLfloat s; // glyph x offset in texture coordinates
-        GLfloat t; // glyph y offset in texture coordinates
+        float x; // x offset in window coordinates
+        float y; // y offset in window coordinates
+        float s; // glyph x offset in texture coordinates
+        float t; // glyph y offset in texture coordinates
 
         Point() {}
 
@@ -111,15 +111,16 @@ private:
     FT_Error _error;
     FT_GlyphSlot _g;
 
-    GLuint _programId;
-    GLuint _vao; 
-    GLuint _vbo;
+    uint32_t _programId;
+    uint32_t _vao;
+    uint32_t _vbo;
 
-    GLint _uniformTextureHandle;
-    GLint _uniformTextColorHandle;
-    GLint _uniformMVPHandle;
+    uint32_t _uniformTextureHandle;
+    uint32_t _uniformTextColorHandle;
+    uint32_t _uniformMVPHandle;
 
     char* _text;
+    //std::string _text;
 
     std::string _value;
 
@@ -166,14 +167,15 @@ private:
     bool _isInitialized;
     
     // Used for debugging opengl only
+    /*
     inline void getError() {
         const GLubyte* error = glGetString(glGetError());
         if(error != GL_NO_ERROR)
             printf("----------------------------- %i ----------------------", error);
     }
-
+    */
     // Compile shader from file
-    void loadShader(char* shaderSource, GLenum shaderType);
+    //void loadShader(char* shaderSource, GLenum shaderType);
     // Calculate offset needed for center- or left-aligned text
     void calculateAlignment(const char* text, float &x);
     // Split text into words separated by spaces

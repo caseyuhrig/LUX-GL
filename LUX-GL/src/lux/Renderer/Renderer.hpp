@@ -14,7 +14,11 @@ namespace lux {
     class Renderer
     {
     public:
-        Renderer() {}
+        Renderer() 
+        {
+            SetClearColor(glm::vec4(0, 0, 0, 1));
+            //Init();
+        }
         ~Renderer() = default;
 
         void Init() const
@@ -39,7 +43,7 @@ namespace lux {
             Draw(GL_TRIANGLES, va, ib, shader);
         }
 
-        void Draw(const unsigned int mode, const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+        void Draw(const unsigned int& mode, const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
         {
             shader.Bind();
             va.Bind();

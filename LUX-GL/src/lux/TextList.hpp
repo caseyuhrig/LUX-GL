@@ -34,12 +34,23 @@ namespace lux {
         {
         }
 
+        void Resize(const uint32_t& width, const uint32_t& height)
+        {
+            for (auto label : _labels)
+            {
+                label->setWindowSize(width, height);
+                label->setPosition(label->getX(), label->getY());
+                label->setText2(label->getText());
+            }
+        }
+
         void AddText(unsigned int fontID, unsigned int labelID, unsigned int fontSize, int yOffset, const std::string& text)
         {
             auto font = _fonts.at(fontID);
             auto label = std::shared_ptr<FTLabel>(new FTLabel(font, text.c_str(), _x, _y_pos, _width, _height));
             label->setColor(1.0, 1.0, 1.0, 1.0);
             label->setPixelSize(fontSize);
+            //label->setSize(_width, _height);
             _labels.push_back(label);
             _y_pos += yOffset;
         }

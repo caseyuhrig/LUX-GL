@@ -122,12 +122,15 @@
       <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <Optimization>MaxSpeed</Optimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\irrKlang\lib-Winx64-visualStudio;$(SolutionDir)Dependencies\FT\win64;$(SolutionDir)Dependencies\GLFW\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)Dependencies\irrKlang\dll-Win64-visualStudio*.dll" "$(OutDir)"</Command>
@@ -145,6 +148,7 @@
       <ForcedIncludeFiles>%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,6 +157,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\irrKlang\lib-Winx64-visualStudio;$(SolutionDir)Dependencies\FT\win64;$(SolutionDir)Dependencies\GLFW\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;freetype.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)Dependencies\irrKlang\dll-Win64-visualStudio*.dll" "$(OutDir)"</Command>
@@ -162,9 +167,11 @@
     <ClInclude Include="src\lux\Array.hpp" />
     <ClInclude Include="src\lux\Color.hpp" />
     <ClInclude Include="src\lux\Context.hpp" />
+    <ClInclude Include="src\lux\Interface.hpp" />
     <ClInclude Include="src\lux\Interface\Quad.hpp" />
     <ClInclude Include="src\lux\Interface\TopCar.hpp" />
     <ClInclude Include="src\lux\Interface\RoundedCorner.hpp" />
+    <ClInclude Include="src\lux\Platform\Microsoft\Windows.hpp" />
     <ClInclude Include="src\lux\Primitive\Plane.hpp" />
     <ClInclude Include="src\lux\Renderer\Cubemap.hpp" />
     <ClInclude Include="src\lux\Renderer\Timer.hpp" />
@@ -173,6 +180,7 @@
     <ClInclude Include="src\lux\Scene\Scene.hpp" />
     <ClInclude Include="src\lux\Scene\Shadows.hpp" />
     <ClInclude Include="src\lux\Sound.hpp" />
+    <ClInclude Include="src\lux\System.hpp" />
     <ClInclude Include="src\lux\Types.hpp" />
     <ClInclude Include="src\lux\Primitive\Cuboid.hpp" />
     <ClInclude Include="src\lux\Interface\HorzBar.hpp" />

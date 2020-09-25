@@ -1,8 +1,10 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "../Types.hpp"
-#include "../Renderer/UniformBuffer.hpp"
+
+#include "lux/Types.hpp"
+#include "lux/Renderer/UniformBuffer.hpp"
+//#include "lux/Window.hpp"
 
 
 namespace lux {
@@ -33,12 +35,16 @@ namespace lux {
     public:
         Camera() = default;
 
-        Camera(glm::vec3 position, glm::vec3 lookAt)
+        Camera(int width, int height, const glm::vec3& position, const glm::vec3& lookAt)
         {
+            _props.viewport_width = width;
+            _props.viewport_height = height;
+            _props.aspect_ratio = static_cast<float>(_props.viewport_width) / static_cast<float>(_props.viewport_height);
             _props.position = position;
             _props.look_at = lookAt;
             _props.z_far = 120.0f; //2000.0f;
             _props.z_near = 0.01f;
+            UpdateView();
             // 5 = binding point
             _ubo = lux::CreateRef<UniformBuffer>("CameraProperties", 5, 256, &_props);
             // TODO integrate the camera index
@@ -53,6 +59,15 @@ namespace lux {
             _ubo->AddUniform("cameras[0].viewport_height", 236, 4);
             _ubo->AddUniform("cameras[0].aspect_ratio", 240, 4);
             _ubo->SetData(&_props);
+            //void (*resizeFunc)(int width, int height) {
+            //    this->SetViewportSize(width, height);
+            //    };
+            //auto func = std::bind()
+            //auto func = [&](int width, int height) {
+            //    this->SetViewportSize(width, height);
+            //};
+
+            //window.AddResizeListener(func);
         }
         ~Camera() = default;
 
@@ -72,6 +87,10 @@ namespace lux {
         //uint32_t& GetViewportWidth() { return _props.viewport_width; }
         const uint32_t& GetViewportHeight() const { return _props.viewport_width; }
 
+        const float& GetAspectRatio() const {
+            return _props.aspect_ratio;
+        }
+
         
         void SetViewportSize(const uint32_t& width, const uint32_t& height)
         {
@@ -82,22 +101,21 @@ namespace lux {
             PublishViewportSize();
             PublishAspectRatio();
         }
-        /*
-        void SetAspectRatio(float aspectRatio)
-        {
-            _props.aspect_ratio = aspectRatio;
-            UpdateView();
-            PublishAspectRatio();
-        }
-        */
+        // TODO Clean this stuff up!
         void PublishViewportSize() const 
         {
             _ubo->SetUniform1i("cameras[0].viewport_width", _props.viewport_width); 
             _ubo->SetUniform1i("cameras[0].viewport_height", _props.viewport_height);
         }
 
-        void PublishAspectRatio() const { _ubo->SetUniform1f("cameras[0].aspect_ratio", _props.aspect_ratio); }
-        void Publish() const { _ubo->SetData(&_props); }
+        void PublishAspectRatio() {
+            UpdateView();
+            _ubo->SetUniform1f("cameras[0].aspect_ratio", _props.aspect_ratio); 
+        }
+        void Publish() {
+            UpdateView();
+            _ubo->SetData(&_props);
+        }
         /*
         glm::mat4 GetUpsideDownView()
         {

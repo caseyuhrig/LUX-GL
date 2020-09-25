@@ -3,10 +3,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <vector>
 #include <iostream>
 
-#include "Context.hpp"
-#include "Types.hpp"
+#include "lux/Context.hpp"
+#include "lux/Types.hpp"
+#include "lux/Platform/Microsoft/Windows.hpp"
+//#include "lux/Scene/Camera.hpp"
 
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
@@ -28,17 +31,21 @@
 
 namespace lux {
 
+    //extern class Camera;
+
     class Window {
     private:
         GLFWwindow* _window_handle;
+        //Camera* m_Camera;
         Scope<Context> _context;
         std::string title;
         int _window_width, _window_height;
         int _framebuffer_width, _framebuffer_height;
-        float _aspect_ratio;
-        float _xscale, _yscale;
-
-        
+        //float _aspect_ratio;
+        //float _xscale, _yscale;
+        bool m_vSync = false;
+        //std::vector<void (*)(int width, int height)> m_ResizeListeners;  
+        std::vector<std::function<void(int width, int height)>> m_ResizeListeners;
     public:
       
         //Window(const std::string& title, int window_width, int window_height);
@@ -46,8 +53,8 @@ namespace lux {
         //void InitContext();
 
         Window(const std::string& title, int window_width = 1280, int window_height = 720)
-            : _window_width(window_width), _window_height(window_height), _aspect_ratio(0),
-            _framebuffer_width(0), _framebuffer_height(0), _xscale(0), _yscale(0), _window_handle(nullptr)
+            : _window_width(window_width), _window_height(window_height),
+            _framebuffer_width(0), _framebuffer_height(0), _window_handle(nullptr)
         {
             //static const bool USE_ANTIALIASING = true;
 
@@ -65,14 +72,35 @@ namespace lux {
             //if (USE_ANTIALIASING) glfwWindowHint(GLFW_SAMPLES, 8);
             //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
             //glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-            glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-            //glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE);
+            //glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+            glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE);
 
             // does the cool transparent window thing.
             // WAY slow framerate though!
             //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
             //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
+            GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
+
+            int count;
+            GLFWmonitor** monitors = glfwGetMonitors(&count);
+            for (int n = 0;n < count;n++)
+            {
+                GLFWmonitor* monitor = monitors[n];
+                const char* monitorName = glfwGetMonitorName(monitor);
+                int xpos = 0, ypos = 0;
+                glfwGetMonitorPos(monitor, &xpos, &ypos);
+                const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+                
+                //int[xpos, ypos] = glfwGetMonitorPos(monitor, &xpos, &ypos);
+                const bool primary = (monitor == primaryMonitor) ? true : false;
+                const int loc = (xpos < 0) ? 1 : (xpos > 0) ? 3 : 2;
+                std::cout << "Monitor: " << monitorName << " " << xpos << "x" << ypos << 
+                    " pri? " << primary << " loc: " << loc << 
+                    " res: " << mode->width << "x" << mode->height << std::endl;
+                //const RectXY workArea = lux::Platform::Microsoft::Windows::GetWorkArea({ xpos,ypos,mode->width,mode->height });
+                //UX_LOG_INFO("WorkArea: %d %d %d %d", workArea.x1, workArea.y1, workArea.x2, workArea.y2);
+            }
 
             // Create a windowed mode window and its OpenGL context.
             _window_handle = glfwCreateWindow(window_width, window_height, title.c_str(), NULL, NULL);
@@ -107,12 +135,12 @@ namespace lux {
             glfwSetWindowSizeCallback(_window_handle, [](GLFWwindow* window, int width, int height) //mutable
                 {
                     //_window_width = 0;
-                    //auto* _this = (Window*)glfwGetWindowUserPointer(window);
-                    //_this->_window_width = width;
-                    //_this->_window_height = height;
+                    auto* _this = (Window*)glfwGetWindowUserPointer(window);
+                    _this->_window_width = width;
+                    _this->_window_height = height;
 
                     // fire off any events here
-                    //std::cout << "WindowSizeCallback: " << width << " " << height << std::endl;
+                    std::cout << "WindowSizeCallback: " << width << " " << height << std::endl;
 
                     //glfwSetWindowAspectRatio(window, width, height);
 
@@ -150,11 +178,19 @@ namespace lux {
                     auto* _this = (Window*)glfwGetWindowUserPointer(window);
                     _this->_framebuffer_width = width;
                     _this->_framebuffer_height = height;
-                    glViewport(0, 0, width, height);
+                    //glViewport(0, 0, width, height);
                     // TODO set the aspect ratio so the window doesn't get scewed.
                     //      Update the camera setting and whot-not.  Need to register
                     //      a listener from the main program.
                     std::cout << "FramebufferSizeCallback " << width << " " << height << std::endl;
+
+                    //if (_this->m_Camera)
+                    //    _this->m_Camera->SetViewportSize(width, height);
+
+                    for (auto resize : _this->m_ResizeListeners)
+                    {
+                        resize(width, height);
+                    }
                 });
 
             // notified when its time to repaint the window contents
@@ -178,23 +214,52 @@ namespace lux {
             //glfwGetWindowSize(window, &width, &height);
             //glfwSetWindowAspectRatio(window, width, height);   
 
-            bool _v_sync = false;
+            
             //glfwSwapInterval(1); // same as set vsync = true
-            glfwSwapInterval(_v_sync);
+            glfwSwapInterval(m_vSync);
 
             glfwGetFramebufferSize(_window_handle, &_framebuffer_width, &_framebuffer_height);
-            glfwGetWindowContentScale(_window_handle, &_xscale, &_yscale);
-            _aspect_ratio = static_cast<float>(_framebuffer_width) / static_cast<float>(_framebuffer_height);
+            //glfwGetWindowContentScale(_window_handle, &_xscale, &_yscale);
+            //_aspect_ratio = static_cast<float>(_framebuffer_width) / static_cast<float>(_framebuffer_height);
 
             UX_LOG_INFO("Window Size: %d x %d", _window_width, _window_height);
             UX_LOG_INFO("Framebuffer Size: %d x %d", _framebuffer_width, _framebuffer_height);
-            UX_LOG_INFO("Framebuffer Aspect Ratio: %f", _aspect_ratio);
-            UX_LOG_INFO("Window Content Scale: %f %f", _xscale, _yscale);
+            //UX_LOG_INFO("Framebuffer Aspect Ratio: %f", _aspect_ratio);
+            //UX_LOG_INFO("Window Content Scale: %f %f", _xscale, _yscale);
 
             // TODO Set the aspect ratio here?
 
             _context = CreateScope<Context>(_window_handle);
             _context->Init();
+        }
+
+        //void SetCamera(Camera* camera) { m_Camera = camera; }
+
+        /*
+        void AddResizeListener(void(*resizeFunc)(int width, int height))
+        {
+        }
+        */
+
+        void AddResizeListener(std::function<void(int width, int height)> callback)
+        {
+            m_ResizeListeners.push_back(callback);
+        }
+        
+
+        void FillWorkArea()
+        {
+            int xpos, ypos, width, height;
+            glfwGetWindowPos(_window_handle, &xpos, &ypos);
+            glfwGetWindowSize(_window_handle, &width, &height);
+            const RectXY workArea = lux::Platform::Microsoft::Windows::GetWorkArea(_window_handle);
+            const int titleBarHeight = lux::Platform::Microsoft::Windows::GetTitleBarHeight(_window_handle);
+            UX_LOG_INFO("WorkArea: %d %d %d %d", workArea.x1, workArea.y1, workArea.x2, workArea.y2);
+            UX_LOG_INFO("TitleBar Height: %d", titleBarHeight);
+            _window_width = workArea.x2 - workArea.x1;
+            _window_height = workArea.y2 - workArea.y1 - titleBarHeight;
+            glfwSetWindowPos(_window_handle, workArea.x1, workArea.y1 + titleBarHeight);
+            glfwSetWindowSize(_window_handle, _window_width, _window_height);
         }
 
         void Center()
@@ -276,33 +341,28 @@ namespace lux {
         }
 
         inline int GetFramebufferWidth() const { return _framebuffer_width; }
-
         inline int GetFramebufferHeight() const { return _framebuffer_height; }
+        //inline float GetAspectRatio() const { return _aspect_ratio; }
 
-        inline float GetAspectRatio() const { return _aspect_ratio; }
-
-        
+        void SetSize(const int& width, const int& height) { glfwSetWindowSize(_window_handle, width, height); }
 
         //void SetDrawCallback();
+        //inline void Draw(void) const {}
 
-        inline void Draw(void) const
-        {
-
+        int* GetPosition() {
+            int pos[2];
+            glfwGetWindowPos(_window_handle, &pos[0], &pos[1]);
+            return pos;
         }
-
+        inline void SetPosition(const int& x, const int& y) const { glfwSetWindowPos(_window_handle, x, y); }
         inline bool ShouldClose() const { return glfwWindowShouldClose(_window_handle); }
 
-        inline void SwapBuffers() const
+        inline void SwapBuffers() const 
         {          
             _context->SwapBuffers();
             glfwPollEvents();
         }
 
-        // can this be in the destructor?
-        inline void Close() const
-        {
-            glfwDestroyWindow(_window_handle);
-            glfwTerminate();
-        }
+        inline void Destroy() const { glfwDestroyWindow(_window_handle); }
     };
 }

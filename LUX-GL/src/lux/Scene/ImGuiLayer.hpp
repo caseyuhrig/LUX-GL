@@ -19,6 +19,8 @@ namespace lux {
         void Begin();
         void End();
 
+        void Resize(const uint32_t& width, const uint32_t& height);
+
         void SetCubeTransforms(glm::vec3* scaleCube, glm::vec3* translateCube, glm::vec3* rotateCube)
         {
             m_ScaleCube = scaleCube;

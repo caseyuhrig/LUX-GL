@@ -13,11 +13,13 @@ namespace lux {
         Canvas(uint32_t width, uint32_t height, uint32_t samples = 8);
         ~Canvas();
 
-        void Init(uint32_t width, uint32_t height, uint32_t samples = 8);
+        //void Init(uint32_t width, uint32_t height, uint32_t samples = 8);
+        void Resize(const uint32_t& width, const uint32_t& height);
         void Bind() const;
         void Unbind() const;
         void Draw() const;
     private:
+        uint32_t RGB_FORMAT = GL_RGBA16F;
         bool m_Multisample;
         uint32_t m_Samples;
         uint32_t m_FBO;

@@ -63,7 +63,7 @@ FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, int windowWidth, int windowHeig
     _uniformTextColorHandle = glGetUniformLocation(_programId, "textColor");
     _uniformMVPHandle = glGetUniformLocation(_programId, "mvp");
 
-    GLuint curTex = _fontAtlas[_pixelSize]->getTexId(); // get texture ID for this pixel size
+    auto curTex = _fontAtlas[_pixelSize]->getTexId(); // get texture ID for this pixel size
 
     glActiveTexture(GL_TEXTURE0 + curTex);
     glBindTexture(GL_TEXTURE_2D, curTex);
@@ -403,12 +403,12 @@ void FTLabel::setText(char* text)
     }
 }
 
-void FTLabel::setText2(std::string text)
+void FTLabel::setText2(const std::string& text)
 {
     setText((char*)text.c_str());
 }
 
-std::string FTLabel::getText() {
+const std::string& FTLabel::getText() {
     return std::string(_text);
 }
 

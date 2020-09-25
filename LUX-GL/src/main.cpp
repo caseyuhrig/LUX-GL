@@ -44,6 +44,8 @@
 #include "lux/Scene/ImGuiLayer.hpp"
 #include "lux/Scene/LcarsLayer.hpp"
 
+#include "lux/Platform/Microsoft/Windows.hpp"
+#include "lux/Interface.hpp"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
@@ -61,9 +63,8 @@
 #include "nlohmann/json.hpp"
 
 
-
-
-// If w == 0, the value stored is a vector, if w == 1, the value stored is a point.
+// C/C++  Optimizations /O2 /GL
+// Linker Optimizations /LYCG
 
 // swizzling means rearranging the elements of a vector (kinda).
 
@@ -76,7 +77,7 @@ Homogeneous coordinates
 
     This will be more clear soon, but for now, just remember this :
 
-If w == 1, then the vector(x, y, z, 1) is a position in space.
+    If w == 1, then the vector(x, y, z, 1) is a position in space.
     If w == 0, then the vector(x, y, z, 0) is a direction.
     (In fact, remember this forever.)
 
@@ -125,14 +126,66 @@ If w == 1, then the vector(x, y, z, 1) is a position in space.
     //glm::mat4 model = lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
     //model = lux::MatrixUtils::Transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
     //glm::mat4 mvp = camera.GetViewProjection() * model;
+/*
+void window1()
+{
+    
+    auto ui = lux::Interface("LUX/GL (Monitor-Left)", lux::Interface::Position::LEFT);
+    
+    while (!ui.ShouldClose())
+    {
+        ui.Clear();
 
+        ui.Draw();
+
+        ui.SwapBuffers();
+    }
+    
+    ui.Destroy();
+}
+*/
+
+
+/*
+
+if (lux::Monitors::GetCount() < 3)
+{
+    UX_FATAL_ERROR("3 Monitors are required for this program.");
+    exit(1);
+}
+
+//auto window1 = lux::Window::Create(lux::Monitors::GetLeft());
+
+class Interface1 : public Interface
+{
+public:
+    Interface1() : Interface(lux::Window::Create(lux::Monitors::GetLeft()))
+    {
+        
+    }
+    void Render() const
+    {
+    }
+}
+
+auto system = lux::System::Create();
+system->AddInterface();
+
+system->Run();
+
+*/
 
 int main(int argc, char** argv)
 {
+   
+
+ 
+    
     auto window = lux::Window("LUX/GL", 1500, 900);
     window.Center();
+    window.FillWorkArea();
 
-
+    //std::thread win1 = std::thread(window1);
 
 
     // REGISTRY -----------------------------------------------
@@ -173,7 +226,7 @@ int main(int argc, char** argv)
   
 
 
-    lux::Renderer renderer;
+    auto renderer = lux::Renderer();
     renderer.SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
 
     
@@ -181,11 +234,12 @@ int main(int argc, char** argv)
 
     uint32_t ACTIVE_CAMERA = 0;
 
-    auto camera = lux::Camera(glm::vec3(0.0f,0.0f,50.0f), glm::vec3(0.0f,0.0f,0.0f));
-    //camera.SetAspectRatio(window.GetAspectRatio());
-    camera.SetViewportSize(window.GetFramebufferWidth(), window.GetFramebufferHeight());
-    camera.Publish();
+    auto camera = lux::Camera(window.GetWidth(), window.GetHeight(), glm::vec3(0.0f,0.0f,50.0f), glm::vec3(0.0f,0.0f,0.0f));
+    //camera.SetViewportSize(window.GetFramebufferWidth(), window.GetFramebufferHeight());
+    //camera.Publish();
     
+    
+  
 
     auto scene = lux::Scene(camera);
     scene.Publish();
@@ -282,9 +336,9 @@ int main(int argc, char** argv)
 
     auto cube = lux::Cuboid(glm::vec3(-0.5), glm::vec3(0.5), glm::mat4(1.0));
     {
-        auto entity = registry.create();
-        registry.emplace<lux::Mesh>(entity, cube);
-        registry.emplace<glm::mat4>(entity, glm::mat4(1));
+        //auto entity = registry.create();
+        //registry.emplace<lux::Mesh>(entity, cube);
+        //registry.emplace<glm::mat4>(entity, glm::mat4(1));
     }
 
     auto shaderBox = lux::Shader("res/shaders/box.shader");
@@ -296,7 +350,7 @@ int main(int argc, char** argv)
 
 
 
-    auto shaderText = lux::Shader("res/shaders/text.shader");
+    //auto shaderText = lux::Shader("res/shaders/text.shader");
     
 
 
@@ -340,10 +394,10 @@ int main(int argc, char** argv)
     }
 
     //auto cubemapShader = lux::Shader("res/shaders/cubemap-shader.glsl");
-    auto cubemapShader = lux::Shader("res/shaders/cubemap-lighting-shader.glsl");
+    //auto cubemapShader = lux::Shader("res/shaders/cubemap-lighting-shader.glsl");
 
     //auto testShader = cubemapShader;
-    auto testShader = shaderBox;
+    //auto testShader = &shaderBox;
 
 
 
@@ -385,7 +439,7 @@ int main(int argc, char** argv)
     imguiLayer.SetShadowSamples(&shadow_samples);
     imguiLayer.SetShadowBias(&shadow_bias);
 
-    lux::LcarsLayer lcarsLayer = lux::LcarsLayer(&window, renderer, mRotate);
+    lux::LcarsLayer lcarsLayer = lux::LcarsLayer(window.GetWidth(), window.GetHeight(), renderer, mRotate);
     lcarsLayer.SetLights(lights);
     lcarsLayer.SetRotate(mRotate);
 
@@ -433,9 +487,9 @@ int main(int argc, char** argv)
     auto timestep = lux::Timer();
 
 
-    testShader.SetUniformMat4f("u_view", camera.GetView());
-    testShader.SetUniformMat4f("u_proj", camera.GetProjection());
-    testShader.SetUniform1f("u_time", timestep);
+    shaderBox.SetUniformMat4f("u_view", camera.GetView());
+    shaderBox.SetUniformMat4f("u_proj", camera.GetProjection());
+    shaderBox.SetUniform1f("u_time", timestep);
 
 
     
@@ -454,7 +508,17 @@ int main(int argc, char** argv)
     //camera.SetViewportSize(window.GetFramebufferWidth(), window.GetFramebufferHeight());
     //camera.Publish();
 
-    
+    std::function<void(int width, int height)> callback = [&](int width, int height) -> void {
+
+        std::cout << "Aspect1: " << camera.GetAspectRatio() << std::endl;
+        std::cout << "Resize Callback: " << width << " " << height << std::endl;
+        camera.SetViewportSize(width, height);
+        std::cout << "Aspect2: " << camera.GetAspectRatio() << std::endl;
+        canvas.Resize(width, height);
+        lcarsLayer.Resize(width, height);
+    };
+
+    window.AddResizeListener(callback);
   
 
     while (!window.ShouldClose())
@@ -476,14 +540,14 @@ int main(int argc, char** argv)
             {
                 auto& mesh = entityView.get<lux::Mesh>(entity);
                 auto& transformation = entityView.get<glm::mat4>(entity);
-
                 shadows.SetModelTransformation(model * transformation);
-                //simpleDepthShader->SetUniformMat4f("model", model * transformation);
                 mesh.Draw(renderer, *simpleDepthShader);
             }
         }
         shadows.UnBind();
 
+
+        // 1.5 use G-buffer to render SSAO texture
 
 
         // 2. render scene as normal
@@ -492,7 +556,7 @@ int main(int argc, char** argv)
         canvas.Bind();
         renderer.Clear();
         // TODO use the timestep
-        testShader.SetUniform1f("u_time", timestep);
+        shaderBox.SetUniform1f("u_time", timestep);
 
         //cubemapShader.SetUniformMat4f("view", view);
         //cubemapShader.SetUniformMat4f("projection", proj);
@@ -543,6 +607,15 @@ int main(int argc, char** argv)
         //glEnable(GL_BLEND);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         lightCube.Draw(renderer, shaderBase);
+
+        /*
+        auto cubeModel = glm::translate(glm::mat4(1.0), translateCube);
+        cubeModel = glm::scale(cubeModel, scaleCube);
+        //glm::rotate(cubeModel, 10.0, rotateCube);
+        shaderBase.SetUniformMat4f("u_model", model * cubeModel);
+        cube.Draw(renderer, shaderBase);
+        */
+
         //glDisable(GL_BLEND);
 
         //shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lights.GetPosition(1).xyz()));
@@ -551,12 +624,12 @@ int main(int argc, char** argv)
         
         //glm::vec3 lightPos = lights.GetPosition(0);
         // 130 = distance, 4 = seconds
-        /*
+        
         lightPos.x = timestep.PingPong(lightPos.x, lightInc.x, -65.0f, 65.0f, 130.0f, 4.0f);
         lights.SetPosition(0, lightPos);
         glm::vec3 lp2 = glm::vec3(1.0f, lightPos.y, lightPos.x);
         lights.SetPosition(1, lp2);
-        */
+        
 
         layers.Draw();
        
@@ -564,12 +637,14 @@ int main(int argc, char** argv)
 
 
 
-
+        // 3. Render the canvas to a quad
         renderer.Clear();
 
         canvas.Draw();
 
         window.SwapBuffers();
+
+        //glfwPollEvents();
 
         timestep.Update();
     }
@@ -579,7 +654,11 @@ int main(int argc, char** argv)
     //registry.destroy(entity);
     //registry.destroy();
 
-    window.Close();   
+    window.Destroy();   
+
+    //win1.join();
+
+    glfwTerminate();
 
     return 0;
 }

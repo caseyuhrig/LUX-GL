@@ -7,19 +7,13 @@
 
 namespace lux {
 
-    Canvas::Canvas() 
-        : m_ColorAttachment(0), m_DepthAttachment(0), m_VAO(0), m_FBO(0), m_VBO(0), m_Width(0), m_Height(0) {}
+    //Canvas::Canvas() 
+    //    : m_ColorAttachment(0), m_DepthAttachment(0), m_VAO(0), m_FBO(0), m_VBO(0), m_Width(0), m_Height(0) {}
+    Canvas::~Canvas() = default;
+    
+    
 
     Canvas::Canvas(uint32_t width, uint32_t height, uint32_t samples)
-    {
-        Init(width, height, samples);
-    }
-
-    Canvas::~Canvas()
-    {
-    }
-
-    void Canvas::Init(uint32_t width, uint32_t height, uint32_t samples)
     {
         m_Width = width;
         m_Height = height;
@@ -44,10 +38,10 @@ namespace lux {
         m_ShaderBloomFinal->SetUniform1i("scene", 0);
         m_ShaderBloomFinal->SetUniform1i("bloomBlur", 1);
 
-        
+
 
         //if (m_Multisample)
-            m_Shader = lux::CreateRef<Shader>("res/shaders/canvas-shader-MSAA.glsl");
+        m_Shader = lux::CreateRef<Shader>("res/shaders/canvas-shader-MSAA.glsl");
         //else 
         //    m_Shader = lux::CreateRef<Shader>("res/shaders/canvas-shader.glsl");
 
@@ -77,26 +71,17 @@ namespace lux {
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
-        uint32_t RGB_FORMAT = GL_RGBA16F;
+
+
+    
+
+   
+
+       
+        //uint32_t RGB_FORMAT = GL_RGBA16F;
         //uint32_t RGB_FORMAT = GL_RGBA8;
 
-        // multisample framebuffer for output
-        /*
-        glGenFramebuffers(1, &m_MSAA_FBO);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_MSAA_FBO);
-        glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_MSAA_ColorAttachment);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_MSAA_ColorAttachment);
-        if (RGB_FORMAT == GL_RGBA16F)
-            glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA16F, m_Width, m_Height, GL_FALSE);
-        else
-            glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA8, m_Width, m_Height, GL_FALSE);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_MSAA_ColorAttachment, 0);
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            UX_LOG_ERROR("ERROR::MSAA_FRAMEBUFFER:: Framebuffer is not complete!");
-        else UX_LOG_INFO("MSAA Framebuffer GOOD!");
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        */
+      
         glGenFramebuffers(1, &m_BloomFBO);
         glBindFramebuffer(GL_FRAMEBUFFER, m_BloomFBO);
         glCreateTextures(GL_TEXTURE_2D, 1, &m_Bloom_ColorAttachment);
@@ -142,7 +127,8 @@ namespace lux {
 
             glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_DepthAttachment);
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment);
-            glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_DEPTH24_STENCIL8, m_Width, m_Height, GL_FALSE);
+            //glTexStorage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_DEPTH24_STENCIL8, m_Width, m_Height, GL_FALSE);
+            glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_DEPTH24_STENCIL8, m_Width, m_Height, GL_FALSE);
             glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment, 0);
@@ -182,39 +168,7 @@ namespace lux {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthAttachment, 0);
             glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, m_DepthAttachment, 0);
         }
-        // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-        /* SAVING TO LOOK INTO MORE
-        unsigned int fboMsaaId;
-        if (MULTI_SAMPLE)
-        {
-            unsigned int rboC, rboD;
-            glGenRenderbuffers(1, &rboC);
-            glBindRenderbuffer(GL_RENDERBUFFER, rboC);
-            glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_RGBA8, window.GetWidth(), window.GetHeight());
-            //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rboC);
-
-            glGenRenderbuffers(1, &rboD);
-            glBindRenderbuffer(GL_RENDERBUFFER, rboD);
-            glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH_COMPONENT, window.GetWidth(), window.GetHeight());
-            // GL_DEPTH_COMPONENT GL_DEPTH24_STENCIL8
-            //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboD);
-
-
-            glGenFramebuffers(1, &fboMsaaId);
-            glBindFramebuffer(GL_FRAMEBUFFER, fboMsaaId);
-            //glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rboC);
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboD);
-        }
-        else {
-            unsigned int rbo;
-            glGenRenderbuffers(1, &rbo);
-            glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, window.GetWidth(), window.GetHeight());
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-        }
-*/
+       
         unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
         glDrawBuffers(2, attachments);
 
@@ -223,40 +177,20 @@ namespace lux {
         else UX_LOG_INFO("Framebuffer GOOD!");
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        //std::cout << "m_ColorAttachment: " << m_ColorAttachment << std::endl;
-
-
         // ping-pong-framebuffer for blurring
-        //unsigned int pingpongFBO[2];
-        //unsigned int pingpongColorbuffers[2];
         glGenFramebuffers(2, pingpongFBO);
-        //glGenTextures(2, pingpongColorbuffers);
-        //if (m_Multisample)
-        //    glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 2, pingpongColorbuffers);
-        //else
-            glCreateTextures(GL_TEXTURE_2D, 2, pingpongColorbuffers);
+        glCreateTextures(GL_TEXTURE_2D, 2, pingpongColorbuffers);
 
         for (unsigned int i = 0; i < 2; i++)
         {
-            /*
-            if (m_Multisample)
-            {
-                glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-                glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, pingpongColorbuffers[i]);
-                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA16F, m_Width, m_Height, GL_FALSE);
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, pingpongColorbuffers[i], 0);
-            }
-            else {
-            */
-                glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-                glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[i]);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGBA, GL_FLOAT, NULL);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongColorbuffers[i], 0);
-            //}
+            glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
+            glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[i]);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGBA, GL_FLOAT, NULL);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongColorbuffers[i], 0);
             // also check if framebuffers are complete (no need for depth buffer)
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
                 std::cout << "Framebuffer not complete!" << std::endl;
@@ -264,6 +198,73 @@ namespace lux {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    void Canvas::Resize(const uint32_t& width, const uint32_t& height)
+    {
+        m_Width = width;
+        m_Height = height;
+
+        glBindTexture(GL_TEXTURE_2D, m_Bloom_ColorAttachment);
+        if (RGB_FORMAT == GL_RGBA16F)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGBA, GL_FLOAT, nullptr);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        if (m_Multisample)
+        {
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
+            if (RGB_FORMAT == GL_RGBA16F)
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA16F, m_Width, m_Height, GL_FALSE);
+            else
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA8, m_Width, m_Height, GL_FALSE);
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_BrightnessAttachment);
+            if (RGB_FORMAT == GL_RGBA16F)
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA16F, m_Width, m_Height, GL_FALSE);
+            else
+                glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGBA8, m_Width, m_Height, GL_FALSE);
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_DepthAttachment);
+            glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_DEPTH24_STENCIL8, m_Width, m_Height, GL_FALSE);
+            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+        }
+        else {
+
+        }
+
+        for (unsigned int i = 0; i < 2; i++)
+        {
+            glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[i]);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGBA, GL_FLOAT, NULL);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+    }
+
+    /*
+    void Canvas::Resize(const uint32_t& width, const uint32_t& height)
+    {
+        
+        glDeleteBuffers(1, &m_VBO);
+        glDeleteVertexArrays(1, &m_VAO);
+
+        glDeleteFramebuffers(1, &m_BloomFBO);
+        glDeleteTextures(1, &m_Bloom_ColorAttachment);
+
+        glDeleteTextures(1, &m_ColorAttachment);
+        glDeleteTextures(1, &m_BrightnessAttachment);
+        glDeleteTextures(1, &m_DepthAttachment);
+
+        glDeleteFramebuffers(2, pingpongFBO);
+        glDeleteTextures(2, pingpongColorbuffers);
+
+        //glDeleteFramebuffers
+        //    glGenVertexArrays(1, &m_VAO);
+        //glGenBuffers(1, &m_VBO);
+        Init(width, height, m_Samples);
+    }
+    */
 
     void Canvas::Bind() const
     {

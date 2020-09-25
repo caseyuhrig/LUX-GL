@@ -3,7 +3,11 @@
 
 namespace lux {
 
-    Layer::Layer(const std::string& debugName) : m_DebugName(debugName) {}
+    Layer::Layer(const uint32_t& width, const uint32_t& height) 
+        : m_Width(width), m_Height(height), m_DebugName("Debug Name")
+    {
+        
+    }
 
     
 }

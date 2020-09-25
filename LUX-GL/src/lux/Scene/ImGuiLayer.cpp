@@ -13,12 +13,16 @@
 
 namespace lux {
 
-    ImGuiLayer::ImGuiLayer(Window* window) : Layer("ImGui Layer")
+    ImGuiLayer::ImGuiLayer(Window* window) : Layer(window->GetWidth(), window->GetHeight())
     {
         _window = window;
+        SetDebugLabel("ImGui Layer");
     }
 
-  
+    void ImGuiLayer::Resize(const uint32_t& width, const uint32_t& height)
+    {
+
+    }
 
     void ImGuiLayer::Begin()
     {
@@ -149,6 +153,7 @@ namespace lux {
             {
                 std::cout << "EXIT" << std::endl;
                 //break;
+                //exit(0);
             }
 
             //ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
