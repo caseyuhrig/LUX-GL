@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 
+#include "lux/Types.hpp"
+
 
 namespace lux {
 
@@ -16,12 +18,6 @@ namespace lux {
         void Bind() const;
         void Unbind() const;
     private:
-        typedef struct byte_offset
-        {
-            uint32_t offset;
-            uint32_t size;
-        };
-
         std::string _name;
         uint32_t _ssbo_ID, _binding_point, _size;
         std::map <std::string, byte_offset> _layout;

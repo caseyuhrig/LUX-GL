@@ -9,7 +9,7 @@
 
 namespace lux {
 
-	typedef struct CameraProperties
+	struct CameraProperties
 	{
 		glm::vec3 position;        // 12        0
 		float pad1 = 0;            //  4

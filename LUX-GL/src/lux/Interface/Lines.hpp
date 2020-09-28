@@ -1,12 +1,14 @@
 #pragma once
 
-#include "../Types.hpp"
-#include "../Renderer/Renderer.hpp"
-#include "../Renderer/Shader.hpp"
-#include "../Renderer/VertexBufferLayout.hpp"
-#include "glm/glm.hpp";
 #include <iostream>
 #include <vector>
+
+#include <glm/glm.hpp>;
+
+#include "lux/Types.hpp"
+#include "lux/Renderer/Renderer.hpp"
+#include "lux/Renderer/Shader.hpp"
+#include "lux/Renderer/VertexBufferLayout.hpp"
 
 
 struct Line {
@@ -30,7 +32,7 @@ namespace lux {
         unsigned int index = 0;
     public:
         Lines();
-        void add(glm::vec3 p1, glm::vec3 p2);
+        void add(const glm::vec3& p1, const glm::vec3& p2);
         void commit();
         void createCircle(double radius, double steps);
         void createRing(double inner_radius, double outer_radius, double thickness, double steps);

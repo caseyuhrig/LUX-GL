@@ -30,6 +30,12 @@ namespace lux {
 	static const float TO_RADf = PIf / 180.0f;
 	static const float TO_DEGf = 180.0f / PIf;
 
+	struct byte_offset
+	{
+		uint32_t offset;
+		uint32_t size;
+	};
+
 
 	template<typename T>
 	using Scope = std::unique_ptr<T>;
@@ -53,8 +59,18 @@ namespace lux {
 		return static_cast <T> (rand()) / static_cast <T> (RAND_MAX / max);
 	}
 
-	typedef struct RectXY
+	struct RectXY
 	{
 		long x1, y1, x2, y2;
 	};
+
+	
+	static const void* GLvoidptr(uint32_t offset)
+	{
+		// semantically correct!?
+		const auto pointer = static_cast<uintptr_t>(offset);
+		return reinterpret_cast<void*>(pointer);
+	}
+	
+	//static const void* GLoffset_0 = GLvoidptr(0);
 }

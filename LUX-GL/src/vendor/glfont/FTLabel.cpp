@@ -82,12 +82,12 @@ FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, int windowWidth, int windowHeig
     _isInitialized = true;
 }
 
-FTLabel::FTLabel(GLFont* ftFace, int windowWidth, int windowHeight) : 
-  FTLabel(std::shared_ptr<GLFont>(new GLFont(*ftFace)), windowWidth, windowHeight) 
+FTLabel::FTLabel(GLFont* ftFace, int windowWidth, int windowHeight)
+    : FTLabel(std::shared_ptr<GLFont>(new GLFont(*ftFace)), windowWidth, windowHeight) 
 {}
 
-FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, const char* text, float x, float y, int width, int height, int windowWidth, int windowHeight) :
-  FTLabel(ftFace, text, x, y, windowWidth, windowHeight)
+FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, const std::string& text, float x, float y, int width, int height, int windowWidth, int windowHeight) 
+    : FTLabel(ftFace, text, x, y, windowWidth, windowHeight)
 {
     _width = width;
     _height = height;
@@ -95,21 +95,25 @@ FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, const char* text, float x, floa
     recalculateVertices(text, x, y, width, height);
 }
 
-FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, const char* text, float x, float y, int windowWidth, int windowHeight) :
-FTLabel(ftFace, windowWidth, windowHeight)
+FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, const std::string& text, float x, float y, int windowWidth, int windowHeight) 
+    : FTLabel(ftFace, windowWidth, windowHeight)
 {
-    _text = (char*)text;
+    _text = text;
     _x = x;
     _y = y;
 }
 
-FTLabel::~FTLabel() {
+FTLabel::~FTLabel() 
+{
     glDeleteBuffers(1, &_vbo);
     glDeleteVertexArrays(1, &_vao);
 }
 
-void FTLabel::recalculateVertices(const char* text, float x, float y, int width, int height) {
-    
+void FTLabel::recalculateVertices(const std::string& text, float x, float y, int width, int height)
+{
+    // THIS IS NEW
+    _text = text;
+
     _coords.clear(); // case there are any existing coords
 
     // Break the text into individual words
@@ -148,7 +152,8 @@ void FTLabel::recalculateVertices(const char* text, float x, float y, int width,
 
     // Print each line, increasing the y value as we go
     float startY = y - (_face->size->metrics.height >> 6);
-    for(std::string line : lines) {
+    for(std::string line : lines) 
+    {
         // If we go past the specified height, stop drawing
         if(y - startY > height && height)
             break;
@@ -187,13 +192,15 @@ void FTLabel::recalculateVertices(const char* text, float x, float y, int width,
     glUseProgram(0);
 }
 
-void FTLabel::recalculateVertices(const char* text, float x, float y) {
+void FTLabel::recalculateVertices(const std::string& text, float x, float y) {
+
+    _text = text;
 
     // Coordinates passed in should specify where to start drawing from the top left of the text,
     // but FreeType starts drawing from the bottom-right, therefore move down one line
     y += _face->size->metrics.height >> 6;
 
-    FT_GlyphSlot slot = _ftFace->getFaceHandle()->glyph;
+    FT_GlyphSlot slot = _ftFace->GetFontFace()->glyph;
 
     // Calculate alignment (if applicable)
     int textWidth = calcWidth(text);
@@ -212,7 +219,7 @@ void FTLabel::recalculateVertices(const char* text, float x, float y) {
 
     FontAtlas::Character* chars = _fontAtlas[_pixelSize]->getCharInfo();
 
-    for(const char *p = text; *p; ++p) {
+    for(const char *p = text.c_str(); *p; ++p) {
         //std::cout << *p << std::endl;
         float x2 = x + chars[*p].bitmapLeft * _sx; // scaled x coord
         float y2 = -y - chars[*p].bitmapTop * _sy; // scaled y coord
@@ -302,48 +309,8 @@ void FTLabel::render() {
 
 void FTLabel::BlendingBegin()
 {
-    //glDisable(GL_BLEND);
-    //glEnable(GL_ALPHA_TEST);
-    //glAlphaFunc(GL_GREATER, 0.92f); // Or some fitting threshold for your texture
-
-    
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE); // OK //takes 3/4 of the src and add it to the entire dest color
-    //glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA); // OK same as GL_SRC_ALPHA, GL_ONE
-    //glBlendFunc(GL_ONE, GL_SRC_ALPHA); // almost it
-    
-    //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-    
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_DST_ALPHA);
-    //glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
-    //glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA); // does the oposite I'm looking for
-    //glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
-    
-    //glBlendFunc(GL_ONE, GL_DST_ALPHA);
-    //glBlendFunc(GL_ZERO, GL_ZERO);
-    //glBlendFunc(GL_SRC_COLOR, GL_DST_ALPHA);
-    //glBlendFunc(GL_DST_COLOR, GL_ONE);
-    //glBlendFunc(GL_SRC_COLOR, GL_ONE);
-    //glBlendFunc(GL_DST_ALPHA, GL_DST_ONE_MINUS_DST_ALPHA);
-    //glBlendFuncSeparate(GL_ZERO, GL_ONE, GL_ONE, GL_ZERO);
-    //glBlendFuncSeparate(GL_ONE, GL_ONE, GL_ONE, GL_ZERO);
-    //glBlendFuncSeparate(GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA, GL_SRC_ALPHA);
-
-    // allthe below look good except??
-    // GL_ONE or GL_DST_ALPHA or GL_ONE_MINUS_CONSTANT_COLOR or GL_ONE_MINUS_CONSTANT_ALPHA
-
-    //glBlendFunc(GL_SRC_ALPHA, GL_SRC_ALPHA);
-    //glBlendFunc(GL_DST_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glBlendColor(1.0f, 1.0f, 1.0f, 1.0f);
-    //glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
-    //glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
-    //glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    //glDisable(GL_MULTISAMPLE);
-    //glDisable(GL_BLEND);
 }
 
 
@@ -352,7 +319,8 @@ void FTLabel::BlendingEnd()
     glDisable(GL_BLEND);
 }
 
-std::vector<std::string> FTLabel::splitText(const char* text) {
+std::vector<std::string> FTLabel::splitText(const std::string& text) 
+{
     std::string textStr = std::string(text);
     std::vector<std::string> words;
     int startPos = 0; // start position of current word
@@ -377,11 +345,11 @@ std::vector<std::string> FTLabel::splitText(const char* text) {
     return words;
 }
 
-int FTLabel::calcWidth(const char* text) 
+int FTLabel::calcWidth(const std::string& text) 
 {
     int width = 0;
     FontAtlas::Character* chars = _fontAtlas[_pixelSize]->getCharInfo();
-    for(const char* p = text; *p; ++p) {
+    for(const char* p = text.c_str(); *p; ++p) {
         width += chars[*p].advanceX;
     }
     return width;
@@ -391,22 +359,24 @@ int FTLabel::calcWidth(const char* text)
 /**
  * We only want to actually update the text if something has changed.
  */
-void FTLabel::setText(char* text)
+void FTLabel::setText(const std::string& text)
 {    
     //if (strcmp(text, _text) != 0)
-    if (text != _value)
+    if (text != _text)
     {
         //std::cout << "[" << _value << "] [" << text << "]" << std::endl;
         _text = text;
-        _value = std::string(text);
+        //_value = std::string(text);
         recalculateVertices(_text, _x, _y, _width, _height);
     }
 }
 
+/*
 void FTLabel::setText2(const std::string& text)
 {
     setText((char*)text.c_str());
 }
+*/
 
 const std::string& FTLabel::getText() {
     return std::string(_text);
@@ -477,18 +447,15 @@ void FTLabel::setColor(float r, float b, float g, float a) {
     }
 }
 
-glm::vec4 FTLabel::getColor() {
-    return _textColor;
-}
 
-void FTLabel::setFont(std::shared_ptr<GLFont> ftFace) {
+
+void FTLabel::setFont(std::shared_ptr<GLFont> ftFace) 
+{
     _ftFace = ftFace;
-    _face = _ftFace->getFaceHandle(); // shortcut
+    _face = _ftFace->GetFontFace(); // shortcut
 }
 
-char* FTLabel::getFont() {
-    return _font;
-}
+
 
 void FTLabel::setAlignment(FTLabel::FontFlags alignment) {
     _alignment = alignment;
@@ -498,11 +465,10 @@ void FTLabel::setAlignment(FTLabel::FontFlags alignment) {
     }
 }
 
-FTLabel::FontFlags FTLabel::getAlignment() {
-    return _alignment;
-}
 
-void FTLabel::calculateAlignment(const char* text, float &x) {
+
+void FTLabel::calculateAlignment(const std::string& text, float &x) 
+{
     if(_alignment == FTLabel::FontFlags::LeftAligned)
         return; // no need to calculate alignment
 
@@ -511,7 +477,7 @@ void FTLabel::calculateAlignment(const char* text, float &x) {
     FontAtlas::Character* chars = _fontAtlas[_pixelSize]->getCharInfo();
    
     // Calculate total width
-    for(const char* p = text; *p; ++p)
+    for(const char* p = text.c_str(); *p; ++p)
         totalWidth += chars[*p].advanceX;
 
     if(_alignment == FTLabel::FontFlags::CenterAligned)
@@ -520,7 +486,8 @@ void FTLabel::calculateAlignment(const char* text, float &x) {
         x -= totalWidth;
 }
 
-void FTLabel::setPixelSize(int size) {
+void FTLabel::setPixelSize(int size) 
+{
     _pixelSize = size;
 
     // Create texture atlas for characters of this pixel size if there isn't already one
@@ -532,7 +499,8 @@ void FTLabel::setPixelSize(int size) {
     }
 }
 
-void FTLabel::setWindowSize(int width, int height) {
+void FTLabel::setWindowSize(int width, int height) 
+{
     _windowWidth = width;
     _windowHeight = height;
 
@@ -545,7 +513,8 @@ void FTLabel::setWindowSize(int width, int height) {
     }
 }
 
-void FTLabel::rotate(float degrees, float x, float y, float z) {
+void FTLabel::rotate(float degrees, float x, float y, float z) 
+{
     float rad = degrees * DEG_TO_RAD;
     _model = glm::rotate(_model, rad, glm::vec3(x, y, z));
     recalculateMVP();
@@ -556,10 +525,12 @@ void FTLabel::scale(float x, float y, float z) {
     recalculateMVP();
 }
 
-void FTLabel::recalculateMVP() {
+void FTLabel::recalculateMVP() 
+{
     _mvp = _projection * _view * _model;
 
-    if(_uniformMVPHandle != -1) {
+    if(_uniformMVPHandle != -1) 
+    {
         glUseProgram(_programId);
         glUniformMatrix4fv(_uniformMVPHandle, 1, GL_FALSE, glm::value_ptr(_mvp));
         glUseProgram(0);

@@ -325,8 +325,7 @@ namespace lux {
             return bestMonitor;
         }
 
-
-        inline inline GLFWwindow* GetNativeWindow() const { return _window_handle; }
+        GLFWwindow* GetNativeWindow() const { return _window_handle; }
 
         template<typename N = int> 
         N GetWidth() const {
@@ -340,8 +339,8 @@ namespace lux {
             return static_cast<N>(_window_height);
         }
 
-        inline int GetFramebufferWidth() const { return _framebuffer_width; }
-        inline int GetFramebufferHeight() const { return _framebuffer_height; }
+        int GetFramebufferWidth() const { return _framebuffer_width; }
+        int GetFramebufferHeight() const { return _framebuffer_height; }
         //inline float GetAspectRatio() const { return _aspect_ratio; }
 
         void SetSize(const int& width, const int& height) { glfwSetWindowSize(_window_handle, width, height); }
@@ -349,15 +348,15 @@ namespace lux {
         //void SetDrawCallback();
         //inline void Draw(void) const {}
 
-        int* GetPosition() {
-            int pos[2];
-            glfwGetWindowPos(_window_handle, &pos[0], &pos[1]);
-            return pos;
+        glm::ivec2 GetPosition() const {
+            glm::ivec2 position;
+            glfwGetWindowPos(_window_handle, &position.x, &position.y);
+            return position;
         }
-        inline void SetPosition(const int& x, const int& y) const { glfwSetWindowPos(_window_handle, x, y); }
-        inline bool ShouldClose() const { return glfwWindowShouldClose(_window_handle); }
+        void SetPosition(const int& x, const int& y) const { glfwSetWindowPos(_window_handle, x, y); }
+        bool ShouldClose() const { return glfwWindowShouldClose(_window_handle); }
 
-        inline void SwapBuffers() const 
+        void SwapBuffers() const 
         {          
             _context->SwapBuffers();
             glfwPollEvents();

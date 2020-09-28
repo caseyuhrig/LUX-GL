@@ -12,7 +12,7 @@ namespace lux {
         Time() {}
         ~Time() = default;
 
-        typedef struct HMS
+        struct HMS
         {
             int Hour, Minute, Second;
         };
@@ -23,7 +23,7 @@ namespace lux {
             // time in seconds 
             time_t s = time(NULL);
             // to get current time 
-            struct tm*  current_time = localtime(&s);
+            struct tm* current_time = localtime(&s);
             return { current_time->tm_hour, current_time->tm_min, current_time->tm_sec };
         }
 

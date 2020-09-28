@@ -32,8 +32,8 @@ namespace lux {
         void CreateGeometry() override
         {
             // @weird For some reason the normals have to be flipped in opposite directions if smooth or flat lighting is used!
-            unsigned int smooth = GL_SMOOTH;
-            unsigned int steps = 8;
+            uint32_t smooth = GL_SMOOTH;
+            uint32_t steps = 8;
             float ang_step = (end_angle - start_angle) / steps;
 
             
@@ -42,8 +42,8 @@ namespace lux {
             float max_x = -10000.0f, max_y = thickness / 2.0f, max_z = -10000.0f;
             for (float ang = start_angle; ang <= end_angle; ang += ang_step)
             {
-                glm::vec3 p1 = glm::vec3(inner_radius * cos(ang * TO_RAD), 0.0f, inner_radius * sin(ang * TO_RAD));
-                glm::vec3 p2 = glm::vec3(outer_radius * cos(ang * TO_RAD), 0.0f, outer_radius * sin(ang * TO_RAD));
+                glm::vec3 p1 = glm::vec3(inner_radius * cosf(ang * TO_RADf), 0.0f, inner_radius * sinf(ang * TO_RADf));
+                glm::vec3 p2 = glm::vec3(outer_radius * cosf(ang * TO_RADf), 0.0f, outer_radius * sinf(ang * TO_RADf));
                 min_x = glm::min(glm::min(min_x, p1.x), p2.x);
                 min_z = glm::min(glm::min(min_z, p1.z), p2.z);
                 max_x = glm::max(glm::max(max_x, p1.x), p2.x);
@@ -62,19 +62,19 @@ namespace lux {
             unsigned int index = 0;
             unsigned int idx = 0;
             unsigned int i = 0;
-            glm::vec3 normal_top = glm::vec3(0.0, 1.0, 0.0);
-            glm::vec3 normal_bottom = glm::vec3(0.0, -1.0, 0.0);
-            float y_top = thickness / 2.0;
-            float y_bottom = -thickness / 2.0;
+            glm::vec3 normal_top = glm::vec3(0.0f, 1.0f, 0.0f);
+            glm::vec3 normal_bottom = glm::vec3(0.0f, -1.0f, 0.0f);
+            float y_top = thickness / 2.0f;
+            float y_bottom = -thickness / 2.0f;
 
             for (float ang = start_angle; ang < end_angle; ang += ang_step)
             {
                 // TOP
 
-                glm::vec3 a = glm::vec3(outer_radius * cos(ang * TO_RAD), y_top, outer_radius * sin(ang * TO_RAD));
-                glm::vec3 b = glm::vec3(outer_radius * cos((ang + ang_step) * TO_RAD), y_top, outer_radius * sin((ang + ang_step) * TO_RAD));
-                glm::vec3 c = glm::vec3(inner_radius * cos((ang + ang_step) * TO_RAD), y_top, inner_radius * sin((ang + ang_step) * TO_RAD));
-                glm::vec3 d = glm::vec3(inner_radius * cos(ang * TO_RAD), y_top, inner_radius * sin(ang * TO_RAD));
+                glm::vec3 a = glm::vec3(outer_radius * cosf(ang * TO_RADf), y_top, outer_radius * sinf(ang * TO_RADf));
+                glm::vec3 b = glm::vec3(outer_radius * cosf((ang + ang_step) * TO_RADf), y_top, outer_radius * sinf((ang + ang_step) * TO_RADf));
+                glm::vec3 c = glm::vec3(inner_radius * cosf((ang + ang_step) * TO_RADf), y_top, inner_radius * sinf((ang + ang_step) * TO_RADf));
+                glm::vec3 d = glm::vec3(inner_radius * cosf(ang * TO_RADf), y_top, inner_radius * sinf(ang * TO_RADf));
                
                 AddQuad(a, b, c, d, normal_top, color);
 
@@ -88,10 +88,10 @@ namespace lux {
             {
                 // INNER
                 {
-                    glm::vec3 a = glm::vec3(inner_radius * cos(ang * TO_RAD), y_top, inner_radius * sin(ang * TO_RAD));
-                    glm::vec3 b = glm::vec3(inner_radius * cos((ang + ang_step) * TO_RAD), y_top, inner_radius * sin((ang + ang_step) * TO_RAD));
-                    glm::vec3 c = glm::vec3(inner_radius * cos((ang + ang_step) * TO_RAD), y_bottom, inner_radius * sin((ang + ang_step) * TO_RAD));
-                    glm::vec3 d = glm::vec3(inner_radius * cos(ang * TO_RAD), y_bottom, inner_radius * sin(ang * TO_RAD));
+                    glm::vec3 a = glm::vec3(inner_radius * cosf(ang * TO_RADf), y_top, inner_radius * sinf(ang * TO_RADf));
+                    glm::vec3 b = glm::vec3(inner_radius * cosf((ang + ang_step) * TO_RADf), y_top, inner_radius * sinf((ang + ang_step) * TO_RADf));
+                    glm::vec3 c = glm::vec3(inner_radius * cosf((ang + ang_step) * TO_RADf), y_bottom, inner_radius * sinf((ang + ang_step) * TO_RADf));
+                    glm::vec3 d = glm::vec3(inner_radius * cosf(ang * TO_RADf), y_bottom, inner_radius * sinf(ang * TO_RADf));
 
                     if (smooth == GL_SMOOTH)
                     {
@@ -110,10 +110,10 @@ namespace lux {
                 }
                 // OUTER
                 {
-                    glm::vec3 a = glm::vec3(outer_radius * cos(ang * TO_RAD), y_top, outer_radius * sin(ang * TO_RAD));
-                    glm::vec3 b = glm::vec3(outer_radius * cos((ang + ang_step) * TO_RAD), y_top, outer_radius * sin((ang + ang_step) * TO_RAD));
-                    glm::vec3 c = glm::vec3(outer_radius * cos((ang + ang_step) * TO_RAD), y_bottom, outer_radius * sin((ang + ang_step) * TO_RAD));
-                    glm::vec3 d = glm::vec3(outer_radius * cos(ang * TO_RAD), y_bottom, outer_radius * sin(ang * TO_RAD));
+                    glm::vec3 a = glm::vec3(outer_radius * cosf(ang * TO_RAD), y_top, outer_radius * sinf(ang * TO_RAD));
+                    glm::vec3 b = glm::vec3(outer_radius * cosf((ang + ang_step) * TO_RAD), y_top, outer_radius * sinf((ang + ang_step) * TO_RAD));
+                    glm::vec3 c = glm::vec3(outer_radius * cosf((ang + ang_step) * TO_RAD), y_bottom, outer_radius * sinf((ang + ang_step) * TO_RAD));
+                    glm::vec3 d = glm::vec3(outer_radius * cosf(ang * TO_RAD), y_bottom, outer_radius * sinf(ang * TO_RAD));
 
                     if (smooth == GL_SMOOTH)
                     {
@@ -135,13 +135,13 @@ namespace lux {
 
             {
                 float ang = start_angle;
-                float y_top = thickness / 2.0;
-                float y_bottom = -thickness / 2.0;
+                float y_top = thickness / 2.0f;
+                float y_bottom = -thickness / 2.0f;
 
-                glm::vec3 a = glm::vec3(outer_radius * cos(ang * TO_RAD), y_bottom, outer_radius * sin(ang * TO_RAD));
-                glm::vec3 b = glm::vec3(outer_radius * cos(ang * TO_RAD), y_top, outer_radius * sin(ang * TO_RAD));
-                glm::vec3 c = glm::vec3(inner_radius * cos(ang * TO_RAD), y_top, inner_radius * sin(ang * TO_RAD));
-                glm::vec3 d = glm::vec3(inner_radius * cos(ang * TO_RAD), y_bottom, inner_radius * sin(ang * TO_RAD));
+                glm::vec3 a = glm::vec3(outer_radius * cosf(ang * TO_RADf), y_bottom, outer_radius * sinf(ang * TO_RADf));
+                glm::vec3 b = glm::vec3(outer_radius * cosf(ang * TO_RADf), y_top, outer_radius * sinf(ang * TO_RADf));
+                glm::vec3 c = glm::vec3(inner_radius * cosf(ang * TO_RADf), y_top, inner_radius * sinf(ang * TO_RADf));
+                glm::vec3 d = glm::vec3(inner_radius * cosf(ang * TO_RADf), y_bottom, inner_radius * sinf(ang * TO_RADf));
 
                 // TODO !!! I believe just the x normal needs to be inversed.
                 glm::vec3 normal = -glm::triangleNormal(a + offset, b + offset, c + offset);
@@ -154,13 +154,13 @@ namespace lux {
 
             {
                 float ang = end_angle;
-                float y_top = thickness / 2.0;
-                float y_bottom = -thickness / 2.0;
+                float y_top = thickness / 2.0f;
+                float y_bottom = -thickness / 2.0f;
 
-                glm::vec3 a = glm::vec3(outer_radius * cos(ang * TO_RAD), y_bottom, outer_radius * sin(ang * TO_RAD));
-                glm::vec3 b = glm::vec3(outer_radius * cos(ang * TO_RAD), y_top, outer_radius * sin(ang * TO_RAD));
-                glm::vec3 c = glm::vec3(inner_radius * cos(ang * TO_RAD), y_top, inner_radius * sin(ang * TO_RAD));
-                glm::vec3 d = glm::vec3(inner_radius * cos(ang * TO_RAD), y_bottom, inner_radius * sin(ang * TO_RAD));
+                glm::vec3 a = glm::vec3(outer_radius * cosf(ang * TO_RADf), y_bottom, outer_radius * sinf(ang * TO_RADf));
+                glm::vec3 b = glm::vec3(outer_radius * cosf(ang * TO_RADf), y_top, outer_radius * sinf(ang * TO_RADf));
+                glm::vec3 c = glm::vec3(inner_radius * cosf(ang * TO_RADf), y_top, inner_radius * sinf(ang * TO_RADf));
+                glm::vec3 d = glm::vec3(inner_radius * cosf(ang * TO_RADf), y_bottom, inner_radius * sinf(ang * TO_RADf));
 
                 glm::vec3 normal = glm::triangleNormal(a + offset, b + offset, c + offset); // WAS NEGATIVE
                 AddQuad(a, b, c, d, normal, color);

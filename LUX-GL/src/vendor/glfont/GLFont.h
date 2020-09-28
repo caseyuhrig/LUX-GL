@@ -4,20 +4,18 @@
 #include "ft2build.h"
 #include FT_FREETYPE_H
 
+#include <string>
+
+
 class GLFont {
 public:
-    GLFont(const char* fontFile);
-    ~GLFont();
-
-    void setFontFile(const char* fontFile);
-
-    FT_Face getFaceHandle();
-
+    GLFont(const std::string& fontFile);
+    ~GLFont() = default;
+    void SetFontFile(const std::string& fontFile);
+    const FT_Face& GetFontFace() const noexcept { return m_FontFace; }
 private:
-    char* _fontFile;
-    FT_Error _error;
-    FT_Library _ft;
-    FT_Face _face;
-
+    FT_Library m_FreeType;
+    FT_Face m_FontFace;
+    std::string m_FontFile;
 };
 

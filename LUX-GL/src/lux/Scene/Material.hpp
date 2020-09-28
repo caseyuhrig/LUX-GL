@@ -2,8 +2,8 @@
 
 #include <glm/glm.hpp>
 
-#include "../Types.hpp"
-#include "../Renderer/UniformBuffer.hpp"
+#include "lux/Types.hpp"
+#include "lux/Renderer/UniformBuffer.hpp"
 
 
 namespace lux {
@@ -12,7 +12,7 @@ namespace lux {
 	Every variable has to start at 0 or a 16 byte offset with a size of 16,
 	except float or int. (this never seems to work very well)
 	*/
-	typedef struct MaterialProperties          // size = 64
+	struct MaterialProperties          // size = 64
 	{
 		glm::vec3 ambient_color;     // 12      0
 		float pad1 = 0;              //  4

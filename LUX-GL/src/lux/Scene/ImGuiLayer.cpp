@@ -17,15 +17,6 @@ namespace lux {
     {
         _window = window;
         SetDebugLabel("ImGui Layer");
-    }
-
-    void ImGuiLayer::Resize(const uint32_t& width, const uint32_t& height)
-    {
-
-    }
-
-    void ImGuiLayer::Begin()
-    {
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         const char* glsl_version = "#version 450";
@@ -39,6 +30,21 @@ namespace lux {
         //ImGui::StyleColorsClassic();
     }
 
+    void ImGuiLayer::Resize(const uint32_t& width, const uint32_t& height)
+    {
+
+    }
+
+    void ImGuiLayer::Begin()
+    {
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("UX/SIM/GL");
+    }
+
     void ImGuiLayer::SetCubemapSwapFunction(void (*callback_function)(void))
     {
         callback_function();
@@ -46,20 +52,24 @@ namespace lux {
 
     void ImGuiLayer::End()
     {
+        ImGui::End();
 
+        ImGui::Render();
+        ImGui::EndFrame();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
     void ImGuiLayer::Draw() const
     {
         // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        //ImGui_ImplOpenGL3_NewFrame();
+        //ImGui_ImplGlfw_NewFrame();
+        //ImGui::NewFrame();
 
-        {
+        //{
             ImGuiColorEditFlags misc_flags = ImGuiColorEditFlags_Float;
 
-            ImGui::Begin("UX/SIM/GL");
+            //ImGui::Begin("UX/SIM/GL");
             /*
             //ImGui::SliderFloat4("ABCD", abcd, -3.0f, 3.0f, "%.6f");
             //ImGui::SliderFloat4("EFGH", efgh, -3.0f, 3.0f, "%.6f");
@@ -104,7 +114,7 @@ namespace lux {
             ImGui::SliderFloat3("Light Position", (float*)m_LightPos, -100.0f, 100.0f);
             
             ImGui::Separator();
-            ImGui::SliderInt("Shadow Samples", m_ShadowSamples, 1.0f, 100.0f);
+            ImGui::SliderInt("Shadow Samples", m_ShadowSamples, 1, 100);
             ImGui::SliderFloat("Shadow Bias", m_ShadowBias, 0.0f, 1.0f);
             /*
             ImGui::SliderFloat3("Light Position", (float*)&_lights->GetPosition(0), -100.0f, 100.0f);
@@ -188,13 +198,13 @@ namespace lux {
                 */
                 //ImGuizmo::DrawGrid(cameraView, cameraProjection, identityMatrix, 100.f);
                 //ImGuizmo::DrawCubes(cameraView, cameraProjection, &objectMatrix[0][0], gizmoCount);
-            ImGui::End();
+          //  ImGui::End();
 
-            ImGui::ShowDemoWindow();
-        }
+            //ImGui::ShowDemoWindow();
+        //}
 
-        ImGui::Render();
-        ImGui::EndFrame();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        //ImGui::Render();
+        //ImGui::EndFrame();
+        //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 }

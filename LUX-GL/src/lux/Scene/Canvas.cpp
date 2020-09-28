@@ -1,56 +1,38 @@
 #include "Canvas.hpp"
 
 #include <glad/glad.h>
-#include "../Renderer/Shader.hpp"
-#include "../Log.hpp"
+
+#include "lux/Renderer/Shader.hpp"
+#include "lux/Log.hpp"
 
 
 namespace lux {
 
-    //Canvas::Canvas() 
-    //    : m_ColorAttachment(0), m_DepthAttachment(0), m_VAO(0), m_FBO(0), m_VBO(0), m_Width(0), m_Height(0) {}
-    Canvas::~Canvas() = default;
-    
-    
-
     Canvas::Canvas(uint32_t width, uint32_t height, uint32_t samples)
+        : m_Width(width), m_Height(height), m_Samples(samples), m_Multisample(samples > 1)
     {
-        m_Width = width;
-        m_Height = height;
-        m_Samples = samples;
-        m_Multisample = m_Samples > 1;
-
         if (m_Multisample)
         {
-            //m_ShaderBlur = lux::CreateRef<Shader>("res/shaders/shader-blur-MSAA.glsl");
-            m_ShaderBloomFinal = lux::CreateRef<Shader>("res/shaders/shader-bloom_final-MSAA.glsl");
+            m_Shader = Shader::Create("res/shaders/canvas-shader-MSAA.glsl");
+            m_Shader->SetUniform1i("u_Samples", m_Samples);
+            m_ShaderBloomFinal = Shader::Create("res/shaders/shader-bloom_final-MSAA.glsl");
         }
         else {
-            //m_ShaderBlur = lux::CreateRef<Shader>("res/shaders/shader-blur.glsl");
-            m_ShaderBloomFinal = lux::CreateRef<Shader>("res/shaders/shader-bloom_final.glsl");
+            m_Shader = Shader::Create("res/shaders/canvas-shader.glsl");
+            m_ShaderBloomFinal = Shader::Create("res/shaders/shader-bloom_final.glsl");
         }
 
-        m_ShaderBlur = lux::CreateRef<Shader>("res/shaders/shader-blur.glsl");
+        m_ShaderBlur = Shader::Create("res/shaders/shader-blur.glsl");
 
-        m_ShaderBlur->Bind();
         m_ShaderBlur->SetUniform1i("image", 0);
         m_ShaderBloomFinal->Bind();
         m_ShaderBloomFinal->SetUniform1i("scene", 0);
         m_ShaderBloomFinal->SetUniform1i("bloomBlur", 1);
 
-
-
-        //if (m_Multisample)
-        m_Shader = lux::CreateRef<Shader>("res/shaders/canvas-shader-MSAA.glsl");
-        //else 
-        //    m_Shader = lux::CreateRef<Shader>("res/shaders/canvas-shader.glsl");
-
-        m_Shader->Bind();
         m_Shader->SetUniform1i("u_ScreenTexture", 0); // +slot?
-        if (m_Multisample)
-            m_Shader->SetUniform1i("u_Samples", m_Samples);
 
-        float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+        // TODO Create a ScreenQuad class or simular, since this is done in a few places!
+        const float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
             // positions   // texCoords
             -1.0f,  1.0f,  0.0f, 1.0f,
             -1.0f, -1.0f,  0.0f, 0.0f,
@@ -67,19 +49,16 @@ namespace lux {
         glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(0));
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-
-
-    
-
-   
 
        
         //uint32_t RGB_FORMAT = GL_RGBA16F;
         //uint32_t RGB_FORMAT = GL_RGBA8;
+
+        //uint32_t COLOR_FORMAT = GL_FLOAT;
+        //uint32_t COLOR_FORMAT = GL_UNSIGNED_BYTE
 
       
         glGenFramebuffers(1, &m_BloomFBO);
@@ -198,6 +177,9 @@ namespace lux {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    // TODO ~Canvas() needs a lot of work!
+    Canvas::~Canvas() = default;
+
     void Canvas::Resize(const uint32_t& width, const uint32_t& height)
     {
         m_Width = width;
@@ -237,7 +219,7 @@ namespace lux {
         for (unsigned int i = 0; i < 2; i++)
         {
             glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[i]);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGBA, GL_FLOAT, NULL);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Width, m_Height, 0, GL_RGBA, GL_FLOAT, nullptr);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
     }
@@ -311,7 +293,7 @@ namespace lux {
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_BrightnessAttachment);
         m_Shader->Bind();
-        m_Shader->SetUniform1i("u_ScreenTexture", 3); // +slot?
+        m_Shader->SetUniform1i("u_ScreenTexture", 3); // slot
         m_Shader->SetUniform1i("u_Samples", 8); //m_Samples);
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);

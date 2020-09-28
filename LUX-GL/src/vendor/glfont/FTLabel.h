@@ -44,8 +44,8 @@ public:
     // Ctor takes a pointer to a font face
     FTLabel(std::shared_ptr<GLFont> ftFace, int windowWidth, int windowHeight);
     FTLabel(GLFont* ftFace, int windowWidth, int windowHeight);
-    FTLabel(std::shared_ptr<GLFont> ftFace, const char* text, float x, float y, int width, int height, int windowWidth, int windowHeight);
-    FTLabel(std::shared_ptr<GLFont> ftFace, const char* text, float x, float y, int windowWidth, int windowHeight);
+    FTLabel(std::shared_ptr<GLFont> ftFace, const std::string&, float x, float y, int width, int height, int windowWidth, int windowHeight);
+    FTLabel(std::shared_ptr<GLFont> ftFace, const std::string&, float x, float y, int windowWidth, int windowHeight);
     ~FTLabel();
 
     void setWindowSize(int width, int height);
@@ -56,8 +56,8 @@ public:
     void scale(float x, float y, float z);
 
     // Setters
-    void setText(char* text);
-    void setText2(const std::string& text);
+    void setText(const std::string& text);
+    //void setText2(const std::string& text);
     void setPosition(float x, float y);
     void setSize(int width, int height);
     void setFont(std::shared_ptr<GLFont> ftFace);
@@ -74,10 +74,10 @@ public:
     float getY();
     int getWidth();
     int getHeight();
-    char* getFont();
-    glm::vec4 getColor();
-    FontFlags getAlignment();
-    float getRotation();
+    const std::string& getFont() { return _font; }
+    glm::vec4& getColor() { return _textColor; }
+    FTLabel::FontFlags& getAlignment() { return _alignment; }
+    //float getRotation();
     int getIndentation();
     int getFontFlags();
 
@@ -119,10 +119,10 @@ private:
     uint32_t _uniformTextColorHandle;
     uint32_t _uniformMVPHandle;
 
-    char* _text;
-    //std::string _text;
+    //char* _text;
+    std::string _text;
 
-    std::string _value;
+    //std::string _value;
 
     std::vector<Point> _coords;
 
@@ -130,7 +130,7 @@ private:
     std::map<int, std::shared_ptr<FontAtlas>> _fontAtlas;
 
     int _flags; // Currently enabled settings set via FontFlags
-    int _numVertices;
+    size_t _numVertices;
 
     // Window dimensions
     int _windowWidth;
@@ -158,7 +158,7 @@ private:
     glm::mat4 _model;
     glm::mat4 _mvp;
 
-    char* _font; // file path to font file
+    std::string _font; // file path to font file
     glm::vec4 _textColor; // RGBA value we will use to color the font (0.0 - 1.0)
     FontFlags _alignment;
     int _pixelSize;
@@ -177,16 +177,16 @@ private:
     // Compile shader from file
     //void loadShader(char* shaderSource, GLenum shaderType);
     // Calculate offset needed for center- or left-aligned text
-    void calculateAlignment(const char* text, float &x);
+    void calculateAlignment(const std::string& text, float &x);
     // Split text into words separated by spaces
-    std::vector<std::string> splitText(const char* text);
+    std::vector<std::string> splitText(const std::string& text);
     // Returns the width (in pixels) of the string, given the current pixel size
-    int calcWidth(const char* text);
+    int calcWidth(const std::string& text);
 
     // Calculate vertices for a paragraph label
-    void recalculateVertices(const char* text, float x, float y, int width, int height);
+    void recalculateVertices(const std::string& text, float x, float y, int width, int height);
     // Calculate vertices without regards to width or height boundaries
-    void recalculateVertices(const char* text, float x, float y);
+    void recalculateVertices(const std::string& text, float x, float y);
 
     void recalculateMVP();
 };

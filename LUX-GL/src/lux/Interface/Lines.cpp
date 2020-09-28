@@ -1,42 +1,24 @@
 #include "Lines.hpp"
 
 
-
-
 namespace lux {
 
     Lines::Lines()
-    {
-       
+    {     
     }
 
-    void Lines::add(glm::vec3 p1, glm::vec3 p2)
+    void Lines::add(const glm::vec3& p1, const glm::vec3& p2)
     {
-        //Line line;
-        //line.p1 = p1;
-        //line.p2 = p1;
-        //lines.push_back(line);
         points.push_back(p1);
         points.push_back(p2);
         indices.push_back(index);
         index++;
         indices.push_back(index);
         index++;
-        //printf("Index: %d\n", index);
     }
 
     void Lines::commit()
     {
-        /*
-        for (unsigned int n = 0;n < points.size();n++)
-        {
-            printf("XxY: %.6f %.6f %.6f\n", points[n].x, points[n].y, points[n].z);
-        }
-        for (unsigned int n = 0;n < indices.size();n++)
-        {
-            printf("IDX: %d\n", indices[n]);
-        }
-        */
         va = CreateRef<VertexArray>();
         vb = CreateRef<VertexBuffer>(&points[0], 3 * points.size() * sizeof(float));
         layout = CreateRef<VertexBufferLayout>();

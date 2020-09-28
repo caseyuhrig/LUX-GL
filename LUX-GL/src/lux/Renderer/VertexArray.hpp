@@ -12,39 +12,39 @@ namespace lux {
     private:
         unsigned int vao_ID;
     public:
-        inline VertexArray()
+        VertexArray()
         {
             glGenVertexArrays(1, &vao_ID);
             glBindVertexArray(vao_ID);
         }
 
-        inline ~VertexArray()
+        ~VertexArray()
         {
             glDeleteVertexArrays(1, &vao_ID);
         }
 
-        inline void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
+        void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
         {
             Bind();
             vb.Bind();
             const auto& elements = layout.GetElements();
-            unsigned int offset = 0;
+            uint32_t offset = 0;
             for (unsigned int i = 0; i < elements.size(); i++)
             {
                 const auto& element = elements[i];
                 glEnableVertexAttribArray(i);
-                glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset);
+                glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), GLvoidptr(offset));
                 offset += element.count * VertexBufferElement::getSizeOfType(element.type);
             }
 
         }
 
-        inline void Bind() const
+        void Bind() const
         {
             glBindVertexArray(vao_ID);
         }
 
-        inline void Unbind() const
+        void Unbind() const
         {
             glBindVertexArray(0);
         }

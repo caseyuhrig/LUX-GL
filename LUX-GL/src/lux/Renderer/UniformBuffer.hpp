@@ -1,12 +1,15 @@
 #pragma once
 
 #include <glad/glad.h>
-#include "glm/glm.hpp"
-#include <glm/gtx/string_cast.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
 #include <memory>
 #include <iostream>
 #include <map>
+
+#include "glm/glm.hpp"
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 
 // https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
@@ -35,19 +38,11 @@ namespace lux {
     class UniformBuffer
     {
     private:
-
-        typedef struct byte_offset
-        {
-            unsigned int offset;
-            unsigned int size;
-        };
-
         unsigned int  _ubo_ID;
         unsigned int  _binding_point;
         std::string   _name;
         unsigned int  _data_size;
         std::map <std::string, byte_offset> _layout;
-
     public:
 
         inline UniformBuffer(std::string name, unsigned int binding_point, unsigned int data_size, const void* data)

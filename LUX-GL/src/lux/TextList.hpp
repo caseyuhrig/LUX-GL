@@ -17,10 +17,9 @@ namespace lux {
     class TextList
     {
     private:
-        int _x = 0, _y = 0;
-        int _width = 0, _height = 0;
-        int _y_pos = 0;
-        //std::map<unsigned int, std::shared_ptr<GLFont>> _fonts;
+        int _x, _y;
+        int m_Width, m_Height;
+        int _y_pos;
         std::map<unsigned int, std::shared_ptr<GLFont>> _fonts;
         // TODO make fonts static, etc...
         // res/fonts/Inconsolata/static/InconsolataCondensed-Medium.ttf
@@ -30,24 +29,28 @@ namespace lux {
     public:
         TextList() {}
 
-        TextList(int x, int y, int width, int height) : _x(x), _y(y), _width(width), _height(height), _y_pos(y)
+        TextList(int x, int y, int width, int height) 
+            : _x(x), _y(y), m_Width(width), m_Height(height), _y_pos(y)
         {
         }
 
         void Resize(const uint32_t& width, const uint32_t& height)
         {
+            m_Width = width;
+            m_Height = height;
+
             for (auto label : _labels)
             {
                 label->setWindowSize(width, height);
-                label->setPosition(label->getX(), label->getY());
-                label->setText2(label->getText());
+                //label->setPosition(label->getX(), label->getY());
+                //label->setText(label->getText());
             }
         }
 
         void AddText(unsigned int fontID, unsigned int labelID, unsigned int fontSize, int yOffset, const std::string& text)
         {
             auto font = _fonts.at(fontID);
-            auto label = std::shared_ptr<FTLabel>(new FTLabel(font, text.c_str(), _x, _y_pos, _width, _height));
+            auto label = std::shared_ptr<FTLabel>(new FTLabel(font, text, _x, _y_pos, m_Width, m_Height));
             label->setColor(1.0, 1.0, 1.0, 1.0);
             label->setPixelSize(fontSize);
             //label->setSize(_width, _height);
@@ -57,7 +60,7 @@ namespace lux {
 
         void AddFont(unsigned int fontID, const std::string& fontPath)
         {
-            auto font = std::shared_ptr<GLFont>(new GLFont(fontPath.c_str()));
+            auto font = std::shared_ptr<GLFont>(new GLFont(fontPath));
             // TODO check if the font exists first
             _fonts.emplace(fontID, font);
         }
@@ -65,7 +68,7 @@ namespace lux {
         void SetText(unsigned int labelID, const std::string& text) const
         {
             auto label = _labels.at(labelID);
-            label->setText2(text);
+            label->setText(text);
         }
 
         void Draw() const

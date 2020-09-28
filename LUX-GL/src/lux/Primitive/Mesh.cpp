@@ -26,7 +26,7 @@ namespace lux {
         va(CreateRef<VertexArray>()), vb(CreateRef<VertexBuffer>()),
         ib(CreateRef<IndexBuffer>()), layout(CreateRef<VertexBufferLayout>()) {}
 
-    void Mesh::AddIndex(unsigned int i1, unsigned int i2, unsigned int i3)
+    void Mesh::AddIndex(uint32_t i1, uint32_t i2, uint32_t i3)
     {
         indicies.push_back(i1);
         indicies.push_back(i2);
@@ -83,22 +83,23 @@ namespace lux {
                           const float startAngle, const float endAngle, const float step, 
                           const glm::vec3& normal, const glm::vec4& color)
     {
-        for (float angle = startAngle; angle < endAngle;angle += step)
+        for (float angle = startAngle; angle < endAngle; angle += step)
         {
             glm::vec3 a = { 
-                center.x + radius.x * cosf(angle * TO_RAD),
-                center.y + radius.y * sinf(angle * TO_RAD),
+                center.x + radius.x * cosf(angle * TO_RADf),
+                center.y + radius.y * sinf(angle * TO_RADf),
                 0.0f
             };
             glm::vec3 b = {
-                center.x + radius.x * cosf((angle + step) * TO_RAD),
-                center.y + radius.y * sinf((angle + step) * TO_RAD),
+                center.x + radius.x * cosf((angle + step) * TO_RADf),
+                center.y + radius.y * sinf((angle + step) * TO_RADf),
                 0.0f
             };
             AddTriangle(glm::vec3(center, 0.0f), a, b, normal, color);
         }
     }
 
+    // Rectangle with a rounded right end.
     void Mesh::AddHorzBar(const glm::vec2& min, const glm::vec2& max, const glm::vec3& normal, const glm::vec4& color)
     {
         /*
@@ -186,8 +187,8 @@ namespace lux {
         float width = max.x - min.x;
         float height = max.y - min.y;
         glm::vec3 v1 = {
-            center.x + width * std::cosf(start_angle * TO_RAD),
-            center.y + height * std::sinf(start_angle * TO_RAD),
+            center.x + width * std::cosf(start_angle * TO_RADf),
+            center.y + height * std::sinf(start_angle * TO_RADf),
             0.0f
         };
         for (float angle = start_angle;angle < end_angle;angle += step)
@@ -236,8 +237,8 @@ namespace lux {
         float width = max.x - min.x;
         float height = max.y - min.y;
         glm::vec3 v1 = {
-            center.x + width * std::cosf(start_angle * TO_RAD),
-            center.y + height * std::sinf(start_angle * TO_RAD),
+            center.x + width * std::cosf(start_angle * TO_RADf),
+            center.y + height * std::sinf(start_angle * TO_RADf),
             0.0f
         };
         for (float angle = start_angle;angle < end_angle;angle += step)

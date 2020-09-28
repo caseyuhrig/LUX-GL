@@ -65,9 +65,13 @@ namespace lux {
         glm::mat4 transformation;
         glm::vec4 color = glm::vec4(1);
         std::vector<float> vertices;
-        std::vector<unsigned int> indicies;
+        std::vector<uint32_t> indicies;
         bool m_Built = false;
-        void AddIndex(unsigned int i1, unsigned int i2, unsigned int i3);
+
+        const uint32_t GetVerticesSize() const { return static_cast<uint32_t>(vertices.size()); }
+        const uint32_t GetIndiciesSize() const { return static_cast<uint32_t>(indicies.size()); }
+
+        void AddIndex(uint32_t i1, uint32_t i2, uint32_t i3);
         void AddVertex(const glm::vec3& position, const glm::vec4& color, const glm::vec2& texCoord, const glm::vec3& normal);
         /**
          * Adds a triangle to the mesh and updates the verticies accordingly.  Vertices are expected

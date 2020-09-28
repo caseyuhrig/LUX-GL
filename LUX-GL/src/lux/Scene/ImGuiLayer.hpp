@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Layer.hpp"
-#include "../Scene/Material.hpp"
-#include "../Window.hpp"
-#include "../Scene/Camera.hpp"
-#include "../Scene/Light.hpp"
-#include "../Renderer/Shader.hpp"
+#include "lux/Scene/Material.hpp"
+#include "lux/Window.hpp"
+#include "lux/Scene/Camera.hpp"
+#include "lux/Scene/Light.hpp"
+#include "lux/Renderer/Shader.hpp"
 
 
 namespace lux {
@@ -43,13 +43,8 @@ namespace lux {
         void SetShadowBias(float* shadowBias) { m_ShadowBias = shadowBias; }
 
         void SetCamera(Camera* camera) { _camera = camera; }
-        void SetMaterial(Material* material) { 
-            _material = material;
-        }
-        void SetLights(Lights* lights) {
-            _lights = lights;
-          
-        }
+        void SetMaterial(Material* material) { _material = material; }
+        void SetLights(Lights* lights) { _lights = lights; }
         void SetLightPos(glm::vec3* lightPos) { m_LightPos = lightPos; }
         void SetShaderBase(Shader* shader) { _shader_base = shader; }
 

@@ -5,8 +5,11 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+
 #include "glm/glm.hpp"
-#include "../Log.hpp"
+
+#include "lux/Types.hpp"
+#include "lux/Log.hpp"
 
 
 // https://www.khronos.org/opengl/wiki/GLSL_Object
@@ -38,7 +41,7 @@ namespace lux {
         std::unordered_map<std::string, int> m_UniformLocationCache;
 
 
-        inline ShaderProgramSource _ParseShader(const std::string& filepath)
+        ShaderProgramSource _ParseShader(const std::string& filepath)
         {
             std::ifstream stream(filepath);
 
@@ -69,7 +72,7 @@ namespace lux {
             return { ss[0].str(), ss[1].str() , ss[2].str() };
         }
 
-        inline unsigned int _CompileShader(unsigned int type, const std::string& source)
+        unsigned int _CompileShader(unsigned int type, const std::string& source)
         {
             unsigned int id = glCreateShader(type);
             const char* src = source.c_str(); // same as &source[0]
@@ -81,25 +84,22 @@ namespace lux {
             glGetShaderiv(id, GL_COMPILE_STATUS, &result);
             if (result == GL_FALSE)
             {
-                std::cout << source << std::endl;
-                std::cout << "ERROR IN SHADER MAGIC!" << std::endl;
                 int length;
                 glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
                 // alloca allocates on the stack in the functions stack frame.  The memory is freed when the function completes!
                 // malloc allocates on the heap.
-                char* message = (char*)alloca(length * sizeof(char));
-                glGetShaderInfoLog(id, length, &length, message);
-                std::cout << "Failed to compile " <<
-                    (type == GL_VERTEX_SHADER ? "vertex" : "fragment")
-                    << " shader!" << std::endl;
-                std::cout << message << std::endl;
+                std::string message;
+                glGetShaderInfoLog(id, length, &length, message.data());
+                UX_LOG_ERROR("Failed to compile %s shader!", (type == GL_VERTEX_SHADER ? "vertex" : "fragment"));
+                UX_LOG_ERROR("%s", message);
+                UX_LOG_ERROR("%s", source);
                 glDeleteShader(id);
                 return 0;
             }
             return id;
         }
 
-        inline unsigned int _CreateShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader)
+        unsigned int _CreateShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader)
         {
             unsigned int program = glCreateProgram();
             unsigned int vs = _CompileShader(GL_VERTEX_SHADER, vertexShader);
@@ -127,97 +127,97 @@ namespace lux {
             return program;
         }
 
-        inline int _GetUniformLocation(const std::string& name)
+        int _GetUniformLocation(const std::string& name)
         {
             if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
                 return m_UniformLocationCache[name];
 
             int location = glGetUniformLocation(programID, name.c_str());
             if (location == -1)
-                UX_LOG_FATAL("Warning: uniform '%s' doesn't exist!", name.c_str());
+                UX_LOG_ERROR("Warning: uniform '%s' doesn't exist!", name.c_str());
 
             m_UniformLocationCache[name] = location;
             return location;
         }
     public:
 
-        inline Shader(const std::string& filepath)
+        static const Ref<Shader> Create(const std::string& filepath)
+        {
+            return CreateRef<Shader>(filepath);
+        }
+
+        Shader(const std::string& filepath)
             : m_FilePath(filepath), programID(0)
         {
-            ShaderProgramSource source = _ParseShader(filepath);
-            //std::cout << "VERTEX" << std::endl;
-            //std::cout << source.VertexSource << std::endl;
-            //std::cout << "FRAGMENT" << std::endl;
-            //std::cout << source.FragmentSource << std::endl;
+            const ShaderProgramSource source = _ParseShader(filepath);
             programID = _CreateShader(source.VertexSource, source.FragmentSource, source.GeometrySource);
         }
 
-        inline ~Shader()
+        ~Shader()
         {
             glDeleteProgram(programID);
         }
 
-        inline void Bind() const
+        void Bind() const
         {
             glUseProgram(programID);
         }
 
 
-        inline void Unbind() const
+        void Unbind() const
         {
             glUseProgram(0);
         }
 
-        inline unsigned int GetProgramID()
+        const unsigned int GetProgramID() const
         {
             return programID;
         }
 
-        inline void SetUniform1i(const std::string& name, int value)
+        /**
+        * glProgramUniform* vs. glUniform*
+        * the glProgram* version alloes you to set the uniform value without having to
+        * bind the program first.
+        */
+
+        void SetUniform1i(const std::string& name, int value)
         {
-            //glUniform1i(_GetUniformLocation(name), value);
             glProgramUniform1i(programID, _GetUniformLocation(name), value);
         }
 
 
-        inline void SetUniform1f(const std::string& name, float value)
+        void SetUniform1f(const std::string& name, float value)
         {
-            //glUniform1f(_GetUniformLocation(name), value);
             glProgramUniform1f(programID, _GetUniformLocation(name), value);
         }
 
 
-        inline void SetUniform3f(const std::string& name, float v0, float v1, float v2)
+        void SetUniform3f(const std::string& name, float v0, float v1, float v2)
         {
-            //glUniform3f(_GetUniformLocation(name), v0, v1, v2);
             glProgramUniform3f(programID, _GetUniformLocation(name), v0, v1, v2);
         }
 
 
-        inline void SetUniformVec3f(const std::string& name, glm::vec3 v)
+        void SetUniformVec3f(const std::string& name, glm::vec3 v)
         {
-            //glUniform3f(_GetUniformLocation(name), v[0], v[1], v[2]);
             glProgramUniform3f(programID, _GetUniformLocation(name), v[0], v[1], v[2]);
         }
 
 
-        inline void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
+        void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
         {
-            //glUniform4f(_GetUniformLocation(name), v0, v1, v2, v3);
             glProgramUniform4f(programID, _GetUniformLocation(name), v0, v1, v2, v3);
         }
 
 
-        inline void SetUniformVec4f(const std::string& name, glm::vec4& v)
+        void SetUniformVec4f(const std::string& name, glm::vec4& v)
         {
-            //glUniform4f(_GetUniformLocation(name), v[0], v[1], v[2], v[3]);
             glProgramUniform4f(programID, _GetUniformLocation(name), v[0], v[1], v[2], v[3]);
         }
 
 
-        inline void SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
+        void SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
         {
-            //glUniformMatrix4fv(_GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
             glProgramUniformMatrix4fv(programID, _GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
         }
     };

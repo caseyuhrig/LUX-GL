@@ -448,7 +448,7 @@ int main(int argc, char** argv)
     lux::LayerStack layers = lux::LayerStack();  
     layers.Add(&imguiLayer);
     layers.Add(&lcarsLayer);
-    layers.Begin();
+    
 
 
 
@@ -508,8 +508,13 @@ int main(int argc, char** argv)
     //camera.SetViewportSize(window.GetFramebufferWidth(), window.GetFramebufferHeight());
     //camera.Publish();
 
-    std::function<void(int width, int height)> callback = [&](int width, int height) -> void {
+    // std::function<int(int,int,int,int)> valueFunction = [](int s, int d, int ct, int tt) { return -1; };
+    // You could simply add a + before the first lambda : auto valueFunction = +[](...) {...};.
+    // It would convert the lambda to a function pointer, so auto would be deduced as a function pointer.– HolyBlackCat
+    // std::function<void(int, int)> callback = [&](int width, int height) -> void {}
 
+    std::function<void(int, int)> callback = [&](int width, int height)
+    {
         std::cout << "Aspect1: " << camera.GetAspectRatio() << std::endl;
         std::cout << "Resize Callback: " << width << " " << height << std::endl;
         camera.SetViewportSize(width, height);
@@ -527,7 +532,8 @@ int main(int argc, char** argv)
         model = lux::MatrixUtils::Transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
         glm::mat4 mvp = camera.GetViewProjection() * model;
 
-        
+        layers.Begin();
+
         renderer.Clear();
 
      
@@ -632,7 +638,9 @@ int main(int argc, char** argv)
         
 
         layers.Draw();
-       
+        
+        layers.End();
+
         canvas.Unbind();
 
 
@@ -642,6 +650,8 @@ int main(int argc, char** argv)
 
         canvas.Draw();
 
+        
+
         window.SwapBuffers();
 
         //glfwPollEvents();
@@ -649,7 +659,7 @@ int main(int argc, char** argv)
         timestep.Update();
     }
 
-    layers.End();
+    
 
     //registry.destroy(entity);
     //registry.destroy();
