@@ -11,13 +11,12 @@
 #include "lux/Renderer/VertexBufferLayout.hpp"
 
 
-struct Line {
-    glm::vec3 p1;
-    glm::vec3 p2;
-};
-
-
 namespace lux {
+
+    struct Line {
+        glm::vec3 p1;
+        glm::vec3 p2;
+    };
 
     class Lines
     {
@@ -28,15 +27,17 @@ namespace lux {
         Ref<IndexBuffer> ib;
         std::vector<Line> lines;
         std::vector<glm::vec3> points;
-        std::vector<unsigned int> indices;
-        unsigned int index = 0;
+        std::vector<uint32_t> indices;
+        uint32_t index = 0;
     public:
         Lines();
-        void add(const glm::vec3& p1, const glm::vec3& p2);
-        void commit();
-        void createCircle(double radius, double steps);
-        void createRing(double inner_radius, double outer_radius, double thickness, double steps);
+        void Add(const glm::vec3& p1, const glm::vec3& p2);
+        void CreateGrid(float width, float depth, float xSteps, float zSteps, float y);
+        void createCircle(float radius, float steps);
+        void createRing(float inner_radius, float outer_radius, float thickness, float steps);
         void Draw(const Renderer& renderer, const Shader& shader) const;
+    //protected:
+        void Build();
     };
 
 }

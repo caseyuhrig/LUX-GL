@@ -22,6 +22,8 @@
 #include "lux/Interface/Lines.hpp"
 #include "lux/TextList.hpp"
 #include "lux/Primitive/Cuboid.hpp"
+#include "lux/Primitive/Tetrahedron.hpp"
+#include "lux/Primitive/Dodecahedron.hpp"
 #include "lux/Color.hpp"
 #include "lux/Scene/Material.hpp"
 #include "lux/Interface/HorzBar.hpp"
@@ -343,6 +345,8 @@ int main(int argc, char** argv)
 
     auto shaderBox = lux::Shader("res/shaders/box.shader");
 
+    auto shaderUX = lux::Shader("res/shaders/ux.shader");
+
     // used for the lights
     auto shaderBase = lux::Shader("res/shaders/base.shader");
     //auto shaderBase2 = lux::Shader("res/shaders/base.shader");
@@ -423,6 +427,9 @@ int main(int argc, char** argv)
     glm::vec3 scaleCube = glm::vec3(1.0);
     glm::vec3 translateCube = glm::vec3(0.0);
     glm::vec3 rotateCube = glm::vec3(0.0);
+
+    auto tetrahedronTransform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 7.0f, 0.0f));
+
 
     imguiLayer.SetCubeTransforms(&scaleCube, &translateCube, &rotateCube);
 
@@ -525,12 +532,19 @@ int main(int argc, char** argv)
 
     window.AddResizeListener(callback);
   
+    //auto tetrahedron = lux::Tetrahedron();
+    auto tetrahedron = lux::Dodecahedron(5.0f);
+
+
+    auto ground = lux::Lines();
+    ground.CreateGrid(1000.f, 1000.f, 200.f, 200.f, -10.0f);
+
 
     while (!window.ShouldClose())
     {
-        glm::mat4 model = lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
+        auto model = lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
         model = lux::MatrixUtils::Transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
-        glm::mat4 mvp = camera.GetViewProjection() * model;
+        auto mvp = camera.GetViewProjection() * model;
 
         layers.Begin();
 
@@ -549,6 +563,8 @@ int main(int argc, char** argv)
                 shadows.SetModelTransformation(model * transformation);
                 mesh.Draw(renderer, *simpleDepthShader);
             }
+            shadows.SetModelTransformation(model * tetrahedronTransform);
+            tetrahedron.Draw(renderer, shader);
         }
         shadows.UnBind();
 
@@ -598,12 +614,23 @@ int main(int argc, char** argv)
                 /*
                 shaderVisualizeNormals.SetUniformMat4f("projection", camera.GetProjection());
                 shaderVisualizeNormals.SetUniformMat4f("view", camera.GetView());
-                shaderVisualizeNormals.SetUniformMat4f("model", transform);
+                shaderVisualizeNormals.SetUniformMat4f("model", model * transformation);
                 mesh.Draw(renderer, shaderVisualizeNormals);
                 */
             }
-        }
+            shader.SetUniformMat4f("model", model * tetrahedronTransform);
+            tetrahedron.Draw(renderer, shader);
 
+            //auto mvpUX = camera.GetViewProjection() * model * tetrahedronTransform;
+            //shaderUX.SetUniformMat4f("u_MVP", mvpUX);
+            //tetrahedron.Draw(renderer, shaderUX);
+
+            shaderVisualizeNormals.SetUniformMat4f("projection", camera.GetProjection());
+            shaderVisualizeNormals.SetUniformMat4f("view", camera.GetView());
+            shaderVisualizeNormals.SetUniformMat4f("model", model * tetrahedronTransform);
+            tetrahedron.Draw(renderer, shaderVisualizeNormals);
+        }
+        
         //shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lights.GetPosition(0).xyz()));
         shaderBase.SetUniformMat4f("u_proj", camera.GetProjection());
         shaderBase.SetUniformMat4f("u_view", camera.GetView());
@@ -613,6 +640,11 @@ int main(int argc, char** argv)
         //glEnable(GL_BLEND);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         lightCube.Draw(renderer, shaderBase);
+
+        shaderBase.SetUniformMat4f("u_model", model);
+        ground.Draw(renderer, shaderBase);
+
+      
 
         /*
         auto cubeModel = glm::translate(glm::mat4(1.0), translateCube);
@@ -633,13 +665,12 @@ int main(int argc, char** argv)
         
         lightPos.x = timestep.PingPong(lightPos.x, lightInc.x, -65.0f, 65.0f, 130.0f, 4.0f);
         lights.SetPosition(0, lightPos);
-        glm::vec3 lp2 = glm::vec3(1.0f, lightPos.y, lightPos.x);
+        auto lp2 = glm::vec3(1.0f, lightPos.y, lightPos.x);
         lights.SetPosition(1, lp2);
         
-
-        layers.Draw();
         
-        layers.End();
+
+       
 
         canvas.Unbind();
 
@@ -650,7 +681,9 @@ int main(int argc, char** argv)
 
         canvas.Draw();
 
-        
+        layers.Draw();
+
+        layers.End();
 
         window.SwapBuffers();
 

@@ -1,6 +1,10 @@
 #include "Mesh.hpp"
 
-#include "../Log.hpp"
+#include <glm/gtx/normal.hpp>
+#include <glm/gtx/string_cast.hpp>
+
+#include "lux/Color.hpp"
+#include "lux/Log.hpp"
 #include "OBJ_Loader.h"
 
 
@@ -67,16 +71,55 @@ namespace lux {
         AddVertex(p1, color, glm::vec2(0.0f), normal);
         AddVertex(p2, color, glm::vec2(0.0f), normal);
         AddVertex(p3, color, glm::vec2(0.0f), normal);
-        indicies.push_back(indicies.size());
-        indicies.push_back(indicies.size());
-        indicies.push_back(indicies.size());
+        indicies.push_back(GetIndiciesSize());
+        indicies.push_back(GetIndiciesSize());
+        indicies.push_back(GetIndiciesSize());
     }
 
-    void Mesh::AddQuad(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const glm::vec3& p4,
+    void Mesh::AddTriangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3)
+    {
+        AddTriangle(v1, v2, v3, glm::triangleNormal(v1, v2, v3), color);
+    }
+    /*
+    void Mesh::AddTriangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec4& color)
+    {
+        AddTriangle(v1, v2, v3, glm::triangleNormal(v1, v2, v3), color);
+    }
+    */
+    void Mesh::AddQuad(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec3& v4,
         const glm::vec3& normal, const glm::vec4& color)
     {
-        AddTriangle(p1, p2, p3, normal, color);
-        AddTriangle(p3, p4, p1, normal, color);
+        AddTriangle(v1, v2, v3, normal, color);
+        AddTriangle(v3, v4, v1, normal, color);
+    }
+
+    void Mesh::AddPentagon(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, 
+        const glm::vec3& v4, const glm::vec3& v5, const float length)
+    {
+        const auto center = (v1 + v2 + v3 + v4 + v5) / 5.0f;
+        /*
+        std::cout << "v1 " << glm::to_string(v1) << std::endl;
+        std::cout << "v2 " << glm::to_string(v2) << std::endl;
+        std::cout << "v3 " << glm::to_string(v3) << std::endl;
+        std::cout << "v4 " << glm::to_string(v4) << std::endl;
+        std::cout << "v5 " << glm::to_string(v5) << std::endl;
+        std::cout << "cen " << glm::to_string(center) << std::endl;
+        */
+        /*
+        AddTriangle(v1, v2, center, lux::Colors::AMBER);
+        AddTriangle(v2, v3, center, lux::Colors::MEDIUM_SPRING_GREEN);
+        AddTriangle(v3, v4, center, lux::Colors::ORANGE);
+        AddTriangle(v4, v5, center, lux::Colors::STEEL_BLUE);
+        AddTriangle(v5, v1, center, lux::Colors::DEEP_PINK);
+        */
+        //auto n4 = glm::vec3(v4.x, v4.y, v4.z);
+        glm::vec3 normal = glm::normalize(center);
+        //glm::triangleNormal(v1, v2, center)
+        AddTriangle(v1, v2, center, normal, lux::Colors::AMBER);
+        AddTriangle(v2, v3, center, normal, lux::Colors::MEDIUM_SPRING_GREEN);
+        AddTriangle(v3, v4, center, normal, lux::Colors::ORANGE);
+        AddTriangle(v4, v5, center, normal, lux::Colors::STEEL_BLUE);
+        AddTriangle(v5, v1, center, normal, lux::Colors::DEEP_PINK);
     }
 
     void Mesh::AddEllipse(const glm::vec2& center, const glm::vec2& radius, 
@@ -334,55 +377,33 @@ namespace lux {
 
         if (!loaded)
         {
-            std::cout << "[ERROR] Failed to load " << file_path << std::endl;
+            UX_LOG_ERROR("Failed to load %s", file_path);
         }
         if (loaded)
         {
-            std::cout << "READING: " << file_path << std::endl;
+            UX_LOG_INFO("READING: %s", file_path);
             for (int i = 0; i < loader.LoadedMeshes.size(); i++)
             {
                 objl::Mesh curMesh = loader.LoadedMeshes[i];
-                std::cout << "Mesh " << i << ": " << curMesh.MeshName << "\n";
+                UX_LOG_INFO("Mesh %d: %s", i, curMesh.MeshName);
                 if (mesh_name == curMesh.MeshName)
                 {
-                    std::cout << "LOADING: " << mesh_name << std::endl;
-                    for (int j = 0; j < curMesh.Vertices.size(); j++)
+                    UX_LOG_INFO("LOADING: %s", mesh_name);
+                    for (size_t j = 0; j < curMesh.Vertices.size(); j++)
                     {
-                        /*
-                        std::cout << "V" << j << ": " <<
-                            "P(" << curMesh.Vertices[j].Position.X << ", " << curMesh.Vertices[j].Position.Y << ", " << curMesh.Vertices[j].Position.Z << ") " <<
-                            "N(" << curMesh.Vertices[j].Normal.X << ", " << curMesh.Vertices[j].Normal.Y << ", " << curMesh.Vertices[j].Normal.Z << ") " <<
-                            "TC(" << curMesh.Vertices[j].TextureCoordinate.X << ", " << curMesh.Vertices[j].TextureCoordinate.Y << ")\n";
-*/
                         glm::vec3 position = { curMesh.Vertices[j].Position.X, curMesh.Vertices[j].Position.Y, curMesh.Vertices[j].Position.Z };
                         glm::vec2 texCoord = { curMesh.Vertices[j].TextureCoordinate.X, curMesh.Vertices[j].TextureCoordinate.Y };
                         glm::vec3 normal = { curMesh.Vertices[j].Normal.X, curMesh.Vertices[j].Normal.Y, curMesh.Vertices[j].Normal.Z };
-
-                        // z = up
-                        // y = depth
-                        //float save_z = normal.z;
-                        //normal.z = normal.y;
-                        //normal.y = save_z;
-                        //normal.z = -normal.z;
-                        //normal.y = -normal.y;
-                        //glm::new_normal = glm::computeNormal();
                         AddVertex(position, glm::vec4(1), texCoord, normal);
                     }
 
-                    std::cout << "Indices:\n";
-
                     // Go through every 3rd index and print the
                     //	triangle that these indices represent
-                    for (int j = 0; j < curMesh.Indices.size(); j += 3)
+                    for (size_t j = 0; j < curMesh.Indices.size(); j += 3)
                     {
-                        //std::cout << "T" << j / 3 << ": " << curMesh.Indices[j] << ", " << curMesh.Indices[j + 1] << ", " << curMesh.Indices[j + 2] << "\n";
-
-                        unsigned int index1 = curMesh.Indices[j];
-                        unsigned int index2 = curMesh.Indices[j + 1];
-                        unsigned int index3 = curMesh.Indices[j + 2];
-
-                        //std::cout << "T" << j / 3 << ": " << index1 << ", " << index2 << ", " << index3 << "\n";
-
+                        uint32_t index1 = curMesh.Indices[j];
+                        uint32_t index2 = curMesh.Indices[j + 1];
+                        uint32_t index3 = curMesh.Indices[j + 2];
                         AddIndex(index1, index2, index3);
                     }
                 }

@@ -80,13 +80,14 @@ namespace lux {
          * TODO Rename p1,p2,p3 to a,b,c
          * TODO Remove color, need to find another way to attach color data without storing in the mesh object.
          */
-        void AddTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const glm::vec3& normal, const glm::vec4& color);
+        void AddTriangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec3& normal, const glm::vec4& color);
         // Adds a triangle and calculates the normal automatically.
-        //void AddTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const bool smooth, const glm::vec4 color);
-        //void AddTriangle(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3);
-        void AddQuad(const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, const glm::vec3& p4,
+        void AddTriangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3);
+        //void AddTriangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec4& color);
+        void AddQuad(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec3& v4,
                      const glm::vec3& normal, const glm::vec4& color);
-
+        void AddPentagon(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, 
+                         const glm::vec3& v4, const glm::vec3& v5, const float length);
         void AddEllipse(const glm::vec2& center, const glm::vec2& radius, 
                         const float startAngle, const float endAngle, const float step,
                         const glm::vec3& normal, const glm::vec4& color);

@@ -1134,6 +1134,9 @@
     <ClInclude Include="src\lux\Platform\Microsoft\Windows.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\lux\Primitive\Tetrahedron.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp">
@@ -1224,6 +1227,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lux\Scene\Canvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Primitive\Tetrahedron.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lux\Primitive\Dodecahedron.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

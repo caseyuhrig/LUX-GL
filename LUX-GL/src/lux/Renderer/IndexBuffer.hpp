@@ -8,44 +8,33 @@ namespace lux {
     class IndexBuffer
     {
     private:
-        unsigned int ibo_ID;
-        unsigned int m_Count;
+        uint32_t m_ID; // IBO
+        uint32_t m_Count;
     public:
-        inline IndexBuffer() : ibo_ID(0), m_Count(0) {}
+        IndexBuffer() : m_ID(0), m_Count(0) {}
 
-        inline IndexBuffer(const unsigned int* data, unsigned int count)
+        IndexBuffer(const uint32_t* data, uint32_t count)
             : m_Count(count)
         {
-            glGenBuffers(1, &ibo_ID);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_ID);
+            glGenBuffers(1, &m_ID);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW);
         }
 
-        ~IndexBuffer()
-        {
-            glDeleteBuffers(1, &ibo_ID);
-        }
+        ~IndexBuffer() { glDeleteBuffers(1, &m_ID); }
 
         // FIX ME SetData and handle STATIC/DYNAMIC.
-        void Init(const unsigned int* data, unsigned int count)
+        void Init(const uint32_t* data, uint32_t count)
         {
             m_Count = count;
-            glGenBuffers(1, &ibo_ID);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_ID);
+            glGenBuffers(1, &m_ID);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW);
         }
 
-        inline void Bind() const
-        {
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_ID);
-        }
-
-        inline void Unbind() const
-        {
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        }
-
-        inline unsigned int GetCount() const { return m_Count; }
+        void Bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID); }
+        void Unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
+        const uint32_t GetCount() const { return m_Count; }
     };
 
 }

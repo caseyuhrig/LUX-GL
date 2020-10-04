@@ -44,6 +44,7 @@ namespace lux {
             _props.look_at = lookAt;
             _props.z_far = 120.0f; //2000.0f;
             _props.z_near = 0.01f;
+            m_Angle = 55.0f;
             UpdateView();
             // 5 = binding point
             _ubo = lux::CreateRef<UniformBuffer>("CameraProperties", 5, 256, &_props);
@@ -68,6 +69,7 @@ namespace lux {
             //};
 
             //window.AddResizeListener(func);
+            
         }
         ~Camera() = default;
 
@@ -86,11 +88,8 @@ namespace lux {
         const uint32_t& GetViewportWidth() const { return _props.viewport_width; }
         //uint32_t& GetViewportWidth() { return _props.viewport_width; }
         const uint32_t& GetViewportHeight() const { return _props.viewport_width; }
-
-        const float& GetAspectRatio() const {
-            return _props.aspect_ratio;
-        }
-
+        float& GetAngle() { return m_Angle; }
+        const float& GetAspectRatio() const { return _props.aspect_ratio; }
         
         void SetViewportSize(const uint32_t& width, const uint32_t& height)
         {
@@ -128,7 +127,7 @@ namespace lux {
         void UpdateView()
         {
             //_props.projection = glm::infinitePerspective(glm::radians(55.0f), _props.aspect_ratio, _props.z_near);
-            _props.projection = glm::perspective(glm::radians(55.0f), _props.aspect_ratio, _props.z_near, _props.z_far);
+            _props.projection = glm::perspective(glm::radians(m_Angle), _props.aspect_ratio, _props.z_near, _props.z_far);
             _props.view = glm::lookAt(_props.position,     // Camera position in world space
                 _props.look_at,      // look at origin
                 glm::vec3(0, 1, 0)); // Head is up (set to 0, -1, 0 to look upside down)
@@ -138,5 +137,6 @@ namespace lux {
         CameraProperties _props;
         Ref<UniformBuffer> _ubo;
         glm::mat4 m_ViewProjection;
+        float m_Angle = 55.0f;
     };
 }

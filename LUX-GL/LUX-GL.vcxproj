@@ -173,6 +173,7 @@
     <ClInclude Include="src\lux\Interface\RoundedCorner.hpp" />
     <ClInclude Include="src\lux\Platform\Microsoft\Windows.hpp" />
     <ClInclude Include="src\lux\Primitive\Plane.hpp" />
+    <ClInclude Include="src\lux\Primitive\Tetrahedron.hpp" />
     <ClInclude Include="src\lux\Renderer\Cubemap.hpp" />
     <ClInclude Include="src\lux\Renderer\Timer.hpp" />
     <ClInclude Include="src\lux\Scene\Canvas.hpp" />
@@ -542,7 +543,9 @@
     <ClCompile Include="src\lux\Interface\Lines.cpp" />
     <ClCompile Include="src\lux\Log.cpp" />
     <ClCompile Include="src\lux\MatrixUtils.hpp" />
+    <ClCompile Include="src\lux\Primitive\Dodecahedron.hpp" />
     <ClCompile Include="src\lux\Primitive\Mesh.cpp" />
+    <ClCompile Include="src\lux\Primitive\Tetrahedron.cpp" />
     <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp" />
     <ClCompile Include="src\lux\Scene\Canvas.cpp" />
     <ClCompile Include="src\lux\Scene\Skybox.cpp" />

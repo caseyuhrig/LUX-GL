@@ -104,6 +104,8 @@ namespace lux {
             if (ImGui::IsItemActive()) { _camera->UpdateView(); }
             ImGui::SliderFloat3("Camera Look At", (float*)&_camera->GetLookAt(), -100.0f, 100.0f);
             if (ImGui::IsItemActive()) { _camera->UpdateView(); }
+            ImGui::SliderFloat("Angle", &_camera->GetAngle(), 1.0f, 180.0f);
+            if (ImGui::IsItemActive()) { _camera->UpdateView(); }
             ImGui::SliderFloat("Z Near", &_camera->GetZNear(), 0.01f, 2000.0f);
             ImGui::SliderFloat("Z Far", &_camera->GetZFar(), 0.01f, 2000.0f);
             
