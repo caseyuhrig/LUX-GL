@@ -1137,6 +1137,12 @@
     <ClInclude Include="src\lux\Primitive\Tetrahedron.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\lux\Primitive\BezierCurve.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Renderer\GBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp">
@@ -1647,5 +1653,9 @@
     <None Include="res\shaders\shader-bloom_final.glsl" />
     <None Include="res\shaders\shader-bloom_final-MSAA.glsl" />
     <None Include="res\shaders\shader-blur-MSAA.glsl" />
+    <None Include="res\shaders\ssao\ssao_geometry.glsl" />
+    <None Include="res\shaders\ssao\ssao_lighting.glsl" />
+    <None Include="res\shaders\ssao\ssao.glsl" />
+    <None Include="res\shaders\ssao\ssoa_blur.glsl" />
   </ItemGroup>
 </Project>

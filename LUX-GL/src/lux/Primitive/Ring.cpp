@@ -7,19 +7,19 @@ namespace lux {
 
     void Ring::CreateGeometry()
     {
-        glm::vec4 color = glm::vec4(1.0f);
-        double step = PI2 / steps;
-        for (double ang = 0; ang < PI2; ang += step)
+        auto color = glm::vec4(1.0f);
+        auto step = PI2f / m_Steps;
+        for (auto ang = 0.0f; ang < PI2f; ang += step)
         {
-            glm::vec3 p1 = glm::vec3(inner_radius * cos(ang), -thickness / 2, inner_radius * sin(ang));
-            glm::vec3 p2 = glm::vec3(inner_radius * cos(ang + step), -thickness / 2, inner_radius * sin(ang + step));
-            glm::vec3 p3 = glm::vec3(inner_radius * cos(ang), thickness / 2, inner_radius * sin(ang));
-            glm::vec3 p4 = glm::vec3(inner_radius * cos(ang + step), thickness / 2, inner_radius * sin(ang + step));
+            glm::vec3 p1 = glm::vec3(inner_radius * std::cosf(ang), -thickness / 2, inner_radius * std::sinf(ang));
+            glm::vec3 p2 = glm::vec3(inner_radius * std::cosf(ang + step), -thickness / 2, inner_radius * std::sinf(ang + step));
+            glm::vec3 p3 = glm::vec3(inner_radius * std::cosf(ang), thickness / 2, inner_radius * std::sinf(ang));
+            glm::vec3 p4 = glm::vec3(inner_radius * std::cosf(ang + step), thickness / 2, inner_radius * std::sinf(ang + step));
 
-            glm::vec3 p5 = glm::vec3(outer_radius * cos(ang), -thickness / 2, outer_radius * sin(ang));
-            glm::vec3 p6 = glm::vec3(outer_radius * cos(ang + step), -thickness / 2, outer_radius * sin(ang + step));
-            glm::vec3 p7 = glm::vec3(outer_radius * cos(ang), thickness / 2, outer_radius * sin(ang));
-            glm::vec3 p8 = glm::vec3(outer_radius * cos(ang + step), thickness / 2, outer_radius * sin(ang + step));
+            glm::vec3 p5 = glm::vec3(outer_radius * std::cosf(ang), -thickness / 2, outer_radius * std::sinf(ang));
+            glm::vec3 p6 = glm::vec3(outer_radius * std::cosf(ang + step), -thickness / 2, outer_radius * std::sinf(ang + step));
+            glm::vec3 p7 = glm::vec3(outer_radius * std::cosf(ang), thickness / 2, outer_radius * std::sinf(ang));
+            glm::vec3 p8 = glm::vec3(outer_radius * std::cosf(ang + step), thickness / 2, outer_radius * std::sinf(ang + step));
             //glm::normalize(p1);
             // left side
             AddTriangle(p1, p2, p3, glm::triangleNormal(p1, p2, p3), GetColor());

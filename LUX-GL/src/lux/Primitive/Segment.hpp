@@ -59,9 +59,9 @@ namespace lux {
             //std::cout << "MIN: " << min_x << ' ' << min_y << ' ' << min_z << std::endl;
             //std::cout << "MAX: " << max_x << ' ' << max_y << ' ' << max_z << std::endl;
             // draw on the x/z plane
-            unsigned int index = 0;
-            unsigned int idx = 0;
-            unsigned int i = 0;
+            uint32_t index = 0;
+            uint32_t idx = 0;
+            uint32_t i = 0;
             glm::vec3 normal_top = glm::vec3(0.0f, 1.0f, 0.0f);
             glm::vec3 normal_bottom = glm::vec3(0.0f, -1.0f, 0.0f);
             float y_top = thickness / 2.0f;
@@ -110,10 +110,10 @@ namespace lux {
                 }
                 // OUTER
                 {
-                    glm::vec3 a = glm::vec3(outer_radius * cosf(ang * TO_RAD), y_top, outer_radius * sinf(ang * TO_RAD));
-                    glm::vec3 b = glm::vec3(outer_radius * cosf((ang + ang_step) * TO_RAD), y_top, outer_radius * sinf((ang + ang_step) * TO_RAD));
-                    glm::vec3 c = glm::vec3(outer_radius * cosf((ang + ang_step) * TO_RAD), y_bottom, outer_radius * sinf((ang + ang_step) * TO_RAD));
-                    glm::vec3 d = glm::vec3(outer_radius * cosf(ang * TO_RAD), y_bottom, outer_radius * sinf(ang * TO_RAD));
+                    glm::vec3 a = glm::vec3(outer_radius * cosf(ang * TO_RADf), y_top, outer_radius * sinf(ang * TO_RADf));
+                    glm::vec3 b = glm::vec3(outer_radius * cosf((ang + ang_step) * TO_RADf), y_top, outer_radius * sinf((ang + ang_step) * TO_RADf));
+                    glm::vec3 c = glm::vec3(outer_radius * cosf((ang + ang_step) * TO_RADf), y_bottom, outer_radius * sinf((ang + ang_step) * TO_RADf));
+                    glm::vec3 d = glm::vec3(outer_radius * cosf(ang * TO_RADf), y_bottom, outer_radius * sinf(ang * TO_RADf));
 
                     if (smooth == GL_SMOOTH)
                     {

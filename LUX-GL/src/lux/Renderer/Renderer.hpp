@@ -28,7 +28,7 @@ namespace lux {
             glEnable(GL_CULL_FACE);
         }
 
-        void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const
+        void SetViewport(const uint32_t x, const uint32_t y, const uint32_t width, const uint32_t height) const
         {
             glViewport(x, y, width, height);
         }
@@ -57,10 +57,10 @@ namespace lux {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         }
 
-        float& Gamma() { return gamma; }
+        float& Gamma() { return m_Gamma; }
 
     private:
-        float gamma = 1.0;
+        float m_Gamma = 1.0;
     };
 
 }

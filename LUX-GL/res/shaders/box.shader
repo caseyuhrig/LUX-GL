@@ -180,14 +180,16 @@ void main()
 
     // times'ing things together looks the best! ... so far!
     FragColor = vec4(1.0f);
-    for (unsigned int n = 0;n < LIGHTS;n++)
-    {
+    //for (unsigned int n = 0;n < LIGHTS;n++)
+    //{
         //FragColor = FragColor + calc_color(lights[n], material);
-        FragColor = FragColor * calc_color(scene, lights[n], material, camera_position);
-    }
+        //FragColor = FragColor * calc_color(scene, lights[n], material, camera_position);
+        FragColor = FragColor * calc_color(scene, lights[0], material, camera_position);
+    //}
     //FragColor = FragColor / LIGHTS;
-    FragColor = FragColor * LIGHTS;
-    FragColor.rgb = pow(FragColor.rgb, vec3(1.0 / scene.gamma));
+    //FragColor = FragColor * LIGHTS;
+
+    //FragColor.rgb = pow(FragColor.rgb, vec3(1.0 / scene.gamma));
 
     //vec2 st = gl_FragCoord.xy / vec2(1500,900);
     //float r = random(st * 1.0) * 0.25;

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 
-#include <glm/glm.hpp>;
+#include <glm/glm.hpp>
 
 #include "lux/Types.hpp"
 #include "lux/Renderer/Renderer.hpp"
@@ -38,6 +38,7 @@ namespace lux {
         void Draw(const Renderer& renderer, const Shader& shader) const;
     //protected:
         void Build();
+        void Dump();
     };
 
 }

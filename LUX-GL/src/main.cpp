@@ -1,4 +1,8 @@
-﻿#include <glad/glad.h>  
+﻿#define GLM_FORCE_SWIZZLE
+#include <windows.h>
+
+
+#include <glad/glad.h>  
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -11,7 +15,7 @@
 // some magic needed to get spdlog working!
 // except it's not working now, build issues.
 
-#define GLM_FORCE_SWIZZLE
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -57,6 +61,7 @@
 //#include "imgui/ImGuizmo.h"
 
 
+#include <assimp/Importer.hpp>
 
 #include "entt/entt.hpp"
 
@@ -67,6 +72,12 @@
 
 // C/C++  Optimizations /O2 /GL
 // Linker Optimizations /LYCG
+
+// for python
+// As another option you could enable support of long file names in Windows 10 by changing 
+// HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled registry value.
+
+// set ENV var for 64 bit default package install vcpkg
 
 // swizzling means rearranging the elements of a vector (kinda).
 
@@ -179,9 +190,27 @@ system->Run();
 
 int main(int argc, char** argv)
 {
-   
-
+#ifdef __SSE__
+    UX_LOG_INFO("SSE (true)");
+#else
+    UX_LOG_INFO("SSE (false)");
+#endif
+#ifdef __SSE2__
+    UX_LOG_INFO("SSE2 (true)");
+#endif
+#ifdef __SSE3__
+    UX_LOG_INFO("SSE3 (true)");
+#endif
+#ifdef __AVX__
+    UX_LOG_INFO("AVX (true)");
+#endif
+#ifdef __AVX2__
+    UX_LOG_INFO("AVX2 (true)");
+#endif
  
+    // constexpr auto π = lux::π<float>;
+    // std::cout << "FLOAT: " << π << std::endl;
+   
     
     auto window = lux::Window("LUX/GL", 1500, 900);
     window.Center();
@@ -229,7 +258,7 @@ int main(int argc, char** argv)
 
 
     auto renderer = lux::Renderer();
-    renderer.SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
+    renderer.SetClearColor(lux::Colors::Black);
 
     
 
@@ -247,7 +276,7 @@ int main(int argc, char** argv)
     scene.Publish();
 
 
-    glm::vec3 axis = { 0.0, 0.0, 0.0 };
+    auto axis = glm::vec3(0.0f, 0.0f, 0.0f);
 
 
 
@@ -285,13 +314,13 @@ int main(int argc, char** argv)
     
     for (size_t n = 0;n < 180;n++)
     {
-        float length = lux::random(8.0f);
-        float angle = lux::random(lux::RADIANSf);
+        const float length = lux::random(8.0f);
+        const float angle = lux::random(lux::RADIANSf);
 
         glm::mat4 rm4 = lux::MatrixUtils::RotateAroundAxis(glm::mat4(1.0), axis, glm::vec3(0.0, angle, 0.0));
                   rm4 = glm::translate(rm4, glm::vec3(4, 0, 0)); // radius
 
-        float radius = 0.05 + lux::random(0.1f);
+        const float radius = 0.05f + lux::random(0.1f);
 
         auto s_cube = lux::Cuboid(glm::vec3(0.0, -radius, -radius), glm::vec3(0.5 + length, radius, radius), glm::mat4(1));
 
@@ -336,12 +365,12 @@ int main(int argc, char** argv)
     
    
 
-    auto cube = lux::Cuboid(glm::vec3(-0.5), glm::vec3(0.5), glm::mat4(1.0));
-    {
+    //auto cube = lux::Cuboid(glm::vec3(-0.5), glm::vec3(0.5), glm::mat4(1.0));
+    //{
         //auto entity = registry.create();
         //registry.emplace<lux::Mesh>(entity, cube);
         //registry.emplace<glm::mat4>(entity, glm::mat4(1));
-    }
+    //}
 
     auto shaderBox = lux::Shader("res/shaders/box.shader");
 
@@ -349,21 +378,10 @@ int main(int argc, char** argv)
 
     // used for the lights
     auto shaderBase = lux::Shader("res/shaders/base.shader");
-    //auto shaderBase2 = lux::Shader("res/shaders/base.shader");
-
-
-
-
-    //auto shaderText = lux::Shader("res/shaders/text.shader");
-    
-
-
- 
-    
-
-    shaderBase.Bind();
     shaderBase.SetUniformMat4f("u_proj", camera.GetProjection());
     shaderBase.SetUniformMat4f("u_view", camera.GetView());
+    shaderBase.SetUniformVec4f("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    shaderBase.SetUniformVec4f("u_BrightColor", glm::vec4(1.5f, 1.5f, 1.5f, 1.0f));
    
 
 
@@ -388,7 +406,7 @@ int main(int argc, char** argv)
 
     auto canvas = lux::Canvas(window.GetWidth(), window.GetHeight(), 8);
 
-
+    /*
     auto skybox = lux::Skybox();
     skybox.SetCamera(camera);
     {
@@ -396,7 +414,7 @@ int main(int argc, char** argv)
         registry.emplace<lux::Skybox>(entity, skybox);
         registry.emplace<glm::mat4>(entity, glm::mat4(1));
     }
-
+    */
     //auto cubemapShader = lux::Shader("res/shaders/cubemap-shader.glsl");
     //auto cubemapShader = lux::Shader("res/shaders/cubemap-lighting-shader.glsl");
 
@@ -441,7 +459,7 @@ int main(int argc, char** argv)
 
     
     int shadow_samples = 10;
-    float shadow_bias = 0.3;
+    float shadow_bias = 0.3f;
 
     imguiLayer.SetShadowSamples(&shadow_samples);
     imguiLayer.SetShadowBias(&shadow_bias);
@@ -501,12 +519,15 @@ int main(int argc, char** argv)
 
     
     auto shadows = lux::Shadows(camera);
-    //shadows.Init();
+
    
     // TODO move this out of the Shadows class, no reason to get the Shader from that location.
     //auto shader = shadows.GetShader();
     auto shader = lux::Shader("res/shaders/point_shadows.glsl");
     shader.SetUniform1i("shadows", true);
+    //shader.SetUniformVec4f("u_LightColor", lux::Colors::White);
+    shader.SetUniformVec4f("u_LightColor", lux::Colors::NeonPink);
+
     // TODO, want to remove this, hmm?
     auto simpleDepthShader = shadows.GetDepthShader();
 
@@ -537,16 +558,27 @@ int main(int argc, char** argv)
 
 
     auto ground = lux::Lines();
-    ground.CreateGrid(1000.f, 1000.f, 200.f, 200.f, -10.0f);
+    ground.CreateGrid(5000.f, 1000.f, 500.f, 100.f, -10.0f);
+
+    auto plane = lux::Plane(5000.f, 1000.f, 500.f, 100.f, -10.0f);
 
 
     while (!window.ShouldClose())
     {
+       
+
         auto model = lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate);
         model = lux::MatrixUtils::Transform(model, glm::vec3(scale2, scale2, scale2), translate2, rotate2);
         auto mvp = camera.GetViewProjection() * model;
 
         layers.Begin();
+
+        // Start the Dear ImGui frame
+       //ImGui_ImplOpenGL3_NewFrame();
+       //ImGui_ImplGlfw_NewFrame();
+       //ImGui::NewFrame();
+
+       
 
         renderer.Clear();
 
@@ -564,7 +596,7 @@ int main(int argc, char** argv)
                 mesh.Draw(renderer, *simpleDepthShader);
             }
             shadows.SetModelTransformation(model * tetrahedronTransform);
-            tetrahedron.Draw(renderer, shader);
+            tetrahedron.Draw(renderer, *simpleDepthShader);
         }
         shadows.UnBind();
 
@@ -586,6 +618,8 @@ int main(int argc, char** argv)
 
         shader.Bind();
         
+        shader.SetUniformVec4f("u_Color", glm::vec4(0.45f, 0.45f, 0.45f, 1.0f));
+
         shader.SetUniformMat4f("projection", camera.GetProjection());
         shader.SetUniformMat4f("view", camera.GetView());
         // set lighting uniforms
@@ -621,27 +655,40 @@ int main(int argc, char** argv)
             shader.SetUniformMat4f("model", model * tetrahedronTransform);
             tetrahedron.Draw(renderer, shader);
 
+            shader.SetUniformVec4f("u_Color", lux::Colors::NeonBlue);
+            shader.SetUniformMat4f("model", glm::mat4(1.0f));
+            plane.Draw(renderer, shader);
+
             //auto mvpUX = camera.GetViewProjection() * model * tetrahedronTransform;
             //shaderUX.SetUniformMat4f("u_MVP", mvpUX);
             //tetrahedron.Draw(renderer, shaderUX);
-
+            /*
             shaderVisualizeNormals.SetUniformMat4f("projection", camera.GetProjection());
             shaderVisualizeNormals.SetUniformMat4f("view", camera.GetView());
             shaderVisualizeNormals.SetUniformMat4f("model", model * tetrahedronTransform);
             tetrahedron.Draw(renderer, shaderVisualizeNormals);
+            */
         }
         
         //shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lights.GetPosition(0).xyz()));
         shaderBase.SetUniformMat4f("u_proj", camera.GetProjection());
         shaderBase.SetUniformMat4f("u_view", camera.GetView());
         shaderBase.SetUniformMat4f("u_model", glm::translate(glm::mat4(1.0), lightPos));
+
+        shaderBase.SetUniformVec4f("u_Color", lux::Colors::White);
+        shaderBase.SetUniformVec4f("u_BrightColor", lux::Colors::BrightWhite);
+
         //shader->SetUniformMat4f("model", glm::translate(glm::mat4(1.0), lightPos));
 
         //glEnable(GL_BLEND);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         lightCube.Draw(renderer, shaderBase);
 
-        shaderBase.SetUniformMat4f("u_model", model);
+        
+        shaderBase.SetUniformMat4f("u_model", glm::mat4(1.0));
+        shaderBase.SetUniformVec4f("u_Color", lux::Colors::DeepPink);
+        //shaderBase.SetUniformVec4f("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        shaderBase.SetUniformVec4f("u_BrightColor", lux::Colors::DeepPink * 2.0f);
         ground.Draw(renderer, shaderBase);
 
       
@@ -683,11 +730,12 @@ int main(int argc, char** argv)
 
         layers.Draw();
 
+        ImGui::Begin("Parameters");
+        ImGui::End();
+
         layers.End();
 
         window.SwapBuffers();
-
-        //glfwPollEvents();
 
         timestep.Update();
     }

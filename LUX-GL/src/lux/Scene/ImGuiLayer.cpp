@@ -30,7 +30,7 @@ namespace lux {
         //ImGui::StyleColorsClassic();
     }
 
-    void ImGuiLayer::Resize(const uint32_t& width, const uint32_t& height)
+    void ImGuiLayer::Resize(const uint32_t width, const uint32_t height)
     {
 
     }
@@ -42,7 +42,7 @@ namespace lux {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("UX/SIM/GL");
+        //ImGui::Begin("UX/SIM/GL");
     }
 
     void ImGuiLayer::SetCubemapSwapFunction(void (*callback_function)(void))
@@ -52,7 +52,7 @@ namespace lux {
 
     void ImGuiLayer::End()
     {
-        ImGui::End();
+        //ImGui::End();
 
         ImGui::Render();
         ImGui::EndFrame();
@@ -69,7 +69,7 @@ namespace lux {
         //{
             ImGuiColorEditFlags misc_flags = ImGuiColorEditFlags_Float;
 
-            //ImGui::Begin("UX/SIM/GL");
+            ImGui::Begin("UX/SIM/GL");
             /*
             //ImGui::SliderFloat4("ABCD", abcd, -3.0f, 3.0f, "%.6f");
             //ImGui::SliderFloat4("EFGH", efgh, -3.0f, 3.0f, "%.6f");
@@ -161,11 +161,16 @@ namespace lux {
                 engine->play3D(soundFilename.c_str(), soundPos);
             }
             */
+            if (ImGui::Button("Resize"))
+            {
+                _window->SuperSize();
+            }
             if (ImGui::Button("Exit"))
             {
                 std::cout << "EXIT" << std::endl;
                 //break;
                 //exit(0);
+                _window->Close();
             }
 
             //ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -200,7 +205,7 @@ namespace lux {
                 */
                 //ImGuizmo::DrawGrid(cameraView, cameraProjection, identityMatrix, 100.f);
                 //ImGuizmo::DrawCubes(cameraView, cameraProjection, &objectMatrix[0][0], gizmoCount);
-          //  ImGui::End();
+            ImGui::End();
 
             //ImGui::ShowDemoWindow();
         //}

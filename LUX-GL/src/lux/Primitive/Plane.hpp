@@ -9,15 +9,19 @@ namespace lux {
     class Plane : public Mesh
     {
     public:
-        Plane(float radius, float y, float segments) 
-            : Mesh(glm::vec3(-radius, y, -radius), glm::vec3(radius, y, radius)), m_Segments(segments) {}
+        Plane(float width, float depth, float xSegments, float ySegments, float y)
+            : Mesh(glm::vec3(-width / 2.0f, y, -depth / 2.0f), glm::vec3(width / 2.0f, y, depth / 2.0f)), 
+            m_xSegments(xSegments), m_ySegments(ySegments) 
+        {
+            Build();
+        }
 
         void CreateGeometry() override
         {
             auto normal = glm::vec3(0, 1, 0);
             float y = min.y;
-            float xStep = (fabsf(min.x) + fabsf(min.x)) / m_Segments;
-            float zStep = (fabsf(min.z) + fabsf(max.x)) / m_Segments;
+            float xStep = (fabsf(min.x) + fabsf(min.x)) / m_xSegments;
+            float zStep = (fabsf(min.z) + fabsf(max.x)) / m_ySegments;
             for (float x = min.x; x < max.x; x += xStep)
             {
                 for (float z = min.z; z < max.z; z += zStep)
@@ -31,6 +35,7 @@ namespace lux {
             }
         }
     private:
-        float m_Segments;
+        float m_xSegments;
+        float m_ySegments;
     };
 }

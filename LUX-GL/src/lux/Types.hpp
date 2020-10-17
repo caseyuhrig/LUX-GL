@@ -6,42 +6,58 @@
 #include <string>
 #include <algorithm>
 #include <memory>
-#include <ctime>
+#include <numbers>
+//#include <ctime>
 
-#include <stdarg.h>
+//#include <stdarg.h>
 #include <glm/glm.hpp>
 
 
 //#define ASSERT(x) if (!(x)) __debugbreak();
 
+// #include <limits>
+// const int min_int = std::numeric_limits<int>::min();
+// const int max_int = std::numeric_limits<int>::max();
 
 
 namespace lux {
 
-	static const double PI = 3.14159265358979323846264; // std::acos(-1.0);
-	static const double PI2 = PI * 2.0;
-	static const double RADIANS = PI2;
-	static const double TO_RAD = PI / 180.0;
-	static const double TO_DEG = 180.0 / PI;
+	constexpr double PI = std::numbers::pi_v<double>; // std::acos(-1.0);
+	constexpr double PI2 = PI * 2.0;
+	constexpr double RADIANS = PI2;
+	constexpr double TO_RAD = PI / 180.0;
+	constexpr double TO_DEG = 180.0 / PI;
+	
+	constexpr float PIf = std::numbers::pi_v<float>;
+	constexpr float PI2f = PIf * 2.0f;
+	constexpr float RADIANSf = PI2f;
+	constexpr float TO_RADf = PIf / 180.0f;
+	constexpr float TO_DEGf = 180.0f / PIf;
 
-	static const float PIf = 3.14159265358979323846264f; // std::acosf(-1.0f);?
-	static const float PI2f = PIf * 2.0f;
-	static const float RADIANSf = PI2f;
-	static const float TO_RADf = PIf / 180.0f;
-	static const float TO_DEGf = 180.0f / PIf;
+	//template<typename T>
+	//constexpr auto π = std::numbers::pi_v<T>;
+	// the golden ratio Φ constant
+	//template<typename T>
+	//constexpr auto Φ = std::numbers::phi_v<T>;
+	
+	// 2² √ √ 
+	//template<typename T>
+	//constexpr auto √(T value) { return std::sqrt<T>(value); }
 
 	//static const float ϕf = (std::sqrtf(5.0f) - 1.0f) / 2.0f;
-	static const float PHIf = 1.6180339887f; //(std::sqrtf(5.0f) - 1.0f) / 2.0f; // The golden ratio
+	constexpr float PHIf = std::numbers::phi_v<float>; // The golden ratio
+
 
 	struct byte_offset
 	{
 		uint32_t offset;
-		uint32_t size;
+		size_t size;
 	};
 
 
 	template<typename T>
 	using Scope = std::unique_ptr<T>;
+
 	template<typename T, typename ... Args>
 	constexpr Scope<T> CreateScope(Args&& ... args)
 	{
@@ -50,6 +66,7 @@ namespace lux {
 
 	template<typename T>
 	using Ref = std::shared_ptr<T>;
+
 	template<typename T, typename ... Args>
 	constexpr Ref<T> CreateRef(Args&& ... args)
 	{
@@ -57,9 +74,10 @@ namespace lux {
 	}	
 
 	template <typename T>
-	T random(T max)
+	static const T random(const T max)
 	{
-		return static_cast <T> (rand()) / static_cast <T> (RAND_MAX / max);
+		//return static_cast <T> (std::rand()) / static_cast <T> (std::RAND_MAX / max);
+		return static_cast <T> (std::rand() / (RAND_MAX / max));
 	}
 
 	struct RectXY
@@ -67,17 +85,15 @@ namespace lux {
 		long x1, y1, x2, y2;
 	};
 
-	constexpr glm::vec3 circle_xz(float radius, float angle)
+	constexpr glm::vec3 circle_xz(const float radius, const float angle)
 	{
 		return glm::vec3(radius * std::cosf(angle), 0, radius * std::sinf(angle));
 	}
 
-	static const void* GLvoidptr(uint32_t offset)
+	// Don't like this, only using so I can find the places this is being done.
+	inline static const auto make_void_ptr(uint32_t offset)
 	{
-		// semantically correct!?
-		const auto pointer = static_cast<uintptr_t>(offset);
-		return reinterpret_cast<void*>(pointer);
+		return reinterpret_cast<void*>(offset);
 	}
-	
-	//static const void* GLoffset_0 = GLvoidptr(0);
+
 }

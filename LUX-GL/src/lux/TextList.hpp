@@ -16,30 +16,20 @@ namespace lux {
 
     class TextList
     {
-    private:
-        int _x, _y;
-        int m_Width, m_Height;
-        int _y_pos;
-        std::map<unsigned int, std::shared_ptr<GLFont>> _fonts;
-        // TODO make fonts static, etc...
-        // res/fonts/Inconsolata/static/InconsolataCondensed-Medium.ttf
-        // res/fonts/Inconsolata/static/InconsolataCondensed-Light.ttf
-        //std::vector<std::unique_ptr<FTLabel>> _labels;
-        std::vector<std::shared_ptr<FTLabel>> _labels;
     public:
-        TextList() {}
+        TextList() 
+            : _x(0.0f), _y(0.0f), m_Width(0.0f), m_Height(0.0f), _y_pos(0.0f)
+        {}
 
-        TextList(int x, int y, int width, int height) 
+        TextList(float x, float y, float width, float height)
             : _x(x), _y(y), m_Width(width), m_Height(height), _y_pos(y)
-        {
-        }
+        {}
 
-        void Resize(const uint32_t& width, const uint32_t& height)
+        void Resize(const float width, const float height)
         {
             m_Width = width;
             m_Height = height;
-
-            for (auto label : _labels)
+            for (const auto& [id, label] : _labels)
             {
                 label->setWindowSize(width, height);
                 //label->setPosition(label->getX(), label->getY());
@@ -47,25 +37,25 @@ namespace lux {
             }
         }
 
-        void AddText(unsigned int fontID, unsigned int labelID, unsigned int fontSize, int yOffset, const std::string& text)
+        void AddText(const uint32_t fontID, const uint32_t labelID, const int fontSize, const float yOffset, const std::string& text)
         {
-            auto font = _fonts.at(fontID);
-            auto label = std::shared_ptr<FTLabel>(new FTLabel(font, text, _x, _y_pos, m_Width, m_Height));
+            const auto font = _fonts.at(fontID);
+            const auto label = CreateRef<FTLabel>(font, text, _x, _y_pos, m_Width, m_Height);
             label->setColor(1.0, 1.0, 1.0, 1.0);
             label->setPixelSize(fontSize);
-            //label->setSize(_width, _height);
-            _labels.push_back(label);
+            _labels.emplace(labelID, label);
             _y_pos += yOffset;
+            //_y_pos += font->GetFontFace()->max_advance_height;
         }
 
-        void AddFont(unsigned int fontID, const std::string& fontPath)
+        void AddFont(const uint32_t fontID, const std::string& fontPath)
         {
-            auto font = std::shared_ptr<GLFont>(new GLFont(fontPath));
+            const auto font = CreateRef<GLFont>(fontPath);
             // TODO check if the font exists first
             _fonts.emplace(fontID, font);
         }
 
-        void SetText(unsigned int labelID, const std::string& text) const
+        void SetText(const uint32_t& labelID, const std::string& text) const
         {
             auto label = _labels.at(labelID);
             label->setText(text);
@@ -73,8 +63,20 @@ namespace lux {
 
         void Draw() const
         {
-            for (auto label : _labels)
+            for (const auto& [id, label] : _labels)
+            {
                 label->render();
+            }
         }
+    private:
+        float _x, _y;
+        float m_Width, m_Height;
+        float _y_pos;
+        std::unordered_map<uint32_t, Ref<GLFont>> _fonts;
+        // TODO make fonts static, etc...
+        // res/fonts/Inconsolata/static/InconsolataCondensed-Medium.ttf
+        // res/fonts/Inconsolata/static/InconsolataCondensed-Light.ttf
+        //std::vector<std::unique_ptr<FTLabel>> _labels;
+        std::unordered_map<uint32_t, Ref<FTLabel>> _labels;
     };
 }

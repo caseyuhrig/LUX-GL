@@ -36,7 +36,7 @@ namespace lux {
 
             m_Shader = CreateRef<Shader>("res/shaders/ux.shader");
 
-            const glm::vec4 amber = glm::vec4(COLOR_AMBER.rgb, 0.8);
+            const auto amber = glm::vec4(Colors::Amber.rgb, 0.8f);
 
             mesh = TopCar(glm::vec2(10.0f, 100.0f), glm::vec2(900.0f, 890.0f), amber);
             mesh.Build();

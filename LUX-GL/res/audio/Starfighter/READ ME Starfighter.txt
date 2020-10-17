@@ -1,0 +1,468 @@
+Readme 	5-1-6
+VERSION	7-6 2-1
+
+SEE BELOW FOR VERSION CHANGES AND ADDITIONS AT END OF "README"
+The last download version is in the folder "Old Versions."
+
+**********************************************************************
+**********************************************************************
+******************************STARFIGHTER*****************************
+**********************************************************************
+**********************************************************************
+
+                          WARNING STARFIGHTER
+
+This game (like every other videogame) uses light and
+flash effects. If you have seizures, you should not be playing
+this game (or any videogames for that matter). You also should
+not play videogames while walking or operating machinery
+(including while flying a Gunstar unless you want earth to fall prey
+to Xur and the Ko-Dan. Your decision man). Don't play videogames
+near ledges, stairs, or the edge of a cliff.
+
+
+		         LEGAL STUFF STARFIGHTER
+
+"The Last Starfighter" is copyrighted by Lorimar-Universal.
+
+	THIS IS FREEWARE. IT IS NOT TO BE SOLD OR MARKETED.
+	THIS IS FREEWARE. IT IS NOT TO BE SOLD OR MARKETED.
+	THIS IS FREEWARE. IT IS NOT TO BE SOLD OR MARKETED.
+
+Did I mention? ...
+	THIS IS FREEWARE. IT IS NOT TO BE SOLD OR MARKETED.
+
+This is an entirely fan-based effort. If you like this project
+and wish to endorse it with your dollars, please buy licensed
+"Last Starfighter" or Universal stuff. If you don't own the DVD,
+shame on you.  Go buy it now. The Craig Safan soundtrack is also
+more than worth the purchase. It is the good will of the studios that
+allows projects like this to go forward so please support them. If
+this does inspire you to build/create, please let us know how. If you
+build a Starfighter cab, please email us pics. That is what makes
+these projects worthwhile.
+
+
+
+
+
+
+************************************************************
+*******************THE FUN PART*****************************
+************************************************************
+
+
+Greetings Starfighter, you have been recruited by the Star
+League to defend the frontier against Xur and the Ko-Dan
+Armada. Good Luck!!!
+
+The Starfighter program is an attempt to recreate the game
+from "The Last Starfighter" film. This is purely a fan-based
+effort and has no commercial ties whatsoever. It is designed to
+ultimately run in a prop cabinet but control allowances have
+been made for easy computer play and adaptation to MAME cabs.
+
+Ultimately, I hope we will supply you the information and software
+necessary to create your own Starfighter arcade cabinet.
+
+
+---------------------------------------------------------------------------------
+Contents:
+---------------------------------------------------------------------------------
+
+I. 	Requirements
+II. 	Getting Started
+III. 	How to play
+IV. 	Spanish Voice Pack
+V. 	Display Resolution
+VI. 	Dipswitches
+VII. 	Joystick and other Peripherals
+VIII. 	Display Resolution
+IX. 	CREDITS
+X. 	Trouble Shooting
+XI. 	Contact
+XII. 	Recent level changes
+
+
+
+---------------------------------------------------------------------------------
+I. Requirements:
+---------------------------------------------------------------------------------
+The game is written in Dark Basic (www.darkbasic.com) so the very 
+minimum requirements are set by the DB compiler. I have run this without
+difficulty on P3/256 DDR ram/128 AGP. It did take a bit to reach full speed.
+The game does use rapid texture swapping which is the primary source of slow-
+down I have noted. The game runs under Windows 98 and up.
+I will update compatibility issues as I get feedback.
+
+
+---------------------------------------------------------------------------------
+II. Getting Started:
+---------------------------------------------------------------------------------
+UNZIP THE DOWNLOAD TO THE DESIRED LOCATION.
+INSTALL THE ENCLOSED FONTS (USUZI, LASTSTAR, and STARF7) FOR PROPER TEXT APPEARANCE.
+USUZI IS A FREEWARE FONT AND NOT CREATED SPECIFICALLY FOR THIS PROJECT.
+
+DOUBLE CLICK THE STARFIGHTER EXECUTABLE TO START.
+
+IMPORTANT: DO NOT REMOVE STARFIGHTER FROM THE FOLDER AS THE PROGRAM WILL FAIL.
+CREATE A SHORTCUT TO ACCESS THE GAME FROM OUTSIDE THE FOLDER.
+
+Problems? See Troubleshooting below
+
+
+---------------------------------------------------------------------------------
+III. How to play:
+---------------------------------------------------------------------------------
+The game is a dual joystick game with 2 fire buttons, 3 weapon
+toggles and a coin switch. In addition for MAME adaptation, there
+is a weapon toggle set to a single button to cycle weapons. There
+is also a button for diagnostic mode (all dipswitches).
+
+
+DEFAULT CONTROLS
+
+  Turret movement and right fire          ASWD LAlt
+					  Arrows
+
+  Reticle and left fire                   JKLI Space
+					  Mouse and mouse fire if active
+						Mouse 1 fire, Mouse2 Weapon toggle, 3 DeathBlossom
+
+  Laser                                   m
+  Particle Beam                           ,
+  Photon bolt (Missiles)                  .
+
+  MAME Weapon Toggle                      1
+  COIN                                    5
+  Diagnostic Mode                         0
+
+
+In the film, the left joystick moves the turret and the right moves
+the targeting. This seemed left-handed to me. Currently, the keys are 
+mapped in a reverse fashion on the key board (aswd controls the reticle
+ and jkil rotates the turret). Arrows are default turret always. Left 
+alt and space are fire. "m",",", and "." are laser, particle beam, and 
+missiles respectively. "1" is MAME weapon cycle. "0" enters diagnostic 
+mode while in attract mode. "5" is coin up. Pressing all weapons at 
+once or MAME toggle with left fire activates Death Blossom (if enabled). 
+
+The HUD is relatively complex. The right upper sphere is 3d targeting scanner.
+The red circle within is roughly your field of view. On levels where the
+full HUD is visible (the green full screen HUD), there will be blinking white
+dots visible between the inner and outer rings (within the red weapon gauges)
+which also direct you to targets (like the arrows in some FPS style games). The
+right upper sphere shows the orientation of the gunner turret to the ship. The 
+skeleton ship within changes color with player damage. The right lower sphere is
+enemy damage. It will read "Hull Temp" when an enemy is in your sights. I had it 
+set originally to show remaining shields on enemies but changed it to be more in
+line with the film (now fills and empties with enemy explosion). The left lower 
+gauge is your hull temperature. This "cools" over time assuming no enemy hits in
+the meantime.
+
+The red semicircles on the HUD are weapon gauges. The top two are laser 
+energy remaining. The left lower is Photon Bolts (missiles) and the right 
+lower is particle beam. Score and number of enemies encountered per level
+are displayed in the lower center region.
+
+An animated explanation of all controls occurs in the attract mode under 
+"Gunstar Turret Control." If you leave the game on without playing, it will
+cycle through to this subroutine (be patient).
+
+The goal of the game is to survive as many levels as possible while destroying
+as many enemies as possible. Enemy missiles can be destroyed with laser or 
+particle beam but will not missile lock.
+
+If you succeed in destroying the Command Ship and your score is worthy, you will
+join the Star League list of heroes.
+
+ALSO, 
+If you take a moment to watch the attract mode, you will see there is a
+fully animated section titled "Gunstar Turret Control." This goes through a basic
+explanation of the HUD, controls, and weapons use. Feel free to email me and say 
+"There is no explanation of the controls." That will be great because then I'll know
+you didn't take the time to watch the full attract mode and think you are a lazy cretin.
+
+---------------------------------------------------------------------------------
+IV. Spanish Voice Pack:
+---------------------------------------------------------------------------------
+There is a Spanish voice pack courtesy of El Dunadan. The files within can be
+moved into the sounds file to replace existing dialog with Spanish. It is recommended
+you back up the original "sounds" file before doing so to serve as a backup of the
+original.
+
+---------------------------------------------------------------------------------
+V. Display Resolution:
+---------------------------------------------------------------------------------
+This version of STARFIGHTER supports variable resolution. Double click on
+"DISPLAY RES" and a list of supported resolutions is persented. Enter the number
+for the desired resolution. Hit Esc to exit once the text begins to flash. It is
+best if the aspect ratio remains 4x3 if possible for appearance and font size.
+
+---------------------------------------------------------------------------------
+VI. Dipswitches/Diagnostic Mode:
+---------------------------------------------------------------------------------
+
+Hitting the diagnostic mode button (DEFAULT 0) during attract mode brings up a set of 
+game options. Most are self explanatory.
+
+
+	Music- Toggles the music on or off during attract.
+	Sound Effects- Toggles sound effects on or off during attract.
+
+	High score reset- Resets high scores to default.
+
+	Free Play- Toggles free play on or off (sets credits to 10).
+
+	Death Blossom- Toggles Death Blossom on or off (Alex Rogan didn't have DB
+		in the arcade game, you pansy).
+		DB Malufunction rate can be set. 20=20% of the time DB short circuits.
+
+	Text- Toggles explanatory text seen between levels on or off.
+
+	Coins to start/continue- coins needed to start/continue.
+
+	Continue- Toggles continue possible on or off (Alex also didn't have this).
+
+	Shields- Sets player shields at start and continue.
+
+	Weapon recharge rate- Sets recharge rate during combat and between levels.
+
+	Enemy accuracy-Sets likelihood of enemy hitting you. Setting either "Close" or
+	       "Bullseye" to "0" means enemy accuracy 100%. Lower is deadlier.
+
+	Level planner- This allows you to map out your arcade game in terms of level
+	       order. You can program in up to 50 levels. The last level will
+	       be the Command ship level by default (i.e. the first "0" that occurs-
+	       all levels after the first "0" are deleted). The level by number 
+	       is described in the on-screen text at the top of the screen.
+
+	Mouse Control- Toggles mouse control of the reticle on or off.
+
+	Keyboard mapping- Allows you to map keyboard/MAME controls.
+
+	Refresh rate- Sets the sync rate or refresh rate (fps- speed of the game).
+	       If you set this too low, the game will run too slowly to reset.
+	       If this occurs, look in the "Arrays" file and copy "syncrate30.dat".
+	       Rename it "syncrate.dat" and replace the syncrate file in the "arrays"
+	       folder. This will set the syncrate back to 30 fps.
+
+	Default control- Restores all controls to original settings.
+
+	settings- This saves your preferences in a data file (i.e. the game will run
+	       that way until new changes are saved).
+
+	Restore Defaults- Restores all dipswitches to original settings. THIS DOES NOT 
+	       SAVE THE SETTINGS AUTOMATICALLY (You have to save them for the
+	       changes to persist).
+
+	Joystick- Enables joystick turret control- Limited joystick support in this version
+		of DarkBASIC- Works best with joystick mouse.
+
+	Turret speed- Allows custom turret acceleration and top speed.
+
+
+---------------------------------------------------------------------------------
+VII. Joystick and other Peripherals
+---------------------------------------------------------------------------------
+The current controls will configure only to a single joystick and mouse (the idea being
+you use the stick with one hand and the mouse with the other). Unfortunately, the
+configuration is limited by the version of DarkBASIC used as the compiler. You may wish
+to adjust the turret speed and acceleration (in Diagnostic mode) to best suit your 
+peripheral.
+
+Here are a few freeware programs that will map keyboard controls to a vast array of
+peripherals. I don't specifically endorse any of these but they seem to map well.
+
+Most useful freeware thus far- JoytoKey
+         http://www.electracode.com/4/joy2key/JoyToKey%20English%20Version.htm
+ 
+
+Also try Autohotkey
+         http://www.autohotkey.com/
+ 
+For Mouse only- Joystick Mouse (to map the mouse control to the hat or escond dual joystick).
+         http://www.mystikeep.com/shareware/joymouse/joymouse.htm
+
+Also, Total Game Control which worked well but is not freeware.
+
+
+
+---------------------------------------------------------------------------------
+VIII. Display Resolution:
+---------------------------------------------------------------------------------
+To adjust display resolution, double click on the "Display Resolution" executable.
+The screen will blank then list all supported resolutions. Simply type in the number
+corresponding to the desired resolution and hit enter. The screen will fill with "STARFIGHTER."
+Hit "Esc" to exit and then run the game.
+
+For best results, try to keep 4:3 aspect ratio (all text size is adjusted to screen height).
+
+
+
+---------------------------------------------------------------------------------
+IX. CREDITS:
+---------------------------------------------------------------------------------
+
+The STARFIGHTER program is a RogueSynapse(TM) creation. Code was entirely by doc.
+Models, images, sounds were based on/extracted from the film. The film is of course
+Lorimar-Universal.
+
+
+
+Contributors:
+
+	Miniaturizer Ray 	RPF		-Gunstar Model and Fonts-
+	Blue Fugu 				-sounds-
+	Rook3	 		RPF		-fonts and design-
+	Trixter 		RPF		-design-
+	Strmhawkx				-models and design-
+	Vegas Vader 		RPF		-art-
+	Starfighter66 				-Blueprints-
+	Gawker 					-Website-
+	Clandeggin 		BYOAC		-art and Fonts-
+	98Pacecar 		Digit Press	-design-
+	El Dunadan 				-Spanish VoicePack-"
+	TERRA Operative				-Model help-"
+
+	All contributors on the RPF
+	All contributors on BYOAC
+	All contributors at Digital Press
+
+Freeware models were used for the 3d Starfield and the asteroid on stage 2. The 
+Starfighter MIDI is also a freeware download on multiple sites and does not represent
+the work of this team. If you know who to credit, please contact us.
+
+
+I tried to get this out as quickly as possible so, if I forgot anyone, please
+let me know and I will fix it (doc@roguesynapse.com).
+
+Pressing Laser toggle or MAME weapon toggle during the floating text in attract
+mode (the first subroutine) will bring display credits and cue music.
+
+
+---------------------------------------------------------------------------------
+X. Trouble Shooting:
+---------------------------------------------------------------------------------
+This is essentially the second beta version so trouble shooting recs will be ongoing.
+Three important things to note. The program reads and writes to dat files (arrays
+folder). If program errors occur causing the game to exit or halt, make sure that
+all files in all folders are NOT "Read Only" or "Archive" (change in Windows under
+properties). The second thing is to install the fonts in the font folder or the text
+won't look right. Beyond this, will add fixes as problems arise. Third, DO NOT ALTER
+THE FILE HIERARCHY IN THE MAIN FOLDER. If you move files around (like moving the
+Starfighter executable to your desktop), this will cause the program to fail as
+resource files will not be loaded or accessed properly.
+
+---------------------------------------------------------------------------------
+XI. Contact:
+---------------------------------------------------------------------------------
+Please let us know if you have problems or suggestions (or really liked it). 
+This is likely not the final version of the software but will be the only version
+for a while.
+
+Please email us with questions/concerns/criticisms/suggestions/praise at:
+
+doc@roguesynapse.com (software)
+gawker@gawkerweb.com (webmaster)
+
+
+
+---------------------------------------------------------------------------------
+
+
+MAY THE LUCK OF THE SEVEN PILLARS OF GULU BE WITH YOU AT ALL TIMES.
+
+
+Sincerely,
+
+		Doc
+
+
+
+
+
+---------------------------------------------------------------------------------
+XII. Recent level changes (last download 2/06 is 7-5 3-0)
+---------------------------------------------------------------------------------
+
+	6-6 Incorporated new controls and variable turret and reticle speeds
+	Turret movement to acceleration or try lower increment
+
+	6-9 1-1 	Integrated all diagnostics except DBlossom
+				Fixed Level transitions
+				Reduced meteor level number to 50
+				Removed command ship scanner limb
+				Continue/Start coins in place
+
+	6-9 1-2 	Integrated Missile Reticle and new Inner HUd and reticle
+
+	6-9 1-5  Scoring integrated including bonuses
+
+	6-9 1-7  Fixed glitch with command ship
+
+**** 7-0 **** Updated and debugged
+			  
+	7-2 0-2 Reintegrating subtle gauge changes due to slowup
+				Shield increment- DONE
+				Slow LUpper gauge transitions done (play,between,selfplay)
+
+	7-2 0-3 Redoing Flash so timed correctly
+	7-2 0-4 Redoing Flash so timed correctly-Flash1 and Flash2
+	7-2 0-5 Fixed damage gauge to flash and fixed slowdown error due to
+			  objects 2014 and 2015 (replaced with text)
+	7-4 0-3 Fully realized new HUD, retextured damage gauges
+			  Redone mountain background as 3d object-Working
+	7-4 0-4 Changed diagnostic from real to whole
+	7-4 0-5 New intro pad in place/Introducing texture colors
+	7-4 0-6 Introduced color object as textured- Flash DONE
+	7-4 0-7 Textures for ship damage-DONE
+	7-4 0-8 All "color object" commands removed-inc demoshell
+	7-4 0-9 Added MAMEWeap button to controls	
+	7-5 0-2 Integrated new enemy damage meters
+	7-5 0-3 Beacon integrated
+	7-5 0-4 Inner HUD scanner integrated- Main Loop
+	7-5 0-5 Inner HUD scanner integrated- Selfplay demo
+	7-5 0-6 Intgrated level 11- The Fighter swarm for Death Blossom
+	7-5 0-7 Death Blossom	
+	7-5 0-8 Death Blossom	
+	7-5 0-9 Death Blossom	
+	7-5 1-0 Death Blossom- COMPLETED including transitions/instructions
+	7-5 1-1 Fixed player death during death blossom and CS post level 4
+	7-5 1-2 to 2-5 Integrating sounds
+	7-5 2-5 Integrated all sounds including engine loop
+	7-5 2-6 Added sound to coinup
+	7-5 2-7 Credits (activate during text attract with mame/laser tog)
+
+	7-5 3-0 DOWNLOAD VERSION 2-28-6
+
+	7-6 1-0 Fixed lighting glitch on Logo Demo
+	7-6 1-1 Fixed Music Single play (have to reload each time)
+	7-6 1-1 Made Attract sounds less frequent/added timer
+	7-6 1-2 Added toggle for soundefx during attract
+	7-6 1-3 Adding mousefire and mame weapon toggle
+	7-6 1-4 Death Blossom occasional malfunction
+	7-6 1-5 Pts 1-7 Integrating Variable Resolutions
+	7-6 1-6 Finished variable res/Intro shows in attract occasionally
+	7-6 1-7 New Centauri logo
+	7-6 1-8 Joystick incorporation
+	7-6 1-9 Fixed missile glitch in Death Blossom
+	7-6 2-0 Variable Turret Speeds
+	7-6 2-1 Variable Turret Speeds- Diagnostic mode variable
+
+	7-6 2-1 DOWNLOAD VERSION 5-1-6
+
+--------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+

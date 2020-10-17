@@ -30,7 +30,7 @@ void main()
 }
 
 #shader fragment
-#version 330 core
+#version 450 core
 //out vec4 FragColor;
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 BrightColor;
@@ -52,6 +52,9 @@ uniform float far_plane;
 uniform bool shadows;
 uniform float u_bias;
 uniform int u_samples;
+
+uniform vec4 u_Color;
+uniform vec4 u_LightColor;
 
 
 // array of offset direction for sampling
@@ -138,9 +141,11 @@ vec4 CloDep(vec3 fragPos)
 
 void main()
 {           
-    vec3 color = vec3(0.45); //texture(diffuseTexture, fs_in.TexCoords).rgb;
+    //vec3 color = vec3(0.45); //texture(diffuseTexture, fs_in.TexCoords).rgb;
+    //float alpha = u_Color[3];
+    vec3 color = u_Color.rgb;
     vec3 normal = normalize(fs_in.Normal);
-    vec3 lightColor = vec3(0.5);
+    vec3 lightColor = u_LightColor.rgb; //vec3(0.5);
     // ambient
     vec3 ambient = 0.3 * color;
     // diffuse
@@ -164,7 +169,7 @@ void main()
     
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > 1.0)
-        BrightColor = vec4(FragColor.rgb, 1.0);
+        BrightColor = vec4(FragColor.rgb, u_Color[3]);
     else
         BrightColor = vec4(0.0, 0.0, 0.0, 1.0); // black
 }

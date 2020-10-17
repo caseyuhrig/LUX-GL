@@ -8,7 +8,7 @@
 
 namespace lux {
 
-	typedef struct SceneProperties // size = 208
+	struct SceneProperties // size = 208
 	{
 		glm::mat4 Model;           // 64       0
 		glm::mat4 View;            // 64      64

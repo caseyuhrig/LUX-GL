@@ -1,6 +1,8 @@
 #pragma once
 
-#define GLM_SWIZZLE
+#define GLM_FORCE_SWIZZLE
+
+#include <windows.h>
 
 #include <glad/glad.h>                       // Cross platform link between your graphics card and OpenGL.
 #include <GLFW/glfw3.h>
@@ -25,3 +27,6 @@
 #include <irrKlang/irrKlang.h>
 
 #include "nlohmann/json.hpp"
+
+//#include "lux/Primitive/BezierCurve.hpp"
+

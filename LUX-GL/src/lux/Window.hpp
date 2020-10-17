@@ -343,8 +343,20 @@ namespace lux {
         int GetFramebufferHeight() const { return _framebuffer_height; }
         //inline float GetAspectRatio() const { return _aspect_ratio; }
 
-        void SetSize(const int& width, const int& height) { glfwSetWindowSize(_window_handle, width, height); }
+        void SetSize(const int width, const int height) const { glfwSetWindowSize(_window_handle, width, height); }
 
+        /**
+        * Fills all monitors, full screen, no borders!
+        */
+        void SuperSize() const
+        {
+            glfwSetWindowAttrib(_window_handle, GLFW_DECORATED, 0);
+            glfwSetWindowAttrib(_window_handle, GLFW_FLOATING, 1);
+            constexpr int width = 1920 + 1600 + 1600;
+            constexpr int height = 1200;
+            SetPosition(-1920, 0);
+            SetSize(width, height);
+        }
         //void SetDrawCallback();
         //inline void Draw(void) const {}
 
@@ -353,7 +365,7 @@ namespace lux {
             glfwGetWindowPos(_window_handle, &position.x, &position.y);
             return position;
         }
-        void SetPosition(const int& x, const int& y) const { glfwSetWindowPos(_window_handle, x, y); }
+        void SetPosition(const int x, const int y) const { glfwSetWindowPos(_window_handle, x, y); }
         bool ShouldClose() const { return glfwWindowShouldClose(_window_handle); }
 
         void SwapBuffers() const 
@@ -362,6 +374,8 @@ namespace lux {
             glfwPollEvents();
         }
 
-        inline void Destroy() const { glfwDestroyWindow(_window_handle); }
+        void Close() const { glfwSetWindowShouldClose(_window_handle, 1); }
+
+        void Destroy() const { glfwDestroyWindow(_window_handle); }
     };
 }

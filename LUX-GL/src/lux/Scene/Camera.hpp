@@ -42,7 +42,7 @@ namespace lux {
             _props.aspect_ratio = static_cast<float>(_props.viewport_width) / static_cast<float>(_props.viewport_height);
             _props.position = position;
             _props.look_at = lookAt;
-            _props.z_far = 120.0f; //2000.0f;
+            _props.z_far = 2000.0f; // 120.0f 2000.0f;
             _props.z_near = 0.01f;
             m_Angle = 55.0f;
             UpdateView();
@@ -89,6 +89,7 @@ namespace lux {
         //uint32_t& GetViewportWidth() { return _props.viewport_width; }
         const uint32_t& GetViewportHeight() const { return _props.viewport_width; }
         float& GetAngle() { return m_Angle; }
+        const float& GetAngle() const { return m_Angle; }
         const float& GetAspectRatio() const { return _props.aspect_ratio; }
         
         void SetViewportSize(const uint32_t& width, const uint32_t& height)

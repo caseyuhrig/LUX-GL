@@ -80,8 +80,10 @@ namespace lux {
                 AddVertex(point, glm::vec4(1.0), glm::vec2(0.0), normal);
             }
 
-            for (size_t n = 0;n < 36;n+=3)
+            for (uint32_t n = 0; n < 36; n += 3)
+            {
                 AddIndex(n, n + 1, n + 2);
+            }
         }
     };
 }

@@ -9,16 +9,16 @@ namespace lux {
     class Ring : public Mesh
     {
     public:
-        Ring(double inner_radius, double outer_radius, double thickness, double steps)
+        Ring(float inner_radius, float outer_radius, float thickness, float steps)
             : Mesh({ -outer_radius, -thickness / 2, -outer_radius }, { -outer_radius, -thickness / 2, -outer_radius }),
-            inner_radius(inner_radius), outer_radius(outer_radius), thickness(thickness), steps(steps) {}
+            inner_radius(inner_radius), outer_radius(outer_radius), thickness(thickness), m_Steps(steps) {}
 
         virtual void CreateGeometry() override;
     private:
         float inner_radius;
         float outer_radius;
         float thickness;
-        float steps;
+        float m_Steps;
     };
 }
 

@@ -43,16 +43,24 @@ namespace lux {
 			m_LastTime = glfwGetTime();
 		}
 
-		inline float GetSeconds() const { return m_DeltaTime; }
-		inline float GetMilliseconds() const { return m_DeltaTime * 1000.0f; }		
-		inline float GetTimestep() const {	return static_cast<float>(m_DeltaTime);	}
-		inline operator float() const { return GetTimestep(); }
-		inline float CalcIncrement(const float& length, const float& duration) const
+		template<typename T>
+		T GetSeconds() const { return static_cast<T>(m_DeltaTime); }
+
+		template<typename T>
+		T GetMilliseconds() const { return static_cast<T>(m_DeltaTime * 1000.0); }
+
+		template<typename T>
+		T GetTimestep() const {	return static_cast<T>(m_DeltaTime);	}
+
+		template<typename T>
+		operator T() const { return GetTimestep<T>(); }
+
+		float CalcIncrement(const float& length, const float& duration) const
 		{
-			return length / (duration / m_DeltaTime);
+			return length / (duration / GetTimestep<float>());
 		}
 
-		inline float PingPong(float& value, float& direction, const float& min, const float& max, const float& length, const float& duration) const
+		float PingPong(float& value, float& direction, const float& min, const float& max, const float& length, const float& duration) const
 		{
 			//value += direction * (length / (duration / m_DeltaTime));
 			//clamp, floor
@@ -80,7 +88,7 @@ namespace lux {
 		}
 
 
-		inline void Update()
+		void Update()
 		{
 			const auto currentTime = glfwGetTime();
 			//auto currentTime = std::chrono::system_clock::now();

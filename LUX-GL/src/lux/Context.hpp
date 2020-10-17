@@ -18,6 +18,11 @@ namespace lux {
     public:
         Context(GLFWwindow* window_handle) : _window_handle(window_handle) {}
 
+        //static Scope<Context> CreateScope<Context>(_window_handle)
+        //{
+
+        //}
+
         void Init()
         {
             glfwMakeContextCurrent(_window_handle);    // <---- IMPORTANT: has to be done before glewInit()

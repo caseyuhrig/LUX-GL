@@ -1,5 +1,5 @@
 #shader vertex
-#version 440 core
+#version 450 core
 
 layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec3 a_normal;
@@ -29,13 +29,16 @@ void main()
 
 
 #shader fragment
-#version 440 core
+#version 450 core
 
 layout(location = 0) out vec4 FragColor;
 layout(location = 1) out vec4 BrightColor;
 
+uniform vec4 u_Color;
+uniform vec4 u_BrightColor;
+
 void main()
 {
-    FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-    BrightColor = vec4(1.5, 1.5, 1.5, 1.0);
+    FragColor = u_Color;
+    BrightColor = u_BrightColor;
 };

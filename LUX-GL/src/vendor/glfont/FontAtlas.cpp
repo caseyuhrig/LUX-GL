@@ -3,7 +3,7 @@
 #include <iostream>
 #include <algorithm>
 
-FontAtlas::FontAtlas(FT_Face face, int pixelSize) :
+FontAtlas::FontAtlas(const FT_Face face, int pixelSize) :
   _face(face),
   _width(0),
   _height(0)
@@ -50,7 +50,8 @@ FontAtlas::FontAtlas(FT_Face face, int pixelSize) :
 
     int texPos = 0; // texture offset
 
-    for(int i = 32; i < 128; ++i) {
+    for(int i = 32; i < 128; ++i) 
+    {
         if (FT_Load_Char(_face, i, FT_LOAD_RENDER))
         {
             fprintf(stderr, "Loading character %c failed!\n", i);
@@ -62,16 +63,16 @@ FontAtlas::FontAtlas(FT_Face face, int pixelSize) :
         glTexSubImage2D(GL_TEXTURE_2D, 0, texPos, 0, 1, _slot->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, 0); // padding
 
         // Store glyph info in our char array for this pixel size
-        _chars[i].advanceX = _slot->advance.x >> 6;
-        _chars[i].advanceY = _slot->advance.y >> 6;
+        _chars[i].advanceX = static_cast<float>(_slot->advance.x >> 6);
+        _chars[i].advanceY = static_cast<float>(_slot->advance.y >> 6);
 
-        _chars[i].bitmapWidth = _slot->bitmap.width;
-        _chars[i].bitmapHeight = _slot->bitmap.rows;
+        _chars[i].bitmapWidth = static_cast<float>(_slot->bitmap.width);
+        _chars[i].bitmapHeight = static_cast<float>(_slot->bitmap.rows);
 
-        _chars[i].bitmapLeft = _slot->bitmap_left;
-        _chars[i].bitmapTop = _slot->bitmap_top;
+        _chars[i].bitmapLeft = static_cast<float>(_slot->bitmap_left);
+        _chars[i].bitmapTop = static_cast<float>(_slot->bitmap_top);
 
-        _chars[i].xOffset = (float)texPos / (float)_width;
+        _chars[i].xOffset = static_cast<float>(texPos) / static_cast<float>(_width);
 
         // Increase texture offset
         texPos += _slot->bitmap.width + 1; // was 2

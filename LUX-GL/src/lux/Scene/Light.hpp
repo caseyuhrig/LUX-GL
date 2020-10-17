@@ -5,7 +5,7 @@
 
 namespace lux {
 
-	typedef struct LightProperties           // size =  64
+	struct LightProperties           // size =  64
 	{
 		glm::vec4 position;        // 16       0
 		glm::vec3 ambient_color;   // 12      16

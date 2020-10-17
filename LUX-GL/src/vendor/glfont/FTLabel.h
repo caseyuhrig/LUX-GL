@@ -12,6 +12,8 @@
 #include <map>
 #include <vector>
 
+#include "lux/Types.hpp"
+
 #ifndef PI
 #define PI 3.141596
 #endif
@@ -42,10 +44,10 @@ public:
     };
 
     // Ctor takes a pointer to a font face
-    FTLabel(std::shared_ptr<GLFont> ftFace, int windowWidth, int windowHeight);
-    FTLabel(GLFont* ftFace, int windowWidth, int windowHeight);
-    FTLabel(std::shared_ptr<GLFont> ftFace, const std::string&, float x, float y, int width, int height, int windowWidth, int windowHeight);
-    FTLabel(std::shared_ptr<GLFont> ftFace, const std::string&, float x, float y, int windowWidth, int windowHeight);
+    FTLabel(lux::Ref<GLFont> ftFace, int windowWidth, int windowHeight);
+    //FTLabel(GLFont* ftFace, int windowWidth, int windowHeight);
+    FTLabel(lux::Ref<GLFont> ftFace, const std::string&, float x, float y, int width, int height, int windowWidth, int windowHeight);
+    FTLabel(lux::Ref<GLFont> ftFace, const std::string&, float x, float y, int windowWidth, int windowHeight);
     ~FTLabel();
 
     void setWindowSize(int width, int height);

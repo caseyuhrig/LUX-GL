@@ -1,5 +1,9 @@
 #include "Lines.hpp"
 
+#include <glm/gtx/string_cast.hpp>
+
+#include "lux/Log.hpp"
+
 
 namespace lux {
 
@@ -15,6 +19,14 @@ namespace lux {
         index++;
         indices.push_back(index);
         index++;
+    }
+
+    void Lines::Dump()
+    {
+        for (auto p : points)
+        {
+            lux::Log::LOG_DEBUG("Point: %s", glm::to_string(p));
+        }
     }
 
     void Lines::Build()
@@ -35,13 +47,13 @@ namespace lux {
 
     void Lines::CreateGrid(float width, float depth, float xSteps, float zSteps, float y)
     {
-        float xStep = width / xSteps;
-        float zStep = depth / zSteps;
-        for (float x = -width / 2.0f;x <= width / 2.0f;x += xStep)
+        auto xStep = width / xSteps;
+        auto zStep = depth / zSteps;
+        for (auto x = -width / 2.0f;x <= width / 2.0f;x += xStep)
         {
             Add(glm::vec3(x, y, -depth / 2.0f), glm::vec3(x, y, depth / 2.0f));
         }
-        for (float z = -depth / 2.0f;z <= depth / 2.0f;z += xStep)
+        for (auto z = -depth / 2.0f;z <= depth / 2.0f;z += xStep)
         {
             Add(glm::vec3(-width/2.0f, y, z), glm::vec3(width/2.0f, y, z));
         }

@@ -37,7 +37,7 @@ namespace lux {
     {
     private:
         std::string m_FilePath;
-        unsigned int programID;
+        uint32_t programID;
         std::unordered_map<std::string, int> m_UniformLocationCache;
 
 
@@ -72,9 +72,9 @@ namespace lux {
             return { ss[0].str(), ss[1].str() , ss[2].str() };
         }
 
-        unsigned int _CompileShader(unsigned int type, const std::string& source)
+        uint32_t _CompileShader(uint32_t type, const std::string& source)
         {
-            unsigned int id = glCreateShader(type);
+            uint32_t id = glCreateShader(type);
             const char* src = source.c_str(); // same as &source[0]
             // whats an lvalue?
             glShaderSource(id, 1, &src, nullptr); // nullptr for length, assums the lines in the src are null terminated.
@@ -99,12 +99,12 @@ namespace lux {
             return id;
         }
 
-        unsigned int _CreateShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader)
+        uint32_t _CreateShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader)
         {
-            unsigned int program = glCreateProgram();
-            unsigned int vs = _CompileShader(GL_VERTEX_SHADER, vertexShader);
-            unsigned int fs = _CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
-            unsigned int gs = 0;
+            uint32_t program = glCreateProgram();
+            uint32_t vs = _CompileShader(GL_VERTEX_SHADER, vertexShader);
+            uint32_t fs = _CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+            uint32_t gs = 0;
             if (geometryShader.length() > 0)
             {
                 //std::cout << geometryShader << std::endl;
@@ -158,21 +158,9 @@ namespace lux {
             glDeleteProgram(programID);
         }
 
-        void Bind() const
-        {
-            glUseProgram(programID);
-        }
-
-
-        void Unbind() const
-        {
-            glUseProgram(0);
-        }
-
-        const unsigned int GetProgramID() const
-        {
-            return programID;
-        }
+        void Bind() const { glUseProgram(programID); }
+        void Unbind() const { glUseProgram(0); }
+        const uint32_t GetProgramID() const { return programID; }
 
         /**
         * glProgramUniform* vs. glUniform*
@@ -210,7 +198,7 @@ namespace lux {
         }
 
 
-        void SetUniformVec4f(const std::string& name, glm::vec4& v)
+        void SetUniformVec4f(const std::string& name, const glm::vec4& v)
         {
             glProgramUniform4f(programID, _GetUniformLocation(name), v[0], v[1], v[2], v[3]);
         }

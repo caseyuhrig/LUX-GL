@@ -33,7 +33,7 @@ namespace lux {
             {
                 const auto& element = elements[i];
                 glEnableVertexAttribArray(i);
-                glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), GLvoidptr(offset));
+                glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), make_void_ptr(offset));
                 offset += element.count * VertexBufferElement::getSizeOfType(element.type);
             }
 

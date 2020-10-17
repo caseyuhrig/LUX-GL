@@ -13,7 +13,10 @@
 #include "glm\gtc\type_ptr.hpp"
 #include "glm\gtx\transform.hpp"
 
-FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, int windowWidth, int windowHeight) :
+
+
+
+FTLabel::FTLabel(lux::Ref<GLFont> ftFace, int windowWidth, int windowHeight) :
   _isInitialized(false),
   //_text(""),
   _alignment(FontFlags::LeftAligned),
@@ -82,11 +85,11 @@ FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, int windowWidth, int windowHeig
     _isInitialized = true;
 }
 
-FTLabel::FTLabel(GLFont* ftFace, int windowWidth, int windowHeight)
-    : FTLabel(std::shared_ptr<GLFont>(new GLFont(*ftFace)), windowWidth, windowHeight) 
-{}
+//FTLabel::FTLabel(GLFont* ftFace, int windowWidth, int windowHeight)
+//    : FTLabel(std::shared_ptr<GLFont>(new GLFont(*ftFace)), windowWidth, windowHeight) 
+//{}
 
-FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, const std::string& text, float x, float y, int width, int height, int windowWidth, int windowHeight) 
+FTLabel::FTLabel(lux::Ref<GLFont> ftFace, const std::string& text, float x, float y, int width, int height, int windowWidth, int windowHeight)
     : FTLabel(ftFace, text, x, y, windowWidth, windowHeight)
 {
     _width = width;
@@ -95,7 +98,7 @@ FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, const std::string& text, float 
     recalculateVertices(text, x, y, width, height);
 }
 
-FTLabel::FTLabel(std::shared_ptr<GLFont> ftFace, const std::string& text, float x, float y, int windowWidth, int windowHeight) 
+FTLabel::FTLabel(lux::Ref<GLFont> ftFace, const std::string& text, float x, float y, int windowWidth, int windowHeight)
     : FTLabel(ftFace, windowWidth, windowHeight)
 {
     _text = text;
@@ -180,7 +183,7 @@ void FTLabel::recalculateVertices(const std::string& text, float x, float y, int
     // Send the data to the gpu
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Point), 0);
     glBufferData(GL_ARRAY_BUFFER, _coords.size() * sizeof(Point), _coords.data(), GL_DYNAMIC_DRAW);
-    glDrawArrays(GL_TRIANGLES, 0, _coords.size());
+    glDrawArrays(GL_TRIANGLES, 0, static_cast<uint32_t>(_coords.size()));
     _numVertices = _coords.size();
 
     glDisableVertexAttribArray(0);

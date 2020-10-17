@@ -7,6 +7,7 @@
 
 #include "lux/Scene/Layer.hpp"
 #include "lux/Window.hpp"
+#include "lux/Primitive/BezierCurve.hpp"
 
 
 namespace lux {
@@ -14,30 +15,32 @@ namespace lux {
     class LcarsLayer : public Layer
     {
     public:
-        LcarsLayer(const uint32_t& width, const uint32_t& height, const Renderer& renderer, glm::vec3& rotate) 
+        LcarsLayer(const uint32_t width, const uint32_t height, const Renderer& renderer, glm::vec3& rotate) 
             : Layer(width, height), m_Renderer(renderer), m_Rotate(rotate)
         {
             SetDebugLabel("LCARS Layer");
 
             m_Shader = CreateRef<Shader>("res/shaders/ux.shader");
+            m_ShaderBasic = CreateRef<Shader>("res/shaders/basic.shader");
 
-            amber = COLOR_AMBER;
-            amber.a = 0.8;
+            auto amber = glm::vec4(Colors::Amber.rgb, 0.8f);
 
             topCar = TopCar(glm::vec2(10.0f, 100.0f), glm::vec2(900.0f, 890.0f), amber);
             topCar.Build();
 
             // ORTHO
-            glm::mat4 projOrtho = glm::ortho(0.f, static_cast<float>(m_Width), 0.0f, static_cast<float>(m_Height), 0.01f, 2000.0f); // PROJECTION (SCREEN)
-            //glm::mat4 projOrtho = glm::ortho(0.f, (float)window.GetFramebufferWidth(), (float)window.GetFramebufferHeight(), 0.0f, 0.01f, 2000.0f); // PROJECTION (SCREEN)
-            glm::mat4 viewOrtho = glm::lookAt(glm::vec3(0, 0, 10.0),  // Camera position in world space (doesn't really apply when using an ortho projection matrix)
-                glm::vec3(0, 0, 0),  // look at origin
-                glm::vec3(0, 1, 0)); // Head is up (set to 0, -1, 0 to look upside down)       
-            glm::mat4 modelOrtho = glm::mat4(1.0f); // MODEL
-            glm::mat4 mvpOrtho = projOrtho * viewOrtho * modelOrtho;
+            //glm::mat4 projOrtho = glm::ortho(0.f, static_cast<float>(m_Width), 0.0f, static_cast<float>(m_Height), 0.01f, 2000.0f); // PROJECTION (SCREEN)
+            //glm::mat4 viewOrtho = glm::lookAt(glm::vec3(0, 0, 10.0),  // Camera position in world space (doesn't really apply when using an ortho projection matrix)
+            //    glm::vec3(0, 0, 0),  // look at origin
+            //    glm::vec3(0, 1, 0)); // Head is up (set to 0, -1, 0 to look upside down)       
+            //glm::mat4 modelOrtho = glm::mat4(1.0f); // MODEL
+            //glm::mat4 mvpOrtho = projOrtho * viewOrtho * modelOrtho;
 
-            m_Shader->SetUniformMat4f("u_MVP", mvpOrtho);
+            //m_Shader->SetUniformMat4f("u_MVP", mvpOrtho);
             m_Shader->SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
+
+            //m_ShaderBasic->SetUniformMat4f("u_MVP", mvpOrtho);
+            m_ShaderBasic->SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
 
             textList = TextList(110, 600, width, height);
             textList.AddFont(0, "res/fonts/Inconsolata/static/InconsolataCondensed-Medium.ttf");
@@ -51,22 +54,25 @@ namespace lux {
             textList.AddText(1, 6, 18, 18, "FPS: 0.000000");
             textList.AddText(1, 7, 18, 18, "[DATE/TIME]");
 
+            Resize(width, height);
         }
 
-        void Resize(const uint32_t& width, const uint32_t& height)
+        void Resize(const uint32_t width, const uint32_t height)
         {
             m_Width = width;
             m_Height = height;
             textList.Resize(width, height);
             // ORTHO
-            glm::mat4 projOrtho = glm::ortho(0.f, static_cast<float>(m_Width), 0.0f, static_cast<float>(m_Height), 0.01f, 2000.0f); // PROJECTION (SCREEN)
-            //glm::mat4 projOrtho = glm::ortho(0.f, (float)window.GetFramebufferWidth(), (float)window.GetFramebufferHeight(), 0.0f, 0.01f, 2000.0f); // PROJECTION (SCREEN)
-            glm::mat4 viewOrtho = glm::lookAt(glm::vec3(0, 0, 10.0),  // Camera position in world space (doesn't really apply when using an ortho projection matrix)
+            //auto proj = glm::ortho(0.f, static_cast<float>(m_Width), 0.0f, static_cast<float>(m_Height), 0.01f, 2000.0f); // PROJECTION (SCREEN)
+            auto proj = glm::ortho(0.f, static_cast<float>(m_Width), static_cast<float>(m_Height), 0.0f, 0.01f, 2000.0f);
+ 
+            auto view = glm::lookAt(glm::vec3(0, 0, 10.0),  // Camera position in world space (doesn't really apply when using an ortho projection matrix)
                 glm::vec3(0, 0, 0),  // look at origin
                 glm::vec3(0, 1, 0)); // Head is up (set to 0, -1, 0 to look upside down)       
-            glm::mat4 modelOrtho = glm::mat4(1.0f); // MODEL
-            glm::mat4 mvpOrtho = projOrtho * viewOrtho * modelOrtho;
-            m_Shader->SetUniformMat4f("u_MVP", mvpOrtho);
+            //glm::mat4 model = glm::mat4(1.0f); // MODEL
+            glm::mat4 mvp = proj * view; // *model;
+            m_Shader->SetUniformMat4f("u_MVP", mvp);
+            m_ShaderBasic->SetUniformMat4f("u_MVP", mvp);
         }
 
         void SetLights(const Lights& lights)
@@ -91,6 +97,7 @@ namespace lux {
             topCar.Draw(m_Renderer, *m_Shader);
             glDisable(GL_BLEND);
 
+            curve.Draw(m_Renderer, *m_ShaderBasic);
 
             //if (imguiLayer.showText)
             //{
@@ -106,6 +113,8 @@ namespace lux {
                 textList.SetText(7, lux::StringUtils::ToUppercase(lux::Time::Readable()));
 
                 textList.Draw();
+
+                
             //}
         }
 
@@ -122,10 +131,12 @@ namespace lux {
         //Window* m_Window;
         Renderer m_Renderer;
         Ref<Shader> m_Shader;
+        Ref<Shader> m_ShaderBasic;
         TextList textList;
         Lights m_Lights;
         glm::vec3& m_Rotate;
         lux::TopCar topCar;
-        glm::vec4 amber;
+        //glm::vec4 amber;
+        Primitive::BezierCurve curve;
     };
 }

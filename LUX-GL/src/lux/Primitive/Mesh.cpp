@@ -115,11 +115,11 @@ namespace lux {
         //auto n4 = glm::vec3(v4.x, v4.y, v4.z);
         glm::vec3 normal = glm::normalize(center);
         //glm::triangleNormal(v1, v2, center)
-        AddTriangle(v1, v2, center, normal, lux::Colors::AMBER);
-        AddTriangle(v2, v3, center, normal, lux::Colors::MEDIUM_SPRING_GREEN);
-        AddTriangle(v3, v4, center, normal, lux::Colors::ORANGE);
-        AddTriangle(v4, v5, center, normal, lux::Colors::STEEL_BLUE);
-        AddTriangle(v5, v1, center, normal, lux::Colors::DEEP_PINK);
+        AddTriangle(v1, v2, center, normal, lux::Colors::Amber);
+        AddTriangle(v2, v3, center, normal, lux::Colors::MediumSpringGreen);
+        AddTriangle(v3, v4, center, normal, lux::Colors::Orange);
+        AddTriangle(v4, v5, center, normal, lux::Colors::SteelBlue);
+        AddTriangle(v5, v1, center, normal, lux::Colors::DeepPink);
     }
 
     void Mesh::AddEllipse(const glm::vec2& center, const glm::vec2& radius, 
@@ -366,7 +366,7 @@ namespace lux {
         layout->Push<float>(4); // color rgba
         layout->Push<float>(2); // texture coordinates xy
         va->AddBuffer(*vb, *layout);
-        ib->Init(&indicies[0], indicies.size());
+        ib->Init(indicies.data(), indicies.size());
     }
 
 
