@@ -31,18 +31,18 @@ namespace lux {
 
     void Lines::Build()
     {
-        va = CreateRef<VertexArray>();
-        vb = CreateRef<VertexBuffer>(&points[0], 3 * points.size() * sizeof(float));
-        layout = CreateRef<VertexBufferLayout>();
+        va = VertexArray::Create();
+        vb = VertexBuffer::Create(&points[0], 3 * points.size() * sizeof(float));
+        layout = VertexBufferLayout::Create();
         layout->Push<float>(3);
-        va->AddBuffer(*vb, *layout);
+        va->AddBuffer(vb, layout);
         ib = CreateRef<IndexBuffer>(&indices[0], indices.size());
     }
 
 
-    void Lines::Draw(const Renderer& renderer, const Shader& shader) const
+    void Lines::Draw(const Ref<Shader>& shader) const
     {
-        renderer.Draw(GL_LINES, *va, *ib, shader);
+        Renderer::Draw(GL_LINES, va, ib, shader);
     }
 
     void Lines::CreateGrid(float width, float depth, float xSteps, float zSteps, float y)

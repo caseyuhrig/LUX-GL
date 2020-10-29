@@ -365,7 +365,7 @@ namespace lux {
         layout->Push<float>(3); // normal xyz,      location = 1
         layout->Push<float>(4); // color rgba
         layout->Push<float>(2); // texture coordinates xy
-        va->AddBuffer(*vb, *layout);
+        va->AddBuffer(vb, layout);
         ib->Init(indicies.data(), indicies.size());
     }
 

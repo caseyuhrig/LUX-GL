@@ -104,12 +104,12 @@ namespace lux {
         shader->SetUniform1i("skybox", 0);
     }
 
-    void Skybox::SetCamera(const Camera& camera)
+    void Skybox::SetCamera(const Ref<Camera>& camera)
     {
         m_Camera = camera;
         glm::vec3 front = { 0.0f, 0.0f, -1.0f };
         glm::vec3 up = { 0.0f, 1.0f, 0.0f };
-        glm::mat4 cameraViewMatrix = glm::lookAt(m_Camera.GetPosition(), m_Camera.GetPosition() + front, up);
+        glm::mat4 cameraViewMatrix = glm::lookAt(m_Camera->GetPosition(), m_Camera->GetPosition() + front, up);
         m_View = glm::mat4(glm::mat3(cameraViewMatrix)); // remove translation from the view matrix
     }
 
@@ -119,7 +119,7 @@ namespace lux {
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
         shader->Bind();
         shader->SetUniformMat4f("view", m_View);
-        shader->SetUniformMat4f("projection", m_Camera.GetProjection());
+        shader->SetUniformMat4f("projection", m_Camera->GetProjection());
         // skybox cube
         glBindVertexArray(skyboxVAO);
         glActiveTexture(GL_TEXTURE0);

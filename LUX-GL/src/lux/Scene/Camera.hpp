@@ -4,140 +4,124 @@
 
 #include "lux/Types.hpp"
 #include "lux/Renderer/UniformBuffer.hpp"
-//#include "lux/Window.hpp"
+#include "lux/Log.hpp"
 
 
 namespace lux {
 
-	struct CameraProperties
+	struct CameraSpecification
 	{
-		glm::vec3 position;        // 12        0
+		glm::vec3 Position;        // 12        0
 		float pad1 = 0;            //  4
-		glm::vec3 look_at;         // 12       16
+		glm::vec3 LookAt;          // 12       16
         float pad2 = 0;            //  4
-        glm::mat4 projection;      // 64       32
-        glm::mat4 view;            // 64       96
-        glm::mat4 view_projection; // 64      160
-        float z_near;              //  4      224
-        float z_far;               //  4      228
-        uint32_t viewport_width;   //  4      232
-        uint32_t viewport_height;  //  4      236
-        float aspect_ratio;        //  4      240
-        //float z_near = 0.01f;
-        //float z_far = 2000.0;
-
-        //glm::vec3 Position;
-        //glm::vec3 LookAt;
-	};                             //  size = 244 (256)
+        glm::mat4 Projection;      // 64       32
+        glm::mat4 View;            // 64       96
+        glm::mat4 ViewProjection;  // 64      160
+        float zNear;               //  4      224
+        float zFar;                //  4      228
+        uint32_t ViewportWidth;    //  4      232
+        uint32_t ViewportHeight;   //  4      236
+        float AspectRatio;         //  4      240
+        float Angle;               //  4      244
+        float pad3 = 0;            //  4      248
+        float pad4 = 0;            //  4      252
+        glm::vec3 Up;              // 12      256
+        float pad5 = 0;            //  4      268
+	};                             //  size = 272 (16x7)
 
     class Camera
     {
     public:
+        static auto Create(
+            const uint32_t width, 
+            const uint32_t height, 
+            const glm::vec3& position, 
+            const glm::vec3& lookAt,
+            const uint32_t bindingPoint = 5)
+        { 
+            return CreateRef<Camera>(width, height, position, lookAt); 
+        }
+
         Camera() = default;
 
-        Camera(int width, int height, const glm::vec3& position, const glm::vec3& lookAt)
+        Camera(
+            const uint32_t width, 
+            const uint32_t height, 
+            const glm::vec3& position, 
+            const glm::vec3& lookAt, 
+            const uint32_t bindingPoint = 5)
         {
-            _props.viewport_width = width;
-            _props.viewport_height = height;
-            _props.aspect_ratio = static_cast<float>(_props.viewport_width) / static_cast<float>(_props.viewport_height);
-            _props.position = position;
-            _props.look_at = lookAt;
-            _props.z_far = 2000.0f; // 120.0f 2000.0f;
-            _props.z_near = 0.01f;
-            m_Angle = 55.0f;
-            UpdateView();
-            // 5 = binding point
-            _ubo = lux::CreateRef<UniformBuffer>("CameraProperties", 5, 256, &_props);
-            // TODO integrate the camera index
-            _ubo->AddUniform("cameras[0].location", 0, 12);
-            _ubo->AddUniform("cameras[0].look_at", 16, 12);
-            _ubo->AddUniform("cameras[0].projection", 32, 64);
-            _ubo->AddUniform("cameras[0].view", 96, 64);
-            _ubo->AddUniform("cameras[0].view_projection", 160, 64);
-            _ubo->AddUniform("cameras[0].z_near", 224, 4);
-            _ubo->AddUniform("cameras[0].z_far", 228, 4);
-            _ubo->AddUniform("cameras[0].viewport_width", 232, 4);
-            _ubo->AddUniform("cameras[0].viewport_height", 236, 4);
-            _ubo->AddUniform("cameras[0].aspect_ratio", 240, 4);
-            _ubo->SetData(&_props);
-            //void (*resizeFunc)(int width, int height) {
-            //    this->SetViewportSize(width, height);
-            //    };
-            //auto func = std::bind()
-            //auto func = [&](int width, int height) {
-            //    this->SetViewportSize(width, height);
-            //};
+            m_Spec.ViewportWidth = width;
+            m_Spec.ViewportHeight = height;
+            m_Spec.AspectRatio = static_cast<float>(width) / static_cast<float>(height);
+            m_Spec.Position = position;
+            m_Spec.LookAt = lookAt;
+            m_Spec.zFar = 2000.0f; // [2000.0f]
+            m_Spec.zNear = 0.01f;  // [0.01f]
+            m_Spec.Angle = 55.0f;  // [55.0f]
+            m_Spec.Up = glm::vec3(0, 1, 0); // [(0, 1, 0)]
+            CalcViewProjection();
 
-            //window.AddResizeListener(func);
-            
+            auto size = sizeof(CameraSpecification);
+            UX_LOG_DEBUG("Camera Spec Size %d", size);
+
+            m_UniformBuffer = UniformBuffer::Scope("CameraProperties", bindingPoint, size, &m_Spec);
+            // TODO integrate the camera index
+            m_UniformBuffer->AddUniform("cameras[0].location", 0, 12);
+            m_UniformBuffer->AddUniform("cameras[0].look_at", 16, 12);
+            m_UniformBuffer->AddUniform("cameras[0].projection", 32, 64);
+            m_UniformBuffer->AddUniform("cameras[0].view", 96, 64);
+            m_UniformBuffer->AddUniform("cameras[0].view_projection", 160, 64);
+            m_UniformBuffer->AddUniform("cameras[0].z_near", 224, 4);
+            m_UniformBuffer->AddUniform("cameras[0].z_far", 228, 4);
+            m_UniformBuffer->AddUniform("cameras[0].viewport_width", 232, 4);
+            m_UniformBuffer->AddUniform("cameras[0].viewport_height", 236, 4);
+            m_UniformBuffer->AddUniform("cameras[0].aspect_ratio", 240, 4);
+            m_UniformBuffer->AddUniform("cameras[0].angle", 244, 4);
+            m_UniformBuffer->AddUniform("cameras[0].up", 256, 12);
+            m_UniformBuffer->SetData(&m_Spec);
         }
         ~Camera() = default;
-
       
-       
-        const glm::mat4& GetView() const { return _props.view; }
-        //glm::mat4& GetView() { return _props.view; }
-        const glm::mat4& GetProjection() const { return _props.projection; }
-        const glm::mat4& GetViewProjection() const { return m_ViewProjection; } //return _props.projection * _props.view;
-        const glm::vec3& GetPosition() const { return _props.position; }
-        const glm::vec3& GetLookAt() const { return _props.look_at; }
-        const float& GetZNear() const { return _props.z_near; }
-        float& GetZNear() { return _props.z_near; }
-        const float& GetZFar() const { return _props.z_far; }
-        float& GetZFar() { return _props.z_far; }
-        const uint32_t& GetViewportWidth() const { return _props.viewport_width; }
-        //uint32_t& GetViewportWidth() { return _props.viewport_width; }
-        const uint32_t& GetViewportHeight() const { return _props.viewport_width; }
-        float& GetAngle() { return m_Angle; }
-        const float& GetAngle() const { return m_Angle; }
-        const float& GetAspectRatio() const { return _props.aspect_ratio; }
+        const glm::mat4& GetView() const { return m_Spec.View; }
+        glm::mat4& GetView() { return m_Spec.View; }
+        const glm::mat4& GetProjection() const { return m_Spec.Projection; }
+        const glm::mat4& GetViewProjection() const { return m_Spec.ViewProjection; }
+        const glm::vec3& GetPosition() const { return m_Spec.Position; }
+        const glm::vec3& GetLookAt() const { return m_Spec.LookAt; }
+        const float& GetZNear() const { return m_Spec.zNear; }
+        float& GetZNear() { return m_Spec.zNear; }
+        const float& GetZFar() const { return m_Spec.zFar; }
+        float& GetZFar() { return m_Spec.zFar; }
+        const uint32_t& GetViewportWidth() const { return m_Spec.ViewportWidth; }
+        const uint32_t& GetViewportHeight() const { return m_Spec.ViewportWidth; }
+        float& GetAngle() { return m_Spec.Angle; }
+        const float& GetAngle() const { return m_Spec.Angle; }
+        const float& GetAspectRatio() const { return m_Spec.AspectRatio; }
         
-        void SetViewportSize(const uint32_t& width, const uint32_t& height)
+        void SetViewportSize(const uint32_t width, const uint32_t height)
         {
-            _props.viewport_width = width;
-            _props.viewport_height = height;
-            _props.aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
-            UpdateView();
-            PublishViewportSize();
-            PublishAspectRatio();
+            m_Spec.ViewportWidth = width;
+            m_Spec.ViewportHeight = height;
+            m_Spec.AspectRatio = static_cast<float>(width) / static_cast<float>(height);
+            Publish();
         }
-        // TODO Clean this stuff up!
-        void PublishViewportSize() const 
+        void Publish() 
         {
-            _ubo->SetUniform1i("cameras[0].viewport_width", _props.viewport_width); 
-            _ubo->SetUniform1i("cameras[0].viewport_height", _props.viewport_height);
+            //UX_LOG_DEBUG("Camera Publish");
+            CalcViewProjection();
+            m_UniformBuffer->SetData(&m_Spec);
         }
-
-        void PublishAspectRatio() {
-            UpdateView();
-            _ubo->SetUniform1f("cameras[0].aspect_ratio", _props.aspect_ratio); 
-        }
-        void Publish() {
-            UpdateView();
-            _ubo->SetData(&_props);
-        }
-        /*
-        glm::mat4 GetUpsideDownView()
+    protected:
+        void CalcViewProjection()
         {
-            return glm::lookAt(_props.position,     // Camera position in world space
-                _props.look_at,      // look at origin
-                glm::vec3(0, -1, 0)); // Head is up (set to 0, -1, 0 to look upside down)
-        }
-        */
-
-        void UpdateView()
-        {
-            //_props.projection = glm::infinitePerspective(glm::radians(55.0f), _props.aspect_ratio, _props.z_near);
-            _props.projection = glm::perspective(glm::radians(m_Angle), _props.aspect_ratio, _props.z_near, _props.z_far);
-            _props.view = glm::lookAt(_props.position,     // Camera position in world space
-                _props.look_at,      // look at origin
-                glm::vec3(0, 1, 0)); // Head is up (set to 0, -1, 0 to look upside down)
-            m_ViewProjection = _props.projection * _props.view;
+            m_Spec.Projection = glm::perspective(glm::radians(m_Spec.Angle), m_Spec.AspectRatio, m_Spec.zNear, m_Spec.zFar);
+            m_Spec.View = glm::lookAt(m_Spec.Position, m_Spec.LookAt, glm::vec3(0, 1, 0));
+            m_Spec.ViewProjection = m_Spec.Projection * m_Spec.View;
         }
     private:
-        CameraProperties _props;
-        Ref<UniformBuffer> _ubo;
-        glm::mat4 m_ViewProjection;
-        float m_Angle = 55.0f;
+        CameraSpecification m_Spec;
+        Scope<UniformBuffer> m_UniformBuffer;
     };
 }

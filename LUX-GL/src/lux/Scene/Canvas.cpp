@@ -2,13 +2,14 @@
 
 #include <glad/glad.h>
 
+#include "lux/Renderer/Renderer.hpp"
 #include "lux/Renderer/Shader.hpp"
 #include "lux/Log.hpp"
 
 
 namespace lux {
 
-    Canvas::Canvas(uint32_t width, uint32_t height, uint32_t samples)
+    Canvas::Canvas(const uint32_t width, const uint32_t height, const uint32_t samples)
         : m_Width(width), m_Height(height), m_Samples(samples), m_Multisample(samples > 1)
     {
         if (m_Multisample)
@@ -23,7 +24,6 @@ namespace lux {
         }
 
         m_ShaderBlur = Shader::Create("res/shaders/shader-blur.glsl");
-
         m_ShaderBlur->SetUniform1i("image", 0);
         m_ShaderBloomFinal->Bind();
         m_ShaderBloomFinal->SetUniform1i("scene", 0);
@@ -224,38 +224,10 @@ namespace lux {
         }
     }
 
-    /*
-    void Canvas::Resize(const uint32_t& width, const uint32_t& height)
-    {
-        
-        glDeleteBuffers(1, &m_VBO);
-        glDeleteVertexArrays(1, &m_VAO);
-
-        glDeleteFramebuffers(1, &m_BloomFBO);
-        glDeleteTextures(1, &m_Bloom_ColorAttachment);
-
-        glDeleteTextures(1, &m_ColorAttachment);
-        glDeleteTextures(1, &m_BrightnessAttachment);
-        glDeleteTextures(1, &m_DepthAttachment);
-
-        glDeleteFramebuffers(2, pingpongFBO);
-        glDeleteTextures(2, pingpongColorbuffers);
-
-        //glDeleteFramebuffers
-        //    glGenVertexArrays(1, &m_VAO);
-        //glGenBuffers(1, &m_VBO);
-        Init(width, height, m_Samples);
-    }
-    */
-
     void Canvas::Bind() const
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_FBO);
-        //renderer->Clear();
         glEnable(GL_DEPTH_TEST);
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-        //glDrawBuffers(2, attachments);
     }
 
     void Canvas::Unbind() const
@@ -265,127 +237,57 @@ namespace lux {
  
     void Canvas::Draw() const
     {
-        m_ShaderBlur->Bind();
-        m_ShaderBlur->SetUniform1i("image", 0);
-        m_ShaderBloomFinal->Bind();
-        m_ShaderBloomFinal->SetUniform1i("scene", 0);
-        m_ShaderBloomFinal->SetUniform1i("bloomBlur", 1);
-
-        //glEnable(GL_MULTISAMPLE);
-
-        //m_Shader->Bind();     
-        //glBindVertexArray(m_VAO);
-        //glActiveTexture(GL_TEXTURE0); // + slot
-        //if (m_Samples > 1) glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
-        //else glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        
-       //glActiveTexture(GL_TEXTURE0);
-
-        /*
-        glActiveTexture(GL_TEXTURE0);
-        if (m_Samples > 1) glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_BrightnessAttachment);
-        else glBindTexture(GL_TEXTURE_2D, m_BrightnessAttachment);	// use the color attachment texture as the texture of the quad plane
-        */
-
         // just copy into a non-multisampled texture
-        glBindFramebuffer(GL_FRAMEBUFFER, m_BloomFBO);
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_BrightnessAttachment);
+        
         m_Shader->Bind();
         m_Shader->SetUniform1i("u_ScreenTexture", 3); // slot
-        m_Shader->SetUniform1i("u_Samples", 8); //m_Samples);
+        m_Shader->SetUniform1i("u_Samples", m_Samples);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_BloomFBO);
+        glBindTextureUnit(3, m_BrightnessAttachment);
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        
 
-
-
-        //glActiveTexture(GL_TEXTURE0);
         // 2. blur bright fragments with two-pass Gaussian Blur 
-        // --------------------------------------------------
-        
+        // --------------------------------------------------      
         bool horizontal = true, first_iteration = true;
-        unsigned int amount = 10;
         
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, m_Bloom_ColorAttachment);
-
         m_ShaderBlur->Bind();
         m_ShaderBlur->SetUniform1i("image", 3);
-        //m_ShaderBlur->SetUniform1i("u_Samples", m_Samples);
-        for (unsigned int i = 0; i < amount; i++)
+        m_ShaderBlur->SetUniform1i("u_Samples", m_Samples);
+        for (auto i = 0; i < m_BlurAmount; i++)
         {
             glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
             m_ShaderBlur->SetUniform1i("horizontal", horizontal);
-           // if (m_Multisample)
-             //   glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, first_iteration ? m_BrightnessAttachment : pingpongColorbuffers[!horizontal]);  // bind texture of other framebuffer (or scene if first iteration)
-           // else
-                glBindTexture(GL_TEXTURE_2D, first_iteration ? m_Bloom_ColorAttachment : pingpongColorbuffers[!horizontal]);  // bind texture of other framebuffer (or scene if first iteration)
+            // bind texture of other framebuffer (or scene if first iteration)
+            glBindTextureUnit(3, first_iteration ? m_Bloom_ColorAttachment : pingpongColorbuffers[!horizontal]);
             //renderQuad();
+            // TODO Renderer::ScreenQuad();  DrawIndexed?
             glBindVertexArray(m_VAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             horizontal = !horizontal;
             if (first_iteration)
                 first_iteration = false;
-        }
-        
+        }       
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        //return;
-
-
-        // MSAA BEGIN
-        //glBindFramebuffer(GL_FRAMEBUFFER, m_MSAA_FBO);
-        //glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_MSAA_ColorAttachment);
-        //glEnable(GL_DEPTH_TEST);
-
-
-        // 3. now render floating point color buffer to 2D quad and tonemap HDR colors to default framebuffer's (clamped) color range
-        // --------------------------------------------------------------------------------------------------------------------------
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // 3. now render floating point color buffer to 2D quad and tonemap HDR colors to 
+        // default framebuffer's (clamped) color range
+        // ------------------------------------------------
+        //Renderer::Clear();
         m_ShaderBloomFinal->Bind();
-        if (m_Multisample) 
-        {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
-            glActiveTexture(GL_TEXTURE1);
-            //glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, pingpongColorbuffers[!horizontal]);
-            glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
-        }
-        else {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, pingpongColorbuffers[!horizontal]);
-        }
+        m_ShaderBloomFinal->SetUniform1i("scene", 0);
+        m_ShaderBloomFinal->SetUniform1i("bloomBlur", 1);
         m_ShaderBloomFinal->SetUniform1i("u_Samples", m_Samples);
         m_ShaderBloomFinal->SetUniform1i("bloom", m_Bloom);
         m_ShaderBloomFinal->SetUniform1f("exposure", m_Exposure);
-
-        //glActiveTexture(GL_TEXTURE2);
-        //glEnable(GL_MULTISAMPLE);
+        glBindTextureUnit(0, m_ColorAttachment);
+        glBindTextureUnit(1, pingpongColorbuffers[!horizontal]);
         //glEnable(GL_BLEND);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        //glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         glBindVertexArray(m_VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDisable(GL_BLEND);
-
-        // NOW RENDER TO THE DEFAULT FB
-        /*
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_MSAA_ColorAttachment);
-
-        m_Shader->Bind();
-        m_Shader->SetUniform1i("u_ScreenTexture", 2); // +slot?
-        m_Shader->SetUniform1i("u_Samples", 8); //m_Samples);
-
-        glBindVertexArray(m_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        */
+        //glDisable(GL_BLEND);
     }
 }

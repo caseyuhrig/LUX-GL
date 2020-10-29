@@ -186,8 +186,10 @@
     <ClInclude Include="src\lux\Primitive\Tetrahedron.hpp" />
     <ClInclude Include="src\lux\Renderer\Cubemap.hpp" />
     <ClInclude Include="src\lux\Renderer\GBuffer.hpp" />
+    <ClInclude Include="src\lux\Renderer\ShaderLibrary.hpp" />
     <ClInclude Include="src\lux\Renderer\Timer.hpp" />
     <ClInclude Include="src\lux\Scene\Canvas.hpp" />
+    <ClInclude Include="src\lux\Scene\Components.hpp" />
     <ClInclude Include="src\lux\Scene\LcarsLayer.hpp" />
     <ClInclude Include="src\lux\Scene\Scene.hpp" />
     <ClInclude Include="src\lux\Scene\Shadows.hpp" />
@@ -214,7 +216,6 @@
     <ClInclude Include="src\lux\Scene\Camera.hpp" />
     <ClInclude Include="src\lux\Scene\ImGuiLayer.hpp" />
     <ClInclude Include="src\lux\Scene\Layer.hpp" />
-    <ClInclude Include="src\lux\Scene\LayerStack.cpp" />
     <ClInclude Include="src\lux\Scene\Material.hpp" />
     <ClInclude Include="src\lux\Scene\Light.hpp" />
     <ClInclude Include="src\lux\Primitive\Segment.hpp" />
@@ -557,13 +558,9 @@
     <ClCompile Include="src\lux\Primitive\Dodecahedron.hpp" />
     <ClCompile Include="src\lux\Primitive\Mesh.cpp" />
     <ClCompile Include="src\lux\Primitive\Tetrahedron.cpp" />
-    <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp" />
     <ClCompile Include="src\lux\Scene\Canvas.cpp" />
     <ClCompile Include="src\lux\Scene\Skybox.cpp" />
     <ClCompile Include="src\lux\Primitive\Ring.cpp" />
-    <ClCompile Include="src\lux\Scene\Camera.cpp" />
-    <ClCompile Include="src\lux\Scene\ImGuiLayer.cpp" />
-    <ClCompile Include="src\lux\Scene\Layer.cpp" />
     <ClCompile Include="src\lux\Scene\LayerStack.hpp" />
     <ClCompile Include="src\lux\Scene\Material.cpp" />
     <ClCompile Include="src\main.cpp" />

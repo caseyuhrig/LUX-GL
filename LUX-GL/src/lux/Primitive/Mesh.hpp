@@ -49,10 +49,18 @@ namespace lux {
                 UX_LOG_INFO("Build() has already been called...  SKIPPING");
         }
         inline size_t GetVertexCount() { return vertices.size(); }
-        void Draw(const Renderer& renderer, const Shader& shader) const
+        void Draw(const Ref<Shader>& shader) const
         {
-            //if (!built) Build();
-            renderer.Draw(GL_TRIANGLES, *va, *ib, shader);
+            Renderer::Draw(GL_TRIANGLES, va, ib, shader);
+
+            /*
+               auto shaderVisualizeNormals = lux::Shader("res/shaders/visualize_normals.glsl");
+
+               shaderVisualizeNormals.SetUniformMat4f("projection", camera.GetProjection());
+               shaderVisualizeNormals.SetUniformMat4f("view", camera.GetView());
+               shaderVisualizeNormals.SetUniformMat4f("model", model * transformation);
+               mesh.Draw(renderer, shaderVisualizeNormals);
+               */
         }
         void Load(const std::string& mesh_name, const std::string& file_path);
         // TODO Possibly remove transformation and color.  Entity vars!

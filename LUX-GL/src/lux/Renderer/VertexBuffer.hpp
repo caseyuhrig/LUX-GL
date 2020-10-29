@@ -10,6 +10,11 @@ namespace lux {
     private:
         unsigned int vbo_ID;
     public:
+        static Ref<VertexBuffer> Create(const void* data, const size_t size) 
+        {
+            return CreateRef<VertexBuffer>(data, size);
+        }
+
         VertexBuffer() : vbo_ID(0) {}
         VertexBuffer(const size_t size) : VertexBuffer(nullptr, size, GL_DYNAMIC_DRAW) {}
         VertexBuffer(const void* data, const size_t size) : VertexBuffer(data, size, GL_STATIC_DRAW) {}

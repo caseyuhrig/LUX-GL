@@ -14,14 +14,14 @@ namespace lux {
             : Mesh(glm::vec3(min, 0.0f), glm::vec3(max, 0.0f)), 
             _SideWidth(sideWidth), _HorzHeight(horzHeight), _Radius(radius), _ScoopRadius(scoopRadius), _Color(color) 
         {
-            //Build(); // be-careful
+            Build(); // be-careful
         }
 
         TopCar(const glm::vec2& min, const glm::vec2& max, const glm::vec4& color) 
             : Mesh(glm::vec3(min, 0.0f), glm::vec3(max, 0.0f)),
             _SideWidth(80.0f), _HorzHeight(20.0f), _Radius(24.0f), _ScoopRadius(16.0f), _Color(color) 
         {
-            //Build(); // be-careful
+            Build(); // be-careful
         }
 
     void CreateGeometry() override

@@ -17,7 +17,7 @@ namespace lux {
     class GBuffer
     {
     public:
-        GBuffer(const uint32_t width, const uint32_t height) 
+        GBuffer(const uint32_t width, const uint32_t height)
             : m_Width(width), m_Height(height)
         {
             shaderGeometryPass = Shader::Create("res/shaders/ssao/ssao_geometry.glsl");
@@ -25,7 +25,68 @@ namespace lux {
             shaderSSAO = Shader::Create("res/shaders/ssao/ssao.glsl");
             shaderSSAOBlur = Shader::Create("res/shaders/ssao/ssao_blur.glsl");
 
+            // generate sample kernel
+            // ----------------------
+            std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); // generates random floats between 0.0 and 1.0
+            std::default_random_engine generator;
+
+            for (unsigned int i = 0; i < 64; ++i)
+            {
+                auto sample = glm::vec3(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
+                sample = glm::normalize(sample);
+                sample *= randomFloats(generator);
+                float scale = float(i) / 64.0f;
+
+                // scale samples s.t. they're more aligned to center of kernel
+                scale = lerp(0.1f, 1.0f, scale * scale);
+                sample *= scale;
+                ssaoKernel.push_back(sample);
+            }
+
+            // generate noise texture
+            // ----------------------
+            for (unsigned int i = 0; i < 16; i++)
+            {
+                auto noise = glm::vec3(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, 0.0f); // rotate around z-axis (in tangent space)
+                ssaoNoise.push_back(noise);
+            }
+
             initQuad();
+            Resize(width, height);
+            initialized = true;
+        }
+
+        ~GBuffer()
+        {
+            glDeleteFramebuffers(1, &gBuffer);
+            glDeleteTextures(1, &gPosition);
+            glDeleteTextures(1, &gNormal);
+            glDeleteTextures(1, &gAlbedo);
+
+            glDeleteFramebuffers(1, &ssaoFBO);
+            glDeleteFramebuffers(1, &ssaoBlurFBO);
+            glDeleteTextures(1, &ssaoColorBuffer);
+            glDeleteTextures(1, &ssaoColorBufferBlur);
+            glDeleteTextures(1, &noiseTexture);
+        }
+
+        void Resize(const uint32_t width, const uint32_t height)
+        {
+            if (initialized)
+            {
+                glDeleteFramebuffers(1, &gBuffer);
+                glDeleteTextures(1, &gPosition);
+                glDeleteTextures(1, &gNormal);
+                glDeleteTextures(1, &gAlbedo);
+
+                glDeleteFramebuffers(1, &ssaoFBO);
+                glDeleteFramebuffers(1, &ssaoBlurFBO);
+                glDeleteTextures(1, &ssaoColorBuffer);
+                glDeleteTextures(1, &ssaoColorBufferBlur);
+                glDeleteTextures(1, &noiseTexture);
+            }
+            m_Width = width;
+            m_Height = height;
 
             glGenFramebuffers(1, &gBuffer);
             glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
@@ -69,7 +130,8 @@ namespace lux {
             // also create framebuffer to hold SSAO processing stage 
             // -----------------------------------------------------
             
-            glGenFramebuffers(1, &ssaoFBO);  glGenFramebuffers(1, &ssaoBlurFBO);
+            glGenFramebuffers(1, &ssaoFBO);
+            glGenFramebuffers(1, &ssaoBlurFBO);
             glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
             
             // SSAO color buffer
@@ -81,6 +143,7 @@ namespace lux {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
                 UX_LOG_FATAL("SSAO Framebuffer not complete!");
+
             // and blur stage
             glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
             glGenTextures(1, &ssaoColorBufferBlur);
@@ -92,33 +155,7 @@ namespace lux {
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
                 UX_LOG_FATAL("SSAO Blur Framebuffer not complete!");
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-            // generate sample kernel
-            // ----------------------
-            std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); // generates random floats between 0.0 and 1.0
-            std::default_random_engine generator;
-            
-            for (unsigned int i = 0; i < 64; ++i)
-            {
-                glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
-                sample = glm::normalize(sample);
-                sample *= randomFloats(generator);
-                float scale = float(i) / 64.0;
-
-                // scale samples s.t. they're more aligned to center of kernel
-                scale = lerp(0.1f, 1.0f, scale * scale);
-                sample *= scale;
-                ssaoKernel.push_back(sample);
-            }
-
-            // generate noise texture
-            // ----------------------
-            for (unsigned int i = 0; i < 16; i++)
-            {
-                glm::vec3 noise(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, 0.0f); // rotate around z-axis (in tangent space)
-                ssaoNoise.push_back(noise);
-            }
-            
+           
             glGenTextures(1, &noiseTexture);
             glBindTexture(GL_TEXTURE_2D, noiseTexture);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
@@ -129,7 +166,8 @@ namespace lux {
 
         }
         //void Bind() const { glBindFramebuffer(GL_FRAMEBUFFER, gBuffer); }
-        //void UnBind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+        void UnBind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+
         void Before(const glm::mat4& projection, const glm::mat4& view, const glm::mat4& model)
         {
             // 1. geometry pass: render scene's geometry/color data into gbuffer
@@ -164,7 +202,7 @@ namespace lux {
 
         void After(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& lightPos, const glm::vec4& lightColor)
         {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            //glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
             // 2. generate SSAO texture
             // ------------------------
@@ -200,7 +238,7 @@ namespace lux {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             shaderLightingPass->Bind();
             // send light relevant uniforms
-            glm::vec3 lightPosView = glm::vec3(view * glm::vec4(lightPos, 1.0));
+            auto lightPosView = glm::vec3(view * glm::vec4(lightPos, 1.0));
             shaderLightingPass->SetUniformVec3f("light.Position", lightPosView);
             shaderLightingPass->SetUniformVec3f("light.Color", lightColor);
             // Update attenuation parameters
@@ -232,6 +270,8 @@ namespace lux {
 
         std::vector<glm::vec3> ssaoKernel;
         std::vector<glm::vec3> ssaoNoise;
+
+        bool initialized = false;
 
         float lerp(float a, float b, float f)
         {

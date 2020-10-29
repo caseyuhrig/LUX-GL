@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "lux/Types.hpp"
+#include "lux/Renderer/Shader.hpp"
 #include "lux/Renderer/UniformBuffer.hpp"
 
 
@@ -32,23 +33,28 @@ namespace lux {
 
 		// VERY helpful! ...otherwise glm::matrix swizzling between vec3/vec4 and floats make it 
 		// imposible to set via Material = {}
-		MaterialProperties(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float shininess)
+		MaterialProperties(const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular, float shininess)
 			: ambient_color(ambient), diffuse_color(diffuse), specular_color(specular), specular_shininess(shininess) {}
 
-		MaterialProperties(glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular, float shininess)
+		MaterialProperties(const glm::vec4& ambient, const glm::vec4& diffuse, const glm::vec4& specular, float shininess)
 			: ambient_color(ambient), diffuse_color(diffuse), specular_color(specular), specular_shininess(shininess) {}
 	};
+
+	//float shininess = 80.0f; // Default value
+    //float	metalness = 0.0f;
+    //float roughness = 1.0f - glm::sqrt(shininess / 100.0f);
+	//bool hasAlbedoMap
 
 	class Material
 	{
 	public:
-		Material()
+		Material(const Ref<Shader>& shader)
 		{
 			_props.ambient_color = { 0.348f, 0.348f, 0.348f };
 			_props.diffuse_color = { 0.608f, 0.608f, 0.608f };
 			_props.specular_color = { 0.5f, 0.5f, 0.5f };
 			_props.specular_shininess = 32.0f;
-			_ubo = CreateRef<UniformBuffer>("MaterialProperties", 4, 64, &_props);
+			_ubo = UniformBuffer::Create("MaterialProperties", 4, 64, &_props);
 			_ubo->AddUniform("material.ambient_color", 0, 12);
 			_ubo->AddUniform("material.diffuse_color", 16, 12);
 			_ubo->AddUniform("material.specular_color", 32, 12);
@@ -56,11 +62,11 @@ namespace lux {
 		}
 		~Material() = default;
 
-		const glm::vec3& GetAmbientColor() const { return _props.ambient_color; }
-		const glm::vec3& GetDiffuseColor() const { return _props.diffuse_color; }
-		const glm::vec3& GetSpecularColor() const { return _props.specular_color; }
-		const float& GetSpecularShininess() const { return _props.specular_shininess; }
+		glm::vec3& GetAmbientColor() { return _props.ambient_color; }
+		glm::vec3& GetDiffuseColor() { return _props.diffuse_color; }
+		glm::vec3& GetSpecularColor() { return _props.specular_color; }
 		float& GetSpecularShininess() { return _props.specular_shininess; }
+		//float& GetSpecularShininess() { return _props.specular_shininess; }
 
 		void SetAmbientColor(const glm::vec4& ambientColor) { _props.ambient_color = ambientColor;	PublishAmbientColor();}
 		void SetDiffuseColor(const glm::vec4& diffuseColor) { _props.diffuse_color = diffuseColor;	PublishDiffuseColor(); }
@@ -74,5 +80,6 @@ namespace lux {
 	private:
 		MaterialProperties _props;
 		Ref<UniformBuffer> _ubo;
+		bool depthTest;
 	};
 }

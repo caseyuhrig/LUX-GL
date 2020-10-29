@@ -5,6 +5,26 @@
 #include "lux/Window.hpp"
 
 
+/*
+#ifdef __SSE__
+UX_LOG_INFO("SSE (true)");
+#else
+UX_LOG_INFO("SSE (false)");
+#endif
+#ifdef __SSE2__
+UX_LOG_INFO("SSE2 (true)");
+#endif
+#ifdef __SSE3__
+UX_LOG_INFO("SSE3 (true)");
+#endif
+#ifdef __AVX__
+UX_LOG_INFO("AVX (true)");
+#endif
+#ifdef __AVX2__
+UX_LOG_INFO("AVX2 (true)");
+#endif
+*/
+
 namespace lux {
 
     enum class MonitorPosition {

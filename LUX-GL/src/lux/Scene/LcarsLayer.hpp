@@ -15,18 +15,16 @@ namespace lux {
     class LcarsLayer : public Layer
     {
     public:
-        LcarsLayer(const uint32_t width, const uint32_t height, const Renderer& renderer, glm::vec3& rotate) 
-            : Layer(width, height), m_Renderer(renderer), m_Rotate(rotate)
+        LcarsLayer(const uint32_t width, const uint32_t height, glm::vec3& rotate) 
+            : Layer("LCARS"), m_Width(width), m_Height(height), m_Rotate(rotate)
         {
-            SetDebugLabel("LCARS Layer");
-
-            m_Shader = CreateRef<Shader>("res/shaders/ux.shader");
-            m_ShaderBasic = CreateRef<Shader>("res/shaders/basic.shader");
+            m_Shader = Renderer::ShaderLibrary().Get("UX");
+            m_ShaderBasic = Renderer::ShaderLibrary().Get("Basic");
 
             auto amber = glm::vec4(Colors::Amber.rgb, 0.8f);
 
             topCar = TopCar(glm::vec2(10.0f, 100.0f), glm::vec2(900.0f, 890.0f), amber);
-            topCar.Build();
+            //topCar.Build();
 
             // ORTHO
             //glm::mat4 projOrtho = glm::ortho(0.f, static_cast<float>(m_Width), 0.0f, static_cast<float>(m_Height), 0.01f, 2000.0f); // PROJECTION (SCREEN)
@@ -85,7 +83,7 @@ namespace lux {
             m_Rotate = rotate;
         }
         
-        void Draw() const
+        void OnUpdate() override
         {
             //glDisable(GL_BLEND);
             glEnable(GL_BLEND);
@@ -94,10 +92,10 @@ namespace lux {
             //roundedCorner.Draw(renderer, shaderUX);
             //roundedCorner2.Draw(renderer, shaderUX);
             //horzBar.Draw(renderer, shaderUX);
-            topCar.Draw(m_Renderer, *m_Shader);
+            topCar.Draw(m_Shader);
             glDisable(GL_BLEND);
 
-            curve.Draw(m_Renderer, *m_ShaderBasic);
+            curve.Draw(m_ShaderBasic);
 
             //if (imguiLayer.showText)
             //{
@@ -113,30 +111,18 @@ namespace lux {
                 textList.SetText(7, lux::StringUtils::ToUppercase(lux::Time::Readable()));
 
                 textList.Draw();
-
-                
-            //}
-        }
-
-        void Begin()
-        {
-
-        }
-
-        void End()
-        {
-
         }
     private:
-        //Window* m_Window;
-        Renderer m_Renderer;
+        uint32_t m_Width;
+        uint32_t m_Height;
         Ref<Shader> m_Shader;
         Ref<Shader> m_ShaderBasic;
+
         TextList textList;
         Lights m_Lights;
         glm::vec3& m_Rotate;
         lux::TopCar topCar;
-        //glm::vec4 amber;
+
         Primitive::BezierCurve curve;
     };
 }

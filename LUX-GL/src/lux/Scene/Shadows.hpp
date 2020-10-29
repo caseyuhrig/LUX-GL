@@ -1,6 +1,9 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <entt/entt.hpp>
+
+#include "lux/Scene/Components.hpp"
 
 
 namespace lux {
@@ -8,8 +11,8 @@ namespace lux {
     class Shadows
     {
     public:
-        Shadows(Camera& camera) 
-            : m_Camera(camera), m_DepthCubemap(0), m_DepthMapFBO(0)
+        Shadows(const Ref<Scene>& scene)
+            : m_Scene(scene)
         {
             glGenFramebuffers(1, &m_DepthMapFBO);
             glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_DepthCubemap);
@@ -28,17 +31,35 @@ namespace lux {
             glReadBuffer(GL_NONE);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-            m_DepthShader = CreateRef<Shader>("res/shaders/point_shadows_depth.glsl");
-            
+            m_DepthShader = CreateRef<Shader>("res/shaders/point_shadows_depth.glsl");          
         }
 
-        ~Shadows() = default;
-
-        void Bind(glm::vec3 lightPos)
+        ~Shadows()
         {
+            glDeleteFramebuffers(1, &m_DepthMapFBO);
+            glDeleteTextures(1, &m_DepthCubemap);
+        }
+
+        void Bind() const { glBindFramebuffer(GL_FRAMEBUFFER, m_DepthMapFBO); }
+        void UnBind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+
+        //void SetUseShadows(bool& useShadows) { m_UseShadows = useShadows; }
+
+        void BindTextureCubemap(const uint32_t slot)
+        {
+            //glActiveTexture(GL_TEXTURE0 + slot);
+            //glBindTexture(GL_TEXTURE_CUBE_MAP, m_DepthCubemap);
+            glBindTextureUnit(slot, m_DepthCubemap);
+        }
+
+        void RenderTextureCubemap(const glm::mat4& model, const glm::vec3& lightPos)
+        {
+            //const auto& camera = m_Scene->GetCamera();
             // 0. create depth cubemap transformation matrices
             // -----------------------------------------------
-            glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), SHADOW_ASPECT, m_Camera.GetZNear(), m_Camera.GetZFar());
+            auto& zNear = s_Data.SceneData.zNear;
+            auto& zFar = s_Data.SceneData.zFar;
+            const auto shadowProj = glm::perspective(glm::radians(90.0f), SHADOW_ASPECT, zNear, zFar);
             std::vector<glm::mat4> shadowTransforms;
             shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
             shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
@@ -46,31 +67,27 @@ namespace lux {
             shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
             shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
             shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-
             // 1. render scene to depth cubemap
             // --------------------------------
-            glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-            glBindFramebuffer(GL_FRAMEBUFFER, m_DepthMapFBO);
-            glClear(GL_DEPTH_BUFFER_BIT);
+            // TODO Should viewport go below bind?          
+            Bind();                        
+            //glClear(GL_DEPTH_BUFFER_BIT);
+            Renderer::ClearDepthBuffer();
+            Renderer::SetViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
             m_DepthShader->Bind();
             for (uint32_t i = 0; i < 6; ++i)
                 m_DepthShader->SetUniformMat4f("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
-            m_DepthShader->SetUniform1f("far_plane", m_Camera.GetZFar());
+            m_DepthShader->SetUniform1f("far_plane", zFar);
             m_DepthShader->SetUniformVec3f("lightPos", lightPos);
-        }
 
-        inline void UnBind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
-        inline uint32_t GetDepthCubemap() const { return m_DepthCubemap; }
-        inline Ref<Shader> GetDepthShader() const { return m_DepthShader; }
-
-        void SetModelTransformation(const glm::mat4& transformation) const
-        {
-            m_DepthShader->SetUniformMat4f("model", transformation);
-        }
-
-        void SetUseShadows(bool& useShadows)
-        {
-            m_UseShadows = useShadows;
+            const auto& entityView = m_Scene->GetRegistry().view<Mesh, glm::mat4>();
+            for (auto entity : entityView)
+            {
+                const auto& [mesh, transformation] = entityView.get<Mesh, glm::mat4>(entity);
+                m_DepthShader->SetUniformMat4f("model", model * transformation);
+                mesh.Draw(m_DepthShader);
+            }
+            UnBind();
         }
     private:
         const uint32_t SHADOW_WIDTH = 2048;
@@ -78,8 +95,10 @@ namespace lux {
         const float SHADOW_ASPECT = static_cast<float>(SHADOW_WIDTH) / static_cast<float>(SHADOW_HEIGHT);
         uint32_t m_DepthCubemap;
         uint32_t m_DepthMapFBO;
+
         Ref<Shader> m_DepthShader;
-        bool m_UseShadows = true;
-        Camera& m_Camera;
+        Ref<Scene> m_Scene;
+
+        //bool m_UseShadows = true;
     };
 }

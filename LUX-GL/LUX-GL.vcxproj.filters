@@ -1059,9 +1059,6 @@
     <ClInclude Include="src\lux\Scene\ImGuiLayer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\lux\Scene\LayerStack.cpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\lux\Scene\Light.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1143,17 +1140,14 @@
     <ClInclude Include="src\lux\Renderer\GBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\lux\Scene\Components.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lux\Renderer\ShaderLibrary.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\lux\Renderer\ShaderStorageBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lux\Scene\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lux\Scene\Layer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lux\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1209,9 +1203,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lux\Renderer\Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lux\Scene\ImGuiLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lux\Scene\LayerStack.hpp">

@@ -25,6 +25,7 @@ namespace lux {
         Ref<VertexBuffer> vb;
         Ref<VertexBufferLayout> layout;
         Ref<IndexBuffer> ib;
+
         std::vector<Line> lines;
         std::vector<glm::vec3> points;
         std::vector<uint32_t> indices;
@@ -33,9 +34,15 @@ namespace lux {
         Lines();
         void Add(const glm::vec3& p1, const glm::vec3& p2);
         void CreateGrid(float width, float depth, float xSteps, float zSteps, float y);
+        static Lines Grid(float width, float depth, float xSteps, float zSteps, float y)
+        {
+            Lines lines;
+            lines.CreateGrid(width, depth, xSteps, zSteps, y);
+            return lines;
+        }
         void createCircle(float radius, float steps);
         void createRing(float inner_radius, float outer_radius, float thickness, float steps);
-        void Draw(const Renderer& renderer, const Shader& shader) const;
+        void Draw(const Ref<Shader>& shader) const;
     //protected:
         void Build();
         void Dump();

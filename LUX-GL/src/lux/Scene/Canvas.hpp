@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Renderer/Shader.hpp"
-#include "../Types.hpp"
+#include "lux/Renderer/Shader.hpp"
+#include "lux/Types.hpp"
 
 
 namespace lux {
@@ -10,10 +10,8 @@ namespace lux {
     {
     public:
         Canvas();
-        Canvas(uint32_t width, uint32_t height, uint32_t samples = 8);
+        Canvas(const uint32_t width, const uint32_t height, const uint32_t samples = 8);
         ~Canvas();
-
-        //void Init(uint32_t width, uint32_t height, uint32_t samples = 8);
         void Resize(const uint32_t& width, const uint32_t& height);
         void Bind() const;
         void Unbind() const;
@@ -37,6 +35,7 @@ namespace lux {
         uint32_t pingpongFBO[2];
         uint32_t pingpongColorbuffers[2];
         bool m_Bloom = true;
+        uint32_t m_BlurAmount = 10;
         float m_Exposure = 1.0f;
 
         uint32_t m_BloomFBO;

@@ -4,11 +4,14 @@
 
 #include <memory>
 #include <iostream>
-#include <map>
+#include <unordered_map>
 
 #include "glm/glm.hpp"
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "lux/Log.hpp"
+#include "lux/Types.hpp"
 
 
 
@@ -37,21 +40,24 @@ namespace lux {
 
     class UniformBuffer
     {
-    private:
-        unsigned int  _ubo_ID;
-        unsigned int  _binding_point;
-        std::string   _name;
-        unsigned int  _data_size;
-        std::map <std::string, byte_offset> _layout;
     public:
-
-        inline UniformBuffer(std::string name, unsigned int binding_point, unsigned int data_size, const void* data)
-            : _name(name), _binding_point(binding_point), _data_size(data_size)
+        static Ref<UniformBuffer> Create(const std::string& name, uint32_t bindingPoint, uint32_t data_size, const void* data)
         {
-            std::cout << "[UniformBuffer]----------------------------" << std::endl;
-            std::cout << "          Init: " << name << std::endl;
-            std::cout << " Binding Point: " << _binding_point << std::endl;
-            std::cout << "     Data Size: " << _data_size << std::endl;
+            return CreateRef<UniformBuffer>(name, bindingPoint, data_size, data);
+        }
+
+        static Scope<UniformBuffer> Scope(const std::string& name, uint32_t binding_point, uint32_t data_size, const void* data)
+        {
+            return CreateScope<UniformBuffer>(name, binding_point, data_size, data);
+        }
+
+        UniformBuffer(const std::string& name, const uint32_t bindingPoint, const uint32_t dataSize, const void* data)
+            : m_Name(name), m_BindingPoint(bindingPoint), m_DataSize(dataSize)
+        {
+            UX_LOG_INFO("[UniformBuffer]----------------------------");
+            UX_LOG_INFO("          Init: %s", m_Name);
+            UX_LOG_INFO(" Binding Point: %d", m_BindingPoint);
+            UX_LOG_INFO("     Data Size: %d", m_DataSize);
 
             // Block index will bind when you have to manually link the structs in the GlSL program.
             // @ binding = #, in the uniform struct, the *new* way in std140!
@@ -59,111 +65,101 @@ namespace lux {
             //std::cout << "   Block index: " << uniformBlockIndex << std::endl;
             //glUniformBlockBinding(programID, uniformBlockIndex, _binding_point);
 
-            glGenBuffers(1, &_ubo_ID);
-            glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
-            glBufferData(GL_UNIFORM_BUFFER, _data_size, NULL, GL_STATIC_DRAW); // GL_DYNAMIC_DRAW
-            glBindBufferBase(GL_UNIFORM_BUFFER, _binding_point, _ubo_ID);
+            glGenBuffers(1, &m_RendererID);
+            glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+            glBufferData(GL_UNIFORM_BUFFER, m_DataSize, NULL, GL_STATIC_DRAW); // GL_DYNAMIC_DRAW
+            glBindBufferBase(GL_UNIFORM_BUFFER, m_BindingPoint, m_RendererID);
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-            glBindBufferRange(GL_UNIFORM_BUFFER, _binding_point, _ubo_ID, 0, _data_size);
+            //glCreateBuffers(1, &m_RendererID);
+            //glNamedBufferStorage(m_RendererID, m_DataSize, nullptr, GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
+            glBindBufferRange(GL_UNIFORM_BUFFER, m_BindingPoint, m_RendererID, 0, m_DataSize);
 
-            glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
-            glBufferSubData(GL_UNIFORM_BUFFER, 0, _data_size, data);
-            glBindBuffer(GL_UNIFORM_BUFFER, 0);
-        }
-
-        inline ~UniformBuffer()
-        {
-            glDeleteBuffers(1, &_ubo_ID);
-        }
-
-        inline void SetUniformMat4(const std::string& name, const glm::mat4& m)
-        {
-            auto field = _layout[name];
-            /*
-            if (_layout.count(name) == 0)
-            {
-                std::cout << "[ERROR] " << name << " not found in Uniform Buffer " << _name << std::endl;
-            }
-            std::cout << "SetUniform(" << _name << "." << name << ", " << field.offset << ", " << field.size <<
-                ") = " << glm::to_string(m) << ", size = " << sizeof(m) << std::endl;
-                */
-            glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
-            glBufferSubData(GL_UNIFORM_BUFFER, field.offset, field.size, &m);
+            glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+            glBufferSubData(GL_UNIFORM_BUFFER, 0, m_DataSize, data);
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
         }
 
-        inline void SetUniformVec4(const std::string& name, const glm::vec4& v)
+        ~UniformBuffer() { glDeleteBuffers(1, &m_RendererID); }
+
+        void SetUniformMat4(const std::string& name, const glm::mat4& m)
         {
-            auto field = _layout[name];
-            glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
+            auto& uniform = m_Uniforms[name];
+            glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+            glBufferSubData(GL_UNIFORM_BUFFER, uniform.offset, uniform.size, &m);
+            glBindBuffer(GL_UNIFORM_BUFFER, 0);
+        }
+
+        void SetUniformVec4(const std::string& name, const glm::vec4& v)
+        {
+            auto& field = m_Uniforms[name];
+            glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
             glBufferSubData(GL_UNIFORM_BUFFER, field.offset, field.size, &v);
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
         }
 
-        inline void SetUniformVec3(const std::string& name, const glm::vec3& v)
+        void SetUniformVec3(const std::string& name, const glm::vec3& v)
         {
-            auto field = _layout[name];
-            glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
+            auto& field = m_Uniforms[name];
+            glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
             glBufferSubData(GL_UNIFORM_BUFFER, field.offset, field.size, &v);
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
         }
 
-        inline void SetUniform1f(const std::string& name, float f)
+        void SetUniform1f(const std::string& name, float f)
         {
-            auto field = _layout[name];
-            glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
+            auto& field = m_Uniforms[name];
+            glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
             glBufferSubData(GL_UNIFORM_BUFFER, field.offset, field.size, &f);
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
         }
 
-        inline void SetUniform1i(const std::string& name, uint32_t value)
+        void SetUniform1i(const std::string& name, uint32_t value)
         {
-            auto field = _layout[name];
-            glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
+            auto& field = m_Uniforms[name];
+            glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
             glBufferSubData(GL_UNIFORM_BUFFER, field.offset, field.size, &value);
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
         }
 
-        inline void AddUniform(std::string name, unsigned int offset, unsigned int size)
+        void AddUniform(std::string name, unsigned int offset, unsigned int size)
         {
-            if (_layout.count(name) > 0)
-                std::cout << "[ERROR] " << name << " not found in Uniform Buffer " << _name <<
+            if (m_Uniforms.count(name) > 0)
+                std::cout << "[ERROR] " << name << " not found in Uniform Buffer " << m_Name <<
                 ", NOT ADDING UNIFORM TO BUFFER!" << std::endl;
             else
-                _layout.insert(std::make_pair(name, byte_offset{ offset, size }));
+                m_Uniforms.insert(std::make_pair(name, byte_offset{ offset, size }));
         }
 
         // Adds the uniform and sets its starting value.
-        inline void AddUniform(std::string name, unsigned int offset, unsigned int size, void* data)
+        void AddUniform(std::string name, unsigned int offset, unsigned int size, void* data)
         {
-            if (_layout.count(name) > 0) {
-                std::cout << "[ERROR] " << name << " not found in Uniform Buffer " << _name <<
+            if (m_Uniforms.count(name) > 0) {
+                std::cout << "[ERROR] " << name << " not found in Uniform Buffer " << m_Name <<
                     ", NOT ADDING UNIFORM TO BUFFER!" << std::endl;
             }
             else {
-                _layout.insert(std::make_pair(name, byte_offset{ offset, size }));
-                glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
+                m_Uniforms.insert(std::make_pair(name, byte_offset{ offset, size }));
+                glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
                 glBufferSubData(GL_UNIFORM_BUFFER, offset, size, &data);
                 glBindBuffer(GL_UNIFORM_BUFFER, 0);
             }
         }
 
-        inline void SetData(const void* data)
+        void SetData(const void* data)
         {
-            glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
-            glBufferSubData(GL_UNIFORM_BUFFER, 0, _data_size, data);
+            glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID);
+            glBufferSubData(GL_UNIFORM_BUFFER, 0, m_DataSize, data);
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
         }
 
-        inline void Bind() const
-        {
-            glBindBuffer(GL_UNIFORM_BUFFER, _ubo_ID);
-        }
-
-        inline void Unbind() const
-        {
-            glBindBuffer(GL_UNIFORM_BUFFER, 0);
-        }
+        void Bind() const { glBindBuffer(GL_UNIFORM_BUFFER, m_RendererID); }
+        void Unbind() const { glBindBuffer(GL_UNIFORM_BUFFER, 0); }
+    private:
+        uint32_t  m_RendererID;
+        uint32_t  m_BindingPoint;
+        std::string  m_Name;
+        uint32_t  m_DataSize;
+        std::unordered_map <std::string, byte_offset> m_Uniforms;
     };
 }

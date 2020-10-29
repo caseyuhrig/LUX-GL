@@ -10,45 +10,29 @@ namespace lux {
     {
     public:
         LayerStack() {}
+        ~LayerStack() = default;
 
-        ~LayerStack()
-        {
-            //for (Layer* layer : _layers)
-            //{
-                //delete layer;
-            //}
-        }
-
-        void Add(Layer* layer)
-        {
-          
-                _layers.push_back(layer);
-            
-        }
-        void Draw() const
-        {
-            for (Layer* layer : _layers)
-            {
-                layer->Draw();
-            }
+        void Attach(Layer* layer) 
+        { 
+            m_Layers.push_back(layer); 
+            layer->OnAttach();
         }
 
-        void Begin()
+        void OnUpdate() const
         {
-            for (Layer* layer : _layers)
-            {
-                layer->Begin();
-            }
+            for (Layer* layer : m_Layers)
+                layer->OnUpdate();
         }
 
-        void End()
+        void RenderImGui()
         {
-            for (Layer* layer : _layers)
-            {
-                layer->End();
-            }
+            for (Layer* layer : m_Layers)
+                layer->OnImGuiRender();
         }
+
+        std::vector<Layer*>::iterator begin() { return m_Layers.begin(); }
+        std::vector<Layer*>::iterator end() { return m_Layers.end(); }
     private:
-        std::vector<Layer*> _layers;
+        std::vector<Layer*> m_Layers;
     };
 }
