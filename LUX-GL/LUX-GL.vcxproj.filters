@@ -1202,9 +1202,6 @@
     <ClCompile Include="src\lux\MatrixUtils.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\lux\Renderer\Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lux\Scene\LayerStack.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1215,12 +1212,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lux\Primitive\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lux\Primitive\Ring.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lux\Interface\Lines.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\lux\Scene\Canvas.cpp">

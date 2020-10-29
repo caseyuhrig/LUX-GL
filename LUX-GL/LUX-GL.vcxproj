@@ -552,7 +552,6 @@
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\lux\Interface\Lines.cpp" />
     <ClCompile Include="src\lux\Log.cpp" />
     <ClCompile Include="src\lux\MatrixUtils.hpp" />
     <ClCompile Include="src\lux\Primitive\Dodecahedron.hpp" />
@@ -560,12 +559,10 @@
     <ClCompile Include="src\lux\Primitive\Tetrahedron.cpp" />
     <ClCompile Include="src\lux\Scene\Canvas.cpp" />
     <ClCompile Include="src\lux\Scene\Skybox.cpp" />
-    <ClCompile Include="src\lux\Primitive\Ring.cpp" />
     <ClCompile Include="src\lux\Scene\LayerStack.hpp" />
     <ClCompile Include="src\lux\Scene\Material.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\pch.cpp" />
-    <ClCompile Include="src\lux\Renderer\Texture.cpp" />
     <ClCompile Include="src\vendor\common\base64.cpp" />
     <ClCompile Include="src\vendor\glad\glad.c" />
     <ClCompile Include="src\vendor\glfont\FontAtlas.cpp" />
