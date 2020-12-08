@@ -72,5 +72,7 @@ namespace lux {
 		Ref<UniformBuffer> m_UBO;
 		SceneProperties* m_Props;
 		uint32_t m_ActiveScene;
+
+		friend class Entity;
     };
 }

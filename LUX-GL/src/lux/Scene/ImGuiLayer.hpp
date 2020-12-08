@@ -33,7 +33,7 @@ namespace lux {
             ImGui::CreateContext();
             //ImGuiIO& io = ImGui::GetIO(); (void)io;
             // Setup Platform/Renderer bindings
-            ImGui_ImplGlfw_InitForOpenGL(m_Window->GetNativeWindow(), true);
+            ImGui_ImplGlfw_InitForOpenGL(m_Window->GetGlfwWindow(), true);
             ImGui_ImplOpenGL3_Init(glsl_version.c_str());
             // Setup Dear ImGui style
             ImGui::StyleColorsDark();

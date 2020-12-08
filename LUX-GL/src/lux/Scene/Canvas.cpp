@@ -255,7 +255,7 @@ namespace lux {
         
         m_ShaderBlur->Bind();
         m_ShaderBlur->SetUniform1i("image", 3);
-        m_ShaderBlur->SetUniform1i("u_Samples", m_Samples);
+        //m_ShaderBlur->SetUniform1i("u_Samples", m_Samples);
         for (auto i = 0; i < m_BlurAmount; i++)
         {
             glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);

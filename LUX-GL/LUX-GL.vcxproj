@@ -176,6 +176,7 @@
     <ClInclude Include="src\lux\Array.hpp" />
     <ClInclude Include="src\lux\Color.hpp" />
     <ClInclude Include="src\lux\Context.hpp" />
+    <ClInclude Include="src\lux\Core\UUID.hpp" />
     <ClInclude Include="src\lux\Interface.hpp" />
     <ClInclude Include="src\lux\Interface\Quad.hpp" />
     <ClInclude Include="src\lux\Interface\TopCar.hpp" />
@@ -190,7 +191,9 @@
     <ClInclude Include="src\lux\Renderer\Timer.hpp" />
     <ClInclude Include="src\lux\Scene\Canvas.hpp" />
     <ClInclude Include="src\lux\Scene\Components.hpp" />
+    <ClInclude Include="src\lux\Scene\Entity.hpp" />
     <ClInclude Include="src\lux\Scene\LcarsLayer.hpp" />
+    <ClInclude Include="src\lux\Scene\Model.hpp" />
     <ClInclude Include="src\lux\Scene\Scene.hpp" />
     <ClInclude Include="src\lux\Scene\Shadows.hpp" />
     <ClInclude Include="src\lux\Sound.hpp" />
@@ -558,9 +561,7 @@
     <ClCompile Include="src\lux\Primitive\Mesh.cpp" />
     <ClCompile Include="src\lux\Primitive\Tetrahedron.cpp" />
     <ClCompile Include="src\lux\Scene\Canvas.cpp" />
-    <ClCompile Include="src\lux\Scene\Skybox.cpp" />
     <ClCompile Include="src\lux\Scene\LayerStack.hpp" />
-    <ClCompile Include="src\lux\Scene\Material.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\pch.cpp" />
     <ClCompile Include="src\vendor\common\base64.cpp" />

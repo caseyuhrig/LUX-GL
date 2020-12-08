@@ -25,6 +25,11 @@
 
 namespace lux {
 
+    enum class ShaderType
+    {
+        NONE = -1, VERTEX = 0, FRAGMENT = 1, GEOMETRY = 2
+    };
+
     struct ShaderProgramSource
     {
         std::string VertexSource;
@@ -33,26 +38,85 @@ namespace lux {
     };
 
 
-    class Shader
+    class Shader : public Creatable<Shader>
     {
+    public:
+        Shader(const std::string& filepath)
+            : m_FilePath(filepath), programID(0)
+        {
+            const ShaderProgramSource source = ParseShader(filepath);
+            programID = CreateShader(source.VertexSource, source.FragmentSource, source.GeometrySource);
+        }
+
+        ~Shader()
+        {
+            glDeleteProgram(programID);
+        }
+
+        void Bind() const { glUseProgram(programID); }
+        void Unbind() const { glUseProgram(0); }
+        const uint32_t GetProgramID() const { return programID; }
+
+        auto Duplicate() { return Shader::Create(m_FilePath); }
+
+        /**
+        * glProgramUniform* vs. glUniform*
+        * the glProgram* version alloes you to set the uniform value without having to
+        * bind the program first.
+        */
+
+        void SetUniform1i(const std::string& name, int value)
+        {
+            glProgramUniform1i(programID, GetUniformLocation(name), value);
+        }
+
+
+        void SetUniform1f(const std::string& name, float value)
+        {
+            glProgramUniform1f(programID, GetUniformLocation(name), value);
+        }
+
+
+        void SetUniform3f(const std::string& name, float v0, float v1, float v2)
+        {
+            glProgramUniform3f(programID, GetUniformLocation(name), v0, v1, v2);
+        }
+
+
+        void SetUniformVec3f(const std::string& name, glm::vec3 v)
+        {
+            glProgramUniform3f(programID, GetUniformLocation(name), v[0], v[1], v[2]);
+        }
+
+
+        void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
+        {
+            glProgramUniform4f(programID, GetUniformLocation(name), v0, v1, v2, v3);
+        }
+
+
+        void SetUniformVec4f(const std::string& name, const glm::vec4& v)
+        {
+            glProgramUniform4f(programID, GetUniformLocation(name), v[0], v[1], v[2], v[3]);
+        }
+
+
+        void SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
+        {
+            glProgramUniformMatrix4fv(programID, GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+        }
     private:
         std::string m_FilePath;
         uint32_t programID;
         std::unordered_map<std::string, int> m_UniformLocationCache;
 
-
-        ShaderProgramSource _ParseShader(const std::string& filepath)
+        ShaderProgramSource ParseShader(const std::string& filepath)
         {
             std::ifstream stream(filepath);
 
-            enum class ShaderType
-            {
-                NONE = -1, VERTEX = 0, FRAGMENT = 1, GEOMETRY = 2
-            };
-
             std::string line;
             std::stringstream ss[3];
-            ShaderType type = ShaderType::NONE;
+            auto type = ShaderType::NONE;
 
             while (getline(stream, line))
             {
@@ -72,10 +136,10 @@ namespace lux {
             return { ss[0].str(), ss[1].str() , ss[2].str() };
         }
 
-        uint32_t _CompileShader(uint32_t type, const std::string& source)
+        uint32_t CompileShader(const uint32_t type, const std::string& source)
         {
-            uint32_t id = glCreateShader(type);
-            const char* src = source.c_str(); // same as &source[0]
+            const auto id = glCreateShader(type);
+            const auto* src = source.c_str(); // same as &source[0]
             // whats an lvalue?
             glShaderSource(id, 1, &src, nullptr); // nullptr for length, assums the lines in the src are null terminated.
             glCompileShader(id);
@@ -99,16 +163,15 @@ namespace lux {
             return id;
         }
 
-        uint32_t _CreateShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader)
+        uint32_t CreateShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader)
         {
-            uint32_t program = glCreateProgram();
-            uint32_t vs = _CompileShader(GL_VERTEX_SHADER, vertexShader);
-            uint32_t fs = _CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
-            uint32_t gs = 0;
+            auto program = glCreateProgram();
+            auto vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+            auto fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+            auto gs = 0;
             if (geometryShader.length() > 0)
             {
-                //std::cout << geometryShader << std::endl;
-                gs = _CompileShader(GL_GEOMETRY_SHADER, geometryShader);
+                gs = CompileShader(GL_GEOMETRY_SHADER, geometryShader);
                 glAttachShader(program, gs);
             }
             glAttachShader(program, vs);
@@ -117,96 +180,25 @@ namespace lux {
             glLinkProgram(program);
             glValidateProgram(program);
 
-            // delete now because they are attached, may not want to if you are debugging.  Lots of program don't call, minimal impact.
-            glDeleteShader(vs);
-            glDeleteShader(fs);
-            if (gs)
-            {
-                //glDeleteShader(gs);
-            }
+            // Delete now because they are attached, may not want to if you are debugging.
+            // Lots of program don't call, minimal impact.
+            if (vs) glDeleteShader(vs);
+            if (fs) glDeleteShader(fs);
+            if (gs) glDeleteShader(gs);
             return program;
         }
 
-        int _GetUniformLocation(const std::string& name)
+        int GetUniformLocation(const std::string& name)
         {
             if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
                 return m_UniformLocationCache[name];
 
-            int location = glGetUniformLocation(programID, name.c_str());
+            auto location = glGetUniformLocation(programID, name.c_str());
             if (location == -1)
                 UX_LOG_ERROR("Warning: uniform '%s' doesn't exist!", name.c_str());
 
             m_UniformLocationCache[name] = location;
             return location;
-        }
-    public:
-
-        static const Ref<Shader> Create(const std::string& filepath)
-        {
-            return CreateRef<Shader>(filepath);
-        }
-
-        Shader(const std::string& filepath)
-            : m_FilePath(filepath), programID(0)
-        {
-            const ShaderProgramSource source = _ParseShader(filepath);
-            programID = _CreateShader(source.VertexSource, source.FragmentSource, source.GeometrySource);
-        }
-
-        ~Shader()
-        {
-            glDeleteProgram(programID);
-        }
-
-        void Bind() const { glUseProgram(programID); }
-        void Unbind() const { glUseProgram(0); }
-        const uint32_t GetProgramID() const { return programID; }
-
-        /**
-        * glProgramUniform* vs. glUniform*
-        * the glProgram* version alloes you to set the uniform value without having to
-        * bind the program first.
-        */
-
-        void SetUniform1i(const std::string& name, int value)
-        {
-            glProgramUniform1i(programID, _GetUniformLocation(name), value);
-        }
-
-
-        void SetUniform1f(const std::string& name, float value)
-        {
-            glProgramUniform1f(programID, _GetUniformLocation(name), value);
-        }
-
-
-        void SetUniform3f(const std::string& name, float v0, float v1, float v2)
-        {
-            glProgramUniform3f(programID, _GetUniformLocation(name), v0, v1, v2);
-        }
-
-
-        void SetUniformVec3f(const std::string& name, glm::vec3 v)
-        {
-            glProgramUniform3f(programID, _GetUniformLocation(name), v[0], v[1], v[2]);
-        }
-
-
-        void SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
-        {
-            glProgramUniform4f(programID, _GetUniformLocation(name), v0, v1, v2, v3);
-        }
-
-
-        void SetUniformVec4f(const std::string& name, const glm::vec4& v)
-        {
-            glProgramUniform4f(programID, _GetUniformLocation(name), v[0], v[1], v[2], v[3]);
-        }
-
-
-        void SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
-        {
-            glProgramUniformMatrix4fv(programID, _GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
         }
     };
 }

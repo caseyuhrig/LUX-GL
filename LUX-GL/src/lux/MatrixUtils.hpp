@@ -6,26 +6,21 @@
 
 namespace lux {
 
-    class MatrixUtils
+    static class MatrixUtils
     {
     public:
-        MatrixUtils() {}
-        ~MatrixUtils() = default;
+        //MatrixUtils() = default;
+        //~MatrixUtils() = default;
 
         static glm::mat4 RotateAroundAxis(const glm::mat4& model, const glm::vec3& axis, const glm::vec3& angle)
         {
-            //glm::mat4 rotMat = glm::rotate(glm::mat4(1.0), angle.x, glm::vec3(1.0, 0.0, 0.0));
-            //rotMat = glm::rotate(rotMat, angle.y, glm::vec3(0.0, 1.0, 0.0));
-            //rotMat = glm::rotate(rotMat, angle.z, glm::vec3(0.0, 0.0, 1.0));
-            //rotMat = glm::translate(rotMat, axis);
-            //return rotMat * model;
             return glm::translate(
                 glm::rotate(
                     glm::rotate(
-                        glm::rotate(glm::mat4(1.0),
-                            angle.x, glm::vec3(1.0, 0.0, 0.0)),
-                        angle.y, glm::vec3(0.0, 1.0, 0.0)),
-                    angle.z, glm::vec3(0.0, 0.0, 1.0)),
+                        glm::rotate(glm::mat4(1.0f),
+                            angle.x, glm::vec3(1.0f, 0.0f, 0.0f)),
+                        angle.y, glm::vec3(0.0f, 1.0f, 0.0f)),
+                    angle.z, glm::vec3(0.0f, 0.0f, 1.0f)),
                 axis) * model;
         }
 

@@ -13,7 +13,7 @@ namespace lux {
 
    
 
-    class Segment : public Mesh
+    class Segment : public Mesh, public Creatable<Segment>
     {
     public:
         Segment(const float inner_radius, const float outer_radius,

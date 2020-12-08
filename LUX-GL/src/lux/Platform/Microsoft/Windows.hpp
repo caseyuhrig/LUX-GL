@@ -18,10 +18,7 @@ namespace lux {
             class Windows
             {
             public:
-                Windows()
-                {
-
-                }
+                Windows() {}
                 /*
                 static constexpr RectXY GetWorkArea(const HWND& hwnd)
                 {

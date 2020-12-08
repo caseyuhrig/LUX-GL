@@ -1,12 +1,13 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "../Types.hpp"
+#include "lux/Types.hpp"
 //#include "Color.hpp"
-#include "../Renderer/VertexBuffer.hpp"
-#include "../Renderer/IndexBuffer.hpp"
-#include "../Renderer/Renderer.hpp"
-#include "../Renderer/Shader.hpp"
+#include "lux/Renderer/VertexBuffer.hpp"
+#include "lux/Renderer/VertexArray.hpp"
+#include "lux/Renderer/IndexBuffer.hpp"
+//#include "../Renderer/Renderer.hpp"
+#include "lux/Renderer/Shader.hpp"
 
 
 // CCW is GL front facing.
@@ -48,26 +49,34 @@ namespace lux {
             else
                 UX_LOG_INFO("Build() has already been called...  SKIPPING");
         }
-        inline size_t GetVertexCount() { return vertices.size(); }
+        const size_t GetVertexCount() const { return vertices.size(); }
+        /*
         void Draw(const Ref<Shader>& shader) const
         {
             Renderer::Draw(GL_TRIANGLES, va, ib, shader);
 
-            /*
+            
                auto shaderVisualizeNormals = lux::Shader("res/shaders/visualize_normals.glsl");
 
                shaderVisualizeNormals.SetUniformMat4f("projection", camera.GetProjection());
                shaderVisualizeNormals.SetUniformMat4f("view", camera.GetView());
                shaderVisualizeNormals.SetUniformMat4f("model", model * transformation);
                mesh.Draw(renderer, shaderVisualizeNormals);
-               */
+               
         }
+        */
         void Load(const std::string& mesh_name, const std::string& file_path);
         // TODO Possibly remove transformation and color.  Entity vars!
-        inline glm::mat4 GetTransformation() const { return transformation; }
-        inline void SetTransformation(const glm::mat4& trans) { this->transformation = trans; }
-        inline glm::vec4 GetColor() const { return color; }
-        inline void SetColor(const glm::vec4& color) { this->color = color; }
+        glm::mat4 GetTransformation() const { return transformation; }
+        void SetTransformation(const glm::mat4& trans) { this->transformation = trans; }
+        glm::vec4 GetColor() const { return color; }
+        void SetColor(const glm::vec4& color) { this->color = color; }
+        const Ref<VertexArray> GetVertexArray() const { return va; }
+        const Ref<IndexBuffer> GetIndexBuffer() const { return ib; }
+
+        void AddVertex(const glm::vec3& position, const glm::vec4& color, const glm::vec2& texCoord, const glm::vec3& normal);
+        void AddIndex(uint32_t index);
+
     protected:
         glm::vec3 min, max; // mesh bounds
         glm::mat4 transformation;
@@ -80,7 +89,7 @@ namespace lux {
         const uint32_t GetIndiciesSize() const { return static_cast<uint32_t>(indicies.size()); }
 
         void AddIndex(uint32_t i1, uint32_t i2, uint32_t i3);
-        void AddVertex(const glm::vec3& position, const glm::vec4& color, const glm::vec2& texCoord, const glm::vec3& normal);
+        
         /**
          * Adds a triangle to the mesh and updates the verticies accordingly.  Vertices are expected
          * to be in a front facing CCW rotation.
@@ -121,7 +130,6 @@ namespace lux {
         Ref<VertexArray> va;
         Ref<VertexBuffer> vb;
         Ref<VertexBufferLayout> layout;
-        Ref<IndexBuffer> ib;
-        
+        Ref<IndexBuffer> ib;      
     };
 }

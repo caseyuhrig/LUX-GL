@@ -1,10 +1,9 @@
 #pragma once
 
-#include <GL/GL.h>
+#include <glad/glad.h>
 #include <vector>
 #include "lux/Types.hpp"
 
-//#define ASSERT(x) if (!(x)) __debugbreak();
 
 namespace lux {
 

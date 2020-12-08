@@ -5,6 +5,7 @@
 
 #include <imgui/imgui.h>
 
+#include "lux/Renderer/Renderer.hpp"
 #include "lux/Scene/Layer.hpp"
 #include "lux/Window.hpp"
 #include "lux/Primitive/BezierCurve.hpp"
@@ -23,7 +24,7 @@ namespace lux {
 
             auto amber = glm::vec4(Colors::Amber.rgb, 0.8f);
 
-            topCar = TopCar(glm::vec2(10.0f, 100.0f), glm::vec2(900.0f, 890.0f), amber);
+            topCar = TopCar(glm::vec2(10.0f, 10.0f), glm::vec2(1100.0f, 1100.0f), amber);
             //topCar.Build();
 
             // ORTHO
@@ -40,7 +41,7 @@ namespace lux {
             //m_ShaderBasic->SetUniformMat4f("u_MVP", mvpOrtho);
             m_ShaderBasic->SetUniform4f("u_Color", 1.0f, 1.0f, 1.0f, 1.0f);
 
-            textList = TextList(110, 600, width, height);
+            textList = TextList(110, 30, width, height);
             textList.AddFont(0, "res/fonts/Inconsolata/static/InconsolataCondensed-Medium.ttf");
             textList.AddFont(1, "res/fonts/Inconsolata/static/InconsolataCondensed-Light.ttf");
             textList.AddText(0, 0, 24, 24, "LUX/GL v0.12a");
@@ -92,10 +93,11 @@ namespace lux {
             //roundedCorner.Draw(renderer, shaderUX);
             //roundedCorner2.Draw(renderer, shaderUX);
             //horzBar.Draw(renderer, shaderUX);
-            topCar.Draw(m_Shader);
+            //topCar.Draw(m_Shader);
+            Renderer::Draw(topCar, m_Shader);
             glDisable(GL_BLEND);
 
-            curve.Draw(m_ShaderBasic);
+            //curve.Draw(m_ShaderBasic);
 
             //if (imguiLayer.showText)
             //{

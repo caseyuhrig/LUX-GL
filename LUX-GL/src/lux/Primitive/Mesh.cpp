@@ -30,6 +30,11 @@ namespace lux {
         va(CreateRef<VertexArray>()), vb(CreateRef<VertexBuffer>()),
         ib(CreateRef<IndexBuffer>()), layout(CreateRef<VertexBufferLayout>()) {}
 
+    void Mesh::AddIndex(uint32_t index)
+    {
+        indicies.push_back(index);
+    }
+
     void Mesh::AddIndex(uint32_t i1, uint32_t i2, uint32_t i3)
     {
         indicies.push_back(i1);
@@ -409,6 +414,7 @@ namespace lux {
                 }
 
             }
+            Build();
         }
     }
 

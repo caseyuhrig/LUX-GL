@@ -7,8 +7,7 @@ layout(location = 1) in vec3 a_normal;
 out vec3 FragPos;
 out vec3 Normal;
 
-layout(std430, binding = 10) buffer SceneSpecification
-{
+layout(std430, binding = 10) buffer CameraSpec {
     mat4 Projection;
     mat4 View;
     mat4 ViewProjection;
@@ -16,14 +15,7 @@ layout(std430, binding = 10) buffer SceneSpecification
     vec3 LookAt;
     float zFar;
     float zNear;
-    // shadow parameters
-    bool Shadows;
-    float ShadowBias;
-    int ShadowSamples;
-    // light parameters
-    vec3 LightPosition;
-    vec3 LightColor;
-} s_Spec;
+} camera;
 
 
 uniform mat4 u_Model;
@@ -31,9 +23,9 @@ uniform mat4 u_Model;
 
 void main()
 {
-    FragPos = vec3(s_Spec.View * u_Model * vec4(a_position, 1.0));
-    Normal = vec3(s_Spec.View * u_Model * vec4(a_normal, 0.0));
-    gl_Position = s_Spec.Projection * vec4(FragPos, 1.0);
+    FragPos = vec3(camera.View * u_Model * vec4(a_position, 1.0));
+    Normal = vec3(camera.View * u_Model * vec4(a_normal, 0.0));
+    gl_Position = camera.Projection * vec4(FragPos, 1.0);
 };
 
 

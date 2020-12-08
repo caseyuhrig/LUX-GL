@@ -71,6 +71,11 @@ namespace lux {
 
         void Draw(const Ref<Shader>& shader) const
         {
+            //glEnable(GL_LINE_SMOOTH);
+            //glEnable(GL_BLEND);
+            //glDepthMask(false);
+            //glLineWidth(0.5f);
+            //glLineWidth(2.0f);
             Renderer::Draw(GL_LINES, va, ib, shader);
         }
 
@@ -104,8 +109,8 @@ namespace lux {
 
         void createRing(float inner_radius, float outer_radius, float thickness, float steps)
         {
-            double step = PI2 / steps;
-            for (double ang = 0; ang < PI2; ang += step)
+            double step = PI2<double> / steps;
+            for (double ang = 0; ang < PI2<double>; ang += step)
             {
                 glm::vec3 p1 = glm::vec3(inner_radius * cos(ang), -thickness / 2, inner_radius * sin(ang));
                 glm::vec3 p2 = glm::vec3(inner_radius * cos(ang + step), -thickness / 2, inner_radius * sin(ang + step));

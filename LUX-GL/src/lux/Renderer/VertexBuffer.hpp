@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include "lux/Types.hpp"
 
 
 namespace lux {

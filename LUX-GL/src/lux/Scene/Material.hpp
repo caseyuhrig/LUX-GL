@@ -7,6 +7,10 @@
 #include "lux/Renderer/UniformBuffer.hpp"
 
 
+/**
+* A Material Instance
+* https://www.youtube.com/watch?v=edZo8PC5SYc&feature=youtu.be&t=310
+*/
 namespace lux {
 
 	/*

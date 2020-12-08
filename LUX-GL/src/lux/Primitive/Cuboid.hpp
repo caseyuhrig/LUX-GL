@@ -7,7 +7,7 @@
 
 namespace lux {
 
-    class Cuboid : public Mesh
+    class Cuboid : public Mesh, public Creatable<Cuboid>
     {
     public:
         Cuboid(const glm::vec3& min, const glm::vec3& max, const glm::mat4& transform) 

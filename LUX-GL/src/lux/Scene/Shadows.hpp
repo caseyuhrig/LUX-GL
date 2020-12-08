@@ -30,8 +30,8 @@ namespace lux {
             glDrawBuffer(GL_NONE);
             glReadBuffer(GL_NONE);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-            m_DepthShader = CreateRef<Shader>("res/shaders/point_shadows_depth.glsl");          
+            // TODO Get from the shader library.
+            m_DepthShader = Shader::Create("res/shaders/point_shadows_depth.glsl");
         }
 
         ~Shadows()
@@ -43,12 +43,8 @@ namespace lux {
         void Bind() const { glBindFramebuffer(GL_FRAMEBUFFER, m_DepthMapFBO); }
         void UnBind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-        //void SetUseShadows(bool& useShadows) { m_UseShadows = useShadows; }
-
-        void BindTextureCubemap(const uint32_t slot)
+        void BindTextureCubemap(const uint32_t slot) const
         {
-            //glActiveTexture(GL_TEXTURE0 + slot);
-            //glBindTexture(GL_TEXTURE_CUBE_MAP, m_DepthCubemap);
             glBindTextureUnit(slot, m_DepthCubemap);
         }
 
@@ -57,8 +53,8 @@ namespace lux {
             //const auto& camera = m_Scene->GetCamera();
             // 0. create depth cubemap transformation matrices
             // -----------------------------------------------
-            auto& zNear = s_Data.SceneData.zNear;
-            auto& zFar = s_Data.SceneData.zFar;
+            auto zNear = 0.01f; //s_Data.CameraData.zNear;
+            auto zFar = 2000.0f; //s_Data.CameraData.zFar;
             const auto shadowProj = glm::perspective(glm::radians(90.0f), SHADOW_ASPECT, zNear, zFar);
             std::vector<glm::mat4> shadowTransforms;
             shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
@@ -79,13 +75,37 @@ namespace lux {
                 m_DepthShader->SetUniformMat4f("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
             m_DepthShader->SetUniform1f("far_plane", zFar);
             m_DepthShader->SetUniformVec3f("lightPos", lightPos);
-
+            /*
             const auto& entityView = m_Scene->GetRegistry().view<Mesh, glm::mat4>();
             for (auto entity : entityView)
             {
                 const auto& [mesh, transformation] = entityView.get<Mesh, glm::mat4>(entity);
                 m_DepthShader->SetUniformMat4f("model", model * transformation);
                 mesh.Draw(m_DepthShader);
+            }
+            */
+            const auto& entityView = m_Scene->GetRegistry().view<lux::MeshComponent, lux::TransformComponent, lux::TagComponent>();
+            for (auto entity : entityView)
+            {
+                const auto& [mesh, transform, tag] = entityView.get<lux::MeshComponent, lux::TransformComponent, lux::TagComponent>(entity);
+                if (tag != "Ground Cube")
+                {
+                    m_DepthShader->SetUniformMat4f("model", model * transform.Transform);
+                    Renderer::Draw(mesh, m_DepthShader);
+                }
+                else {
+                    m_DepthShader->SetUniformMat4f("model", glm::identity<glm::mat4>() * transform.Transform);
+                    Renderer::Draw(mesh, m_DepthShader);
+                }
+            }
+            const auto& entityView2 = m_Scene->GetRegistry().view<lux::ModelComponent, lux::TransformComponent, lux::TagComponent>();
+            for (auto entityHandle : entityView2)
+            {
+                const auto& [mod, transform, tag] = entityView2.get<lux::ModelComponent, lux::TransformComponent, lux::TagComponent>(entityHandle);
+                //model->Draw(shader);
+                //lux::Renderer::Draw(model, shader);
+                m_DepthShader->SetUniformMat4f("u_Model", model * transform.Transform);
+                mod.Model->Draw(m_DepthShader);
             }
             UnBind();
         }

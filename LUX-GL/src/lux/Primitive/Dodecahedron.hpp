@@ -29,7 +29,7 @@
 
 namespace lux {
 
-    class Dodecahedron : public Mesh
+    class Dodecahedron : public Mesh, public Creatable<Dodecahedron>
     {
     public:
         enum Type { Regular, Small, Great, Excavated };

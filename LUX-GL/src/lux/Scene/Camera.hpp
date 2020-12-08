@@ -30,9 +30,10 @@ namespace lux {
         float pad5 = 0;            //  4      268
 	};                             //  size = 272 (16x7)
 
-    class Camera
+    class Camera : public Creatable<Camera>
     {
     public:
+        /*
         static auto Create(
             const uint32_t width, 
             const uint32_t height, 
@@ -42,7 +43,7 @@ namespace lux {
         { 
             return CreateRef<Camera>(width, height, position, lookAt); 
         }
-
+        */
         Camera() = default;
 
         Camera(
@@ -109,7 +110,6 @@ namespace lux {
         }
         void Publish() 
         {
-            //UX_LOG_DEBUG("Camera Publish");
             CalcViewProjection();
             m_UniformBuffer->SetData(&m_Spec);
         }

@@ -12,7 +12,7 @@ out VS_OUT {
     vec2 TexCoords;
 } vs_out;
 
-layout(std430, binding = 10) buffer SceneSpecification
+layout(std430, binding = 10) buffer CameraSpec
 {
     mat4 Projection;
     mat4 View;
@@ -21,27 +21,33 @@ layout(std430, binding = 10) buffer SceneSpecification
     vec3 LookAt;
     float zFar;
     float zNear;
-    // shadow parameters
-    bool Shadows;
-    float ShadowBias;
-    int ShadowSamples;
-    // light parameters
-    vec3 LightPosition;
-    vec3 LightColor;
-} s_Spec;
+    float AspectRatio;
+    float Angle;
+    vec3 Up;
+    int ViewportWidth;
+    int ViewportHeight;
+} camera;
+
+layout(std430, binding = 13) buffer TransformsSpec
+{
+    mat4 Transform[10];
+} transform;
 
 uniform mat4 u_Model;
 uniform bool u_ReverseNormals;
 
 void main()
 {
-    vs_out.FragPos = vec3(u_Model * vec4(aPos, 1.0));
+    mat4 model = u_Model;
+    //mat4 model = transform.Transform[0];
+
+    vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
     if(u_ReverseNormals) // a slight hack to make sure the outer large cube displays lighting from the 'inside' instead of the default 'outside'.
-        vs_out.Normal = transpose(inverse(mat3(u_Model))) * (-1.0 * aNormal);
+        vs_out.Normal = transpose(inverse(mat3(model))) * (-1.0 * aNormal);
     else
-        vs_out.Normal = transpose(inverse(mat3(u_Model))) * aNormal;
+        vs_out.Normal = transpose(inverse(mat3(model))) * aNormal;
     vs_out.TexCoords = aTexCoords;
-    gl_Position = s_Spec.ViewProjection * u_Model * vec4(aPos, 1.0);
+    gl_Position = camera.Projection * camera.View * model * vec4(aPos, 1.0);
 }
 
 #shader fragment
@@ -56,9 +62,7 @@ in VS_OUT {
     vec2 TexCoords;
 } fs_in;
 
-layout(std430, binding = 10) buffer SceneSpecification
-{
-    // camera parameters
+layout(std430, binding = 10) buffer CameraSpec {
     mat4 Projection;
     mat4 View;
     mat4 ViewProjection;
@@ -66,20 +70,69 @@ layout(std430, binding = 10) buffer SceneSpecification
     vec3 LookAt;
     float zFar;
     float zNear;
-    // shadow parameters
-    bool Shadows;
+    float AspectRatio;
+    float Angle;
+    vec3 Up;
+    int ViewportWidth;
+    int ViewportHeight;
+} camera;
+
+layout(std430, binding = 11) buffer ShadowSpec {
     float ShadowBias;
     int ShadowSamples;
-    // light
+    float ShadowAmount;
+    bool Shadows;
+} shadow;
+
+layout(std430, binding = 12) buffer LightSpec {
     vec3 LightPosition;
     vec3 LightColor;
-} s_Spec;
+} light;
+
+layout(std430, binding = 13) buffer MaterialSpec {
+    vec3 Color;
+    vec3 Ambient;
+    vec3 Diffuse;
+    vec3 Specular;
+    float Shininess;
+} material;
 
 
 //uniform sampler2D diffuseTexture;
 uniform samplerCube depthMap;
 //uniform samplerCubeShadow depthMap;
 uniform vec4 u_Color;
+
+
+uniform vec3 u_CameraPosition;
+uniform vec3 u_LightPosition;
+uniform vec3 u_LightColor;
+
+vec3 lightPos = light.LightPosition;
+//vec3 lightPos = u_LightPosition;
+vec3 lightColor = light.LightColor;
+//vec3 lightColor = u_LightColor;
+vec3 camPos = camera.Position;
+//vec3 camPos = u_CameraPosition;
+float camZFar = camera.zFar;
+//float camZFar = 2000.0f;
+
+
+vec3 color = u_Color.rgb; //material.Color; //u_Color.rgb;
+//vec3 materialAmbient = vec3(0.3); //vec3(1.0f, 0.5f, 0.31f);
+//vec3 materialDiffuse = vec3(1.0); //vec3(1.0f, 0.5f, 0.31f);
+//vec3 materialSpecular = vec3(1.0); //vec3(0.5f, 0.5f, 0.5f);
+//float materialShininess = 64.0; // [32.0f]
+vec3 materialAmbient = material.Ambient;
+vec3 materialDiffuse = material.Diffuse;
+vec3 materialSpecular = material.Specular;
+float materialShininess = material.Shininess;
+
+
+float shadowAlpha = shadow.ShadowAmount; // [0.5] 0.75 0..1
+int shadow_samples = shadow.ShadowSamples; // [10] 1..+
+float shadow_bias = shadow.ShadowBias; // [0.3] 0..1
+bool doShadows = shadow.Shadows; // [true]
 
 
 // array of offset direction for sampling
@@ -95,61 +148,74 @@ const vec3 gridSamplingDisk[20] = vec3[]
 float ShadowCalculation(vec3 fragPos)
 {
     // get vector between fragment position and light position
-    vec3 fragToLight = fragPos - s_Spec.LightPosition;
+    vec3 fragToLight = fragPos - lightPos;
     // now get current linear depth as the length between the fragment and light position
     float currentDepth = length(fragToLight); 
-    float shadow = 0.0;
-    float viewDistance = length(s_Spec.Position - fragPos);
-    float diskRadius = (1.0 + (viewDistance / s_Spec.zFar)) / 25.0;
-    for(int i = 0; i < s_Spec.ShadowSamples; ++i)
+    float amount = 0.0; // shadow amount
+    float viewDistance = length(camPos - fragPos);
+    float diskRadius = (1.0 + (viewDistance / camZFar)) / 25.0;
+    for(int i = 0; i < shadow_samples; ++i)
     {
         float closestDepth = texture(depthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
-        closestDepth *= s_Spec.zFar;   // undo mapping [0;1]
-        if(currentDepth - s_Spec.ShadowBias > closestDepth)
-            shadow += 1.0;
+        closestDepth *= camZFar;   // undo mapping [0;1]
+        if(currentDepth - shadow_bias > closestDepth)
+            amount += 1.0;
     }
-    shadow /= float(s_Spec.ShadowSamples);
+    amount /= float(shadow_samples);
 
     // display closestDepth as debug (to visualize depth cubemap)
     //FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
         
-    return shadow;
+    return amount;
 }
 
 vec4 CloDep(vec3 fragPos)
 {
-    vec3 fragToLight = fragPos - s_Spec.LightPosition;
+    vec3 fragToLight = fragPos - lightPos;
     float closestDepth = texture(depthMap, fragToLight).r;
-    return vec4(vec3(closestDepth / s_Spec.zFar), 1.0);
+    return vec4(vec3(closestDepth / camZFar), 1.0);
 }
 
 void main()
 {
-    vec3 color = u_Color.rgb;
+//materialAmbient = vec3(0.3);
+//materialDiffuse = vec3(1.0);
+//materialSpecular = vec3(1.0);
+
+
     vec3 normal = normalize(fs_in.Normal);
     // ambient
-    vec3 ambient = 0.3 * color;
+    //vec3 ambient = ambientAmount * color;
+    vec3 ambient = lightColor * materialAmbient;
     // diffuse
-    vec3 lightDir = normalize(s_Spec.LightPosition - fs_in.FragPos);
+    vec3 lightDir = normalize(lightPos - fs_in.FragPos);
     float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * s_Spec.LightColor;
+    vec3 diffuse = lightColor * (diff * materialDiffuse);
     // specular
-    vec3 viewDir = normalize(s_Spec.Position - fs_in.FragPos);
+    vec3 viewDir = normalize(camera.Position - fs_in.FragPos);
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = 0.0;
+    //float spec = 0.0;
     vec3 halfwayDir = normalize(lightDir + viewDir);  
-    spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
-    vec3 specular = spec * s_Spec.LightColor;    
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), materialShininess);
+    vec3 specular = lightColor * (spec * materialSpecular);    
     // calculate shadow
-    bool doShadows = s_Spec.Shadows;
-    float shadow = doShadows ? ShadowCalculation(fs_in.FragPos) : 0.0;
-    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;
+    //bool doShadows = true; //shadow.Shadows;
+    float shadowAmount = doShadows ? ShadowCalculation(fs_in.FragPos) : 0.0;
+    vec3 lighting = (ambient + (1.0 - shadowAmount * shadowAlpha) * (diffuse + specular)) * color;
 
-    FragColor = vec4(lighting, 1.0);
+    //FragColor = vec4(lighting, u_Color[3]);
+    vec3 outColor = lighting;
+    outColor = outColor / (outColor + vec3(1.0));
+    //outColor = pow(outColor, vec3(1.0/2.2));
+    
+    FragColor = vec4(outColor, u_Color[3]);
     
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > 1.0)
         BrightColor = vec4(FragColor.rgb, u_Color[3]);
     else
         BrightColor = vec4(0.0, 0.0, 0.0, 1.0); // black
+
+    // adds a cool hue to everything!
+    BrightColor = vec4(FragColor.rgb, 1.0);
 }

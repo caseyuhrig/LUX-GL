@@ -7,26 +7,26 @@
 #include <algorithm>
 #include <memory>
 #include <numbers>
-//#include <ctime>
+#include <typeinfo>
 
-//#include <stdarg.h>
 #include <glm/glm.hpp>
 
-
-//#define ASSERT(x) if (!(x)) __debugbreak();
-
-// #include <limits>
-// const int min_int = std::numeric_limits<int>::min();
-// const int max_int = std::numeric_limits<int>::max();
+#include "lux/Log.hpp"
+#include "lux/Core/UUID.hpp"
 
 
 namespace lux {
 
-	constexpr double PI = std::numbers::pi_v<double>; // std::acos(-1.0);
-	constexpr double PI2 = PI * 2.0;
-	constexpr double RADIANS = PI2;
-	constexpr double TO_RAD = PI / 180.0;
-	constexpr double TO_DEG = 180.0 / PI;
+	using byte = uint8_t;
+
+	// Bjornes what are they called? are needed here. err, concepts!
+	template<typename T> constexpr T PI = std::numbers::pi_v<T>;
+	//constexpr double PI = std::numbers::pi_v<double>; // std::acos(-1.0);
+	template<typename T> constexpr T PI2 = PI<T> + PI<T>;
+	template<typename T> constexpr T RAD = PI2<T>;
+	template<typename T> constexpr T RADIANS = PI2<T>;
+	template<typename T> constexpr T TO_RAD = PI<T> / static_cast<T>(180.0);
+	template<typename T> constexpr T TO_DEG = static_cast<T>(180.0) / PI<T>;
 	
 	constexpr float PIf = std::numbers::pi_v<float>;
 	constexpr float PI2f = PIf * 2.0f;
@@ -64,6 +64,7 @@ namespace lux {
 		return std::make_unique<T>(std::forward<Args>(args)...);
 	}
 
+	
 	template<typename T>
 	using Ref = std::shared_ptr<T>;
 
@@ -71,7 +72,32 @@ namespace lux {
 	constexpr Ref<T> CreateRef(Args&& ... args)
 	{
 		return std::make_shared<T>(std::forward<Args>(args)...);
-	}	
+	}
+
+	// Playing around here...
+
+	class Object
+	{
+	public:
+		UUID GetID() const { return m_ID; }
+	private:
+		UUID m_ID;
+	};
+
+	template<typename T>
+	class Creatable //: public Object
+	{
+	public:
+		template<typename ... Args>
+		constexpr static Ref<T> Create(Args&& ... args)
+		{
+			auto ref = std::make_shared<T>(std::forward<Args>(args)...);
+			//UX_LOG_DEBUG("Create Ref %d", ref->GetID());
+			return ref;
+			//return std::make_shared<T>(std::forward<Args>(args)...);
+		}
+	};
+	
 
 	template <typename T>
 	static const T random(const T max)
