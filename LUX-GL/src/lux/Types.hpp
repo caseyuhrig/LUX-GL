@@ -1,15 +1,6 @@
 ﻿#pragma once
 
-#include <glad/glad.h>
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <memory>
-#include <numbers>
-#include <typeinfo>
-
-#include <glm/glm.hpp>
+#include <pch.hpp>
 
 #include "lux/Log.hpp"
 #include "lux/Core/UUID.hpp"

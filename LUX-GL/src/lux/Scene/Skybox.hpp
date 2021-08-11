@@ -1,20 +1,10 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
-#include <glm/glm.hpp>
-
-#include "stb_image/stb_image.h"
+#include <pch.hpp>
 
 #include "lux/Types.hpp"
 #include "lux/Renderer/Shader.hpp"
 #include "lux/Scene/Camera.hpp"
-
-//#include <glad/glad.h>
-//#include <glm/gtc/matrix_transform.hpp>
-
-//#include "../Log.hpp"
 
 
 namespace lux {
@@ -161,7 +151,7 @@ namespace lux {
                     format = GL_RGBA;
 
                 if (format == 0)
-                    UX_LOG_ERROR("LoadTexture: Number of Components: %d???", nrComponents);
+                    spdlog::error("LoadTexture: Number of Components: {}???", nrComponents);
 
                 glBindTexture(GL_TEXTURE_2D, textureID);
                 glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
@@ -176,7 +166,7 @@ namespace lux {
             }
             else
             {
-                UX_LOG_ERROR("Texture failed to load at path: %s", path);
+                spdlog::error("Texture failed to load at path: {}", path);
                 stbi_image_free(data);
             }
             return textureID;
@@ -208,7 +198,7 @@ namespace lux {
                 }
                 else
                 {
-                    UX_LOG_ERROR("Cubemap texture failed to load at path: %s", faces[i]);
+                    spdlog::error("Cubemap texture failed to load at path: {}", faces[i]);
                     stbi_image_free(data);
                 }
             }

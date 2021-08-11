@@ -1,33 +1,13 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <pch.hpp>
 
-#include <vector>
-#include <iostream>
+#include <lux/Context.hpp>
+#include <lux/Types.hpp>
+#include <lux/Platform/Microsoft/Windows.hpp>
 
-#include "lux/Context.hpp"
-#include "lux/Types.hpp"
-#include "lux/Platform/Microsoft/Windows.hpp"
-//#include "lux/Scene/Camera.hpp"
-
-//#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image/stb_image.h"
-
-/*
-   HOW TO SETUP Modern OpenGl!
-
-   GLFW and GLEW have to be setup.
-
-   Where does the glew32.dll go?  Doesn't, link against the glew32s.lib
-
-   VERY IMPORTANT: In preferences: C/C++ -> Preprocessor -> Preprocessor Definitions (add) GLEW_STATIC in the ; delimited list!
-
-   GL/glew.h contains the main glMethods(...)
-
-   Link to all the *.lib files as needed and include all the header *.h files.
-*/
-
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 namespace lux {
 
@@ -47,8 +27,11 @@ namespace lux {
         {
             if (!glfwInit())
             {
-                UX_LOG_FATAL("Something went wrong initializing GLFW!");
+                spdlog::critical("Something went wrong initializing GLFW!");
                 return;
+            }
+            else {
+                spdlog::info("GLFW OK");
             }
             // https://www.glfw.org/docs/3.3/window_guide.html#window_hints_wnd
             glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -79,7 +62,7 @@ namespace lux {
                 const auto* mode = glfwGetVideoMode(monitor);
                 const auto primary = (monitor == primaryMonitor) ? true : false;
                 const auto loc = (xpos < 0) ? 1 : (xpos > 0) ? 3 : 2;
-                UX_LOG_INFO("Monitor: %s %dx%d Pos: %dx%d Pri: %s Loc: %d", 
+                spdlog::info("Monitor: {} {}x{} Pos: {}x{} Pri: {} Loc: {}", 
                     monitorName, mode->width, mode->height,
                     xpos, ypos, primary ? "true" : "false", loc);
                     
@@ -90,18 +73,21 @@ namespace lux {
             _window_handle = glfwCreateWindow(window_width, window_height, title.c_str(), NULL, NULL);
             if (!_window_handle)
             {
-                std::cout << "[ERROR] Something went wrong creating the window!" << std::endl;
+                spdlog::critical("Something went wrong creating the window!");
                 glfwTerminate();
                 //return -1;
                 return;
             }
+            else {
+                spdlog::info("WINDOW OK");
+            }
             const std::string glfwVersion = glfwGetVersionString();
             int glfwMajorVersion, glfwMinorVersion, glfwRevision;
             glfwGetVersion(&glfwMajorVersion, &glfwMinorVersion, &glfwRevision);
-            UX_LOG_INFO("      GLFW VERSION: %s", glfwVersion);
-            UX_LOG_INFO("GLFW MAJOR VERSION: %d", glfwMajorVersion);
-            UX_LOG_INFO("GLFW MINOR VERSION: %d", glfwMinorVersion);
-            UX_LOG_INFO("     GLFW REVISION: %d", glfwRevision);
+            spdlog::info("      GLFW VERSION: {}", glfwVersion);
+            spdlog::info("GLFW MAJOR VERSION: {}", glfwMajorVersion);
+            spdlog::info("GLFW MINOR VERSION: {}", glfwMinorVersion);
+            spdlog::info("     GLFW REVISION: {}", glfwRevision);
 
             GLFWimage icons[1];
             //stbi_set_flip_vertically_on_load(true);
@@ -117,8 +103,8 @@ namespace lux {
 
             glfwGetFramebufferSize(_window_handle, &_framebuffer_width, &_framebuffer_height);
 
-            UX_LOG_INFO("Window Size: %d x %d", _window_width, _window_height);
-            UX_LOG_INFO("Framebuffer Size: %d x %d", _framebuffer_width, _framebuffer_height);
+            spdlog::info("Window Size: {} x {}", _window_width, _window_height);
+            spdlog::info("Framebuffer Size: {} x {}", _framebuffer_width, _framebuffer_height);
 
             glfwSetWindowUserPointer(_window_handle, this);
 
@@ -129,7 +115,7 @@ namespace lux {
                     that->_window_height = height;
 
                     // fire off any events here
-                    UX_LOG_DEBUG("Window Size Callback: %dx%d", width, height);
+                    spdlog::debug("Window Size Callback: {}x{}", width, height);
 
                     //glfwSetWindowAspectRatio(window, width, height);
 
@@ -171,7 +157,7 @@ namespace lux {
                     // TODO set the aspect ratio so the window doesn't get scewed.
                     //      Update the camera setting and whot-not.  Need to register
                     //      a listener from the main program.
-                    UX_LOG_DEBUG("Framebuffer Size Callback: %dx%d", width, height);
+                    spdlog::debug("Framebuffer Size Callback: {}x{}", width, height);
 
                     //if (_this->m_Camera)
                     //    _this->m_Camera->SetViewportSize(width, height);
@@ -222,8 +208,8 @@ namespace lux {
             glfwGetWindowSize(_window_handle, &width, &height);
             const RectXY workArea = lux::Platform::Microsoft::Windows::GetWorkArea(_window_handle);
             const int titleBarHeight = lux::Platform::Microsoft::Windows::GetTitleBarHeight(_window_handle);
-            UX_LOG_INFO("WorkArea: %d %d %d %d", workArea.x1, workArea.y1, workArea.x2, workArea.y2);
-            UX_LOG_INFO("TitleBar Height: %d", titleBarHeight);
+            spdlog::info("WorkArea: {} {} {} {}", workArea.x1, workArea.y1, workArea.x2, workArea.y2);
+            spdlog::info("TitleBar Height: {}", titleBarHeight);
             _window_width = workArea.x2 - workArea.x1;
             _window_height = workArea.y2 - workArea.y1 - titleBarHeight;
             glfwSetWindowPos(_window_handle, workArea.x1, workArea.y1 + titleBarHeight);
@@ -234,12 +220,12 @@ namespace lux {
         {
             auto* monitor = _getBestMonitor();
             if (!monitor) {
-                UX_LOG_FATAL("A \"BEST\" monitor could not be found.");
+                spdlog::critical("A \"BEST\" monitor could not be found.");
                 return;
             }
             const auto* mode = glfwGetVideoMode(monitor);
             if (!mode) {
-                UX_LOG_FATAL("A video mode could not be found.");
+                spdlog::critical("A video mode could not be found.");
                 return;
             }
             int monitorX, monitorY;

@@ -23,7 +23,7 @@ namespace lux {
                     message += element.first;
                     n++;
                 }
-                UX_LOG_FATAL("%s", message);
+                spdlog::critical("{}", message);
                 throw std::exception(message.c_str());
                 //return nullptr;
                 //assert(false);
@@ -33,6 +33,7 @@ namespace lux {
 
         void Load(const std::string& name, const std::string& filepath)
         {
+            spdlog::info("Loading Shader: {}", filepath);
             auto shader = Shader::Create(filepath);
             m_Shaders.emplace(name, shader);
         }

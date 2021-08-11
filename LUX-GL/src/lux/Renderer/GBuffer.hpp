@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <gl/glew.h>
 
 #include <random>
 
@@ -124,7 +124,7 @@ namespace lux {
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
             // finally check if framebuffer is complete
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-                UX_LOG_FATAL("Framebuffer not complete!");
+                spdlog::error("Framebuffer not complete!");
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
             // also create framebuffer to hold SSAO processing stage 
@@ -142,7 +142,7 @@ namespace lux {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-                UX_LOG_FATAL("SSAO Framebuffer not complete!");
+                spdlog::error("SSAO Framebuffer not complete!");
 
             // and blur stage
             glBindFramebuffer(GL_FRAMEBUFFER, ssaoBlurFBO);
@@ -153,7 +153,7 @@ namespace lux {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBufferBlur, 0);
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-                UX_LOG_FATAL("SSAO Blur Framebuffer not complete!");
+                spdlog::error("SSAO Blur Framebuffer not complete!");
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
            
             glGenTextures(1, &noiseTexture);

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "glm/glm.hpp"
+#include <pch.hpp>
+
 #include "lux/Types.hpp"
 //#include "Color.hpp"
 #include "lux/Renderer/VertexBuffer.hpp"
@@ -8,6 +9,9 @@
 #include "lux/Renderer/IndexBuffer.hpp"
 //#include "../Renderer/Renderer.hpp"
 #include "lux/Renderer/Shader.hpp"
+#include "lux/Color.hpp"
+#include "lux/Log.hpp"
+
 
 
 // CCW is GL front facing.
@@ -47,7 +51,7 @@ namespace lux {
                 m_Built = true;
             }
             else
-                UX_LOG_INFO("Build() has already been called...  SKIPPING");
+                spdlog::warn("Build() has already been called...  SKIPPING");
         }
         const size_t GetVertexCount() const { return vertices.size(); }
         /*

@@ -38,7 +38,7 @@ namespace lux {
                 end_angle = 180.0f;
                 break;
             default:
-                UX_LOG_ERROR("Corner Position %d Invalid.", m_CornerPosition);
+                spdlog::error("Corner Position {} Invalid.", m_CornerPosition);
                 break;
             }
             // draw an arc from the bottom left to the top right.

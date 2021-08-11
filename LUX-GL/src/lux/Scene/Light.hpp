@@ -50,7 +50,7 @@ namespace lux {
 			switch (index) {
 				case 0: m_UBO->SetUniformVec4("lights[0].position", m_Props[index].position); break;
 				case 1: m_UBO->SetUniformVec4("lights[1].position", m_Props[index].position); break;
-				default: UX_LOG_ERROR("Light index %d not found.", index);
+				default: spdlog::error("Light index {} not found.", index);
 			}
 		}
 

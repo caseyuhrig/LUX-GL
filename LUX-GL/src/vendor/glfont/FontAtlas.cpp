@@ -1,7 +1,9 @@
+#include <pch.hpp>
+
 #include "FontAtlas.h"
 
-#include <iostream>
-#include <algorithm>
+
+
 
 FontAtlas::FontAtlas(const FT_Face face, int pixelSize) :
   _face(face),

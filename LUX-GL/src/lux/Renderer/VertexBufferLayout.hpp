@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <gl/glew.h>
 #include <vector>
 #include "lux/Types.hpp"
 

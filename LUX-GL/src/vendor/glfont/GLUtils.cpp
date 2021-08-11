@@ -1,8 +1,6 @@
+#include <pch.hpp>
+
 #include "GLUtils.h"
-#include <algorithm>
-#include <fstream>
-#include <sstream>
-#include <vector>
 
 GLUtils::GLUtils() {}
 

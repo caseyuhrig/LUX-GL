@@ -1,6 +1,8 @@
 #pragma once
 
-#include <glad/glad.h>
+//#include <glad/glad.h>
+#include <gl/gl.h>
+#include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "Log.hpp"
@@ -28,24 +30,33 @@ namespace lux {
             glfwMakeContextCurrent(_window_handle);    // <---- IMPORTANT: has to be done before glewInit()
             if (_window_handle == NULL)
             {
-                UX_LOG_FATAL("Failed to create GLFW window");
+                spdlog::critical("Failed to create GLFW window");
                 glfwTerminate();
             }
 
 
-            //GLenum err = glewInit();
-            //if (GLEW_OK != err)
-            //{
+            const GLenum err = glewInit();
+            if (GLEW_OK != err)
+            {
                 // Problem: glewInit failed, something is seriously wrong.
-            //    std::cerr << "[ERROR]: " << glewGetErrorString(err) << std::endl;
-            //}
+                spdlog::critical("GLEW: {}", glewGetErrorString(err));
+                glfwTerminate();
+            }
+            else {
+                spdlog::info("GLEW OK");
+            }
+            /*
             if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
             {
-                UX_LOG_FATAL("Failed to initialize OpenGL context");
+                spdlog::critical("GLAD Failed to initialize OpenGL context");
                 //return -1;
                 glfwTerminate();
             }
-            UX_LOG_INFO("     Using OpenGL: %s", glGetString(GL_VERSION));
+            else {
+                spdlog::info("GLAD OK");
+            }
+            */
+            spdlog::info("     Using OpenGL: {}", glGetString(GL_VERSION));
             //UX_LOG_INFO("Status: Using GLEW: %s", glewGetString(GLEW_VERSION));
 
      
@@ -60,9 +71,9 @@ namespace lux {
             glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
             glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
 
-            UX_LOG_INFO("  Vendor: %s", glVendorString);
-            UX_LOG_INFO("Renderer: %s", glRendererString);
-            UX_LOG_INFO(" Version: %s", glVersionString);
+            spdlog::info("  Vendor: {}", glVendorString);
+            spdlog::info("Renderer: {}", glRendererString);
+            spdlog::info(" Version: {}", glVersionString);
 
             //HZ_CORE_INFO("OpenGL Info:");
             //HZ_CORE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
@@ -72,7 +83,7 @@ namespace lux {
             //HZ_CORE_ASSERT(versionMajor > 4 || (versionMajor == 4 && versionMinor >= 5), "Hazel requires at least OpenGL version 4.5!");
             if (versionMajor < 4 || (versionMajor == 4 && versionMinor < 5))
             {
-                UX_LOG_ERROR("UX requires at least OpenGL version 4.5!");
+                spdlog::error("LUX requires at least OpenGL version 4.5!");
             }
             glDisable(GL_DEBUG_OUTPUT);
 #ifdef UX_ENABLE_DEBUG
@@ -143,18 +154,18 @@ namespace lux {
             glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_BLOCKS, &max_geometry_uniform_blocks);
             glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &gl_max_vertex_uniform_components);
 
-            UX_LOG_INFO("GL_MAX_UNIFORM_BUFFER_BINDINGS: %d", max_uniform_buffer_bindings);
-            UX_LOG_INFO("GL_MAX_UNIFORM_BUFFER_BINDINGS: %d", max_uniform_buffer_bindings);
-            UX_LOG_INFO("     GL_MAX_UNIFORM_BLOCK_SIZE: %d", max_uniform_block_size);
-            UX_LOG_INFO("  GL_MAX_VERTEX_UNIFORM_BLOCKS: %d", max_vertex_uniform_blocks);
-            UX_LOG_INFO("GL_MAX_FRAGMENT_UNIFORM_BLOCKS: %d", max_fragment_uniform_blocks);
-            UX_LOG_INFO("GL_MAX_GEOMETRY_UNIFORM_BLOCKS: %d", max_geometry_uniform_blocks);
+            spdlog::info("GL_MAX_UNIFORM_BUFFER_BINDINGS: {}", max_uniform_buffer_bindings);
+            spdlog::info("GL_MAX_UNIFORM_BUFFER_BINDINGS: {}", max_uniform_buffer_bindings);
+            spdlog::info("     GL_MAX_UNIFORM_BLOCK_SIZE: {}", max_uniform_block_size);
+            spdlog::info("  GL_MAX_VERTEX_UNIFORM_BLOCKS: {}", max_vertex_uniform_blocks);
+            spdlog::info("GL_MAX_FRAGMENT_UNIFORM_BLOCKS: {}", max_fragment_uniform_blocks);
+            spdlog::info("GL_MAX_GEOMETRY_UNIFORM_BLOCKS: {}", max_geometry_uniform_blocks);
             // Shader Storage Buffer Object (SSBO)
             int gl_max_shader_storage_buffer_bindings;
 
             glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &gl_max_shader_storage_buffer_bindings);
 
-            UX_LOG_INFO("GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS: %d", gl_max_shader_storage_buffer_bindings);
+            spdlog::info("GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS: {}", gl_max_shader_storage_buffer_bindings);
                 //GL_MAX_SHADER_STORAGE_BLOCK_SIZE = 16777216
                 //GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS = 16
                 //GL_MAX_FRAGMENT_SHADER_STORAGE_BLOCKS = 16

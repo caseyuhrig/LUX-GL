@@ -28,7 +28,7 @@ namespace lux {
                 m_Window->SetPosition(-1920 + 60, 60);
                 break;
             default:
-                UX_LOG_FATAL("Unknown Interface Position");
+                spdlog::error("Unknown Interface Position");
             }
             m_Window->FillWorkArea();
 

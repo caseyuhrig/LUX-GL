@@ -1,22 +1,4 @@
-﻿#define GLM_FORCE_SWIZZLE
-#include <windows.h>
-
-#include <glad/glad.h>  
-#include <GLFW/glfw3.h>
-
-#include <iostream>
-#include <string>
-#include <future>
-
-//#define SPDLOG_HEADER_ONLY
-//#define SPDLOG_COMPILED_LIB
-//#include "spdlog/spdlog.h";
-// some magic needed to get spdlog working!
-// except it's not working now, build issues.
-
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
+﻿#include "pch.hpp"
 
 #include "lux/Window.hpp"
 #include "lux/Primitive/Segment.hpp"
@@ -58,18 +40,6 @@
 #include "lux/Platform/Microsoft/Windows.hpp"
 #include "lux/Interface.hpp"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
-//#define IMAPP_IMPL
-//#include "imgui/ImApp.h"
-//#include "imgui/ImGuizmo.h"
-
-#include "entt/entt.hpp"
-
-//#include <assimp/Importer.hpp>
-#include <irrKlang/irrKlang.h>
-//#include "nlohmann/json.hpp"
 
 // OpenEXR
 // https://github.com/AcademySoftwareFoundation/openexr
@@ -94,6 +64,9 @@
 
 int main(int argc, char** argv)
 {
+    std::string name = "Casey";
+    spdlog::info("hello {}", name);
+
     auto window = lux::Window("LUX/GL", 1500, 900);
     window.Center();
     window.FillWorkArea();
@@ -379,7 +352,8 @@ int main(int argc, char** argv)
 
     //bool& doShadows = lux::s_Data.ShadowData.Shadows;
 
-    UX_LOG_DEBUG("   INT SIZE: %d", sizeof(int));
+    /*
+    spdlog::trace("   INT SIZE: %d", sizeof(int));
     UX_LOG_DEBUG(" FLOAT SIZE: %d", sizeof(float));
     UX_LOG_DEBUG("  BOOL SIZE: %d", sizeof(bool));
     UX_LOG_DEBUG("  mat4 SIZE: %d", sizeof(glm::mat4));
@@ -388,7 +362,7 @@ int main(int argc, char** argv)
     UX_LOG_DEBUG("camera SIZE: %d", sizeof(lux::RendererData::CameraInfo));
     UX_LOG_DEBUG("shadow SIZE: %d", sizeof(lux::RendererData::ShadowInfo));
     UX_LOG_DEBUG(" light SIZE: %d", sizeof(lux::RendererData::LightInfo));
-    
+    */
 
     // std::function<int(int,int,int,int)> valueFunction = [](int s, int d, int ct, int tt) { return -1; };
     // You could simply add a + before the first lambda : auto valueFunction = +[](...) {...};.
@@ -462,11 +436,13 @@ int main(int argc, char** argv)
 
     auto model = glm::identity<glm::mat4>();
 
+    spdlog::info("1 -------------------------------------------");
+
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     std::string glsl_version = "#version 450";
     ImGui::CreateContext();
-    //ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
     // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForOpenGL(window.GetGlfwWindow(), true);
     ImGui_ImplOpenGL3_Init(glsl_version.c_str());
@@ -474,243 +450,262 @@ int main(int argc, char** argv)
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsClassic();
 
+    //auto io = ImGui::GetIO();
+
+    spdlog::info("2 -------------------------------------------");
+
     //auto str = glm::to_string(gray);
     //UX_LOG_DEBUG("COLOR: %s", str.c_str());
     //float dot = glm::dot(gray.rgb(), glm::vec3(0.2126, 0.7152, 0.0722));
     //UX_LOG_DEBUG("DOT: %f", dot);
 
     //auto girlModel = lux::Model::Create("res/meshes/Toon-Female-blockout.obj");
-    auto girlModel = lux::Model::Create("c:/Users/casey/Downloads/race_spaceship.obj");
-    lux::Entity::MakeModel(registry, scene, "Girl", girlModel, glm::identity<glm::mat4>());
+    //auto girlModel = lux::Model::Create("c:/Users/casey/Downloads/race_spaceship.obj");
+    //lux::Entity::MakeModel(registry, scene, "Girl", girlModel, glm::identity<glm::mat4>());
 
+    long long n = 0L;
 
     while (!window.ShouldClose())
     {
-        // 1. Render everything that casts a shadow.
-        if (lux::s_Data.ShadowData.Shadows)
-        {
-            shadows.RenderTextureCubemap(model, lightPos);
-            // Bind resulting cubemap to shader.
-            shadows.BindTextureCubemap(1);
-            shader->SetUniform1i("depthMap", 1);
-        }
+        try {
+            //spdlog::info("COUNT: {}", n);
 
-        // 2. render scene as normal
-        canvas.Bind();
-        lux::Renderer::Clear();
-        lux::Renderer::SetViewport(0, 0, window.GetWidth(), window.GetHeight());
-        // TODO, Merge setting a uniform texture and creating the texture.
-        //if (lux::s_Data.ShadowData.Shadows)
-        //{
-            //shadows.BindTextureCubemap(1);
-            //shader->SetUniform1i("depthMap", 1);
-        //}
-
-        
-        const auto& entityView = registry.view<lux::MeshComponent, lux::TransformComponent, lux::TagComponent>();
-        for (auto entityHandle : entityView)
-        {
-            const auto& [mesh, transform, tag] = entityView.get<lux::MeshComponent, lux::TransformComponent, lux::TagComponent>(entityHandle);
-            if (tag != "Ground Cube")
+            // 1. Render everything that casts a shadow.
+            if (lux::s_Data.ShadowData.Shadows)
             {
+                shadows.RenderTextureCubemap(model, lightPos);
+                // Bind resulting cubemap to shader.
+                shadows.BindTextureCubemap(1);
+                shader->SetUniform1i("depthMap", 1);
+            }
+
+            // 2. render scene as normal
+            canvas.Bind();
+            lux::Renderer::Clear();
+            lux::Renderer::SetViewport(0, 0, window.GetWidth(), window.GetHeight());
+            // TODO, Merge setting a uniform texture and creating the texture.
+            //if (lux::s_Data.ShadowData.Shadows)
+            //{
+                //shadows.BindTextureCubemap(1);
+                //shader->SetUniform1i("depthMap", 1);
+            //}
+
+
+            const auto& entityView = registry.view<lux::MeshComponent, lux::TransformComponent, lux::TagComponent>();
+            for (auto entityHandle : entityView)
+            {
+                const auto& [mesh, transform, tag] = entityView.get<lux::MeshComponent, lux::TransformComponent, lux::TagComponent>(entityHandle);
+                if (tag != "Ground Cube")
+                {
+                    shader->SetUniformMat4f("u_Model", model * transform.Transform);
+                    lux::Renderer::Draw(mesh, shader);
+                }
+            }
+
+            const auto& entityView2 = registry.view<lux::ModelComponent, lux::TransformComponent, lux::TagComponent>();
+            for (auto entityHandle : entityView2)
+            {
+                const auto& [mod, transform, tag] = entityView2.get<lux::ModelComponent, lux::TransformComponent, lux::TagComponent>(entityHandle);
+                //model->Draw(shader);
+                //lux::Renderer::Draw(model, shader);
                 shader->SetUniformMat4f("u_Model", model * transform.Transform);
-                lux::Renderer::Draw(mesh, shader);
+                mod.Model->Draw(shader);
             }
-        }
-        
-        const auto& entityView2 = registry.view<lux::ModelComponent, lux::TransformComponent, lux::TagComponent>();
-        for (auto entityHandle : entityView2)
-        {
-            const auto& [mod, transform, tag] = entityView2.get<lux::ModelComponent, lux::TransformComponent, lux::TagComponent>(entityHandle);
-            //model->Draw(shader);
-            //lux::Renderer::Draw(model, shader);
-            shader->SetUniformMat4f("u_Model", model * transform.Transform);
-            mod.Model->Draw(shader);
-        }
-        
-        //shader->SetUniformMat4f("u_Model", model);
-        //girlModel->Draw(shader);
-        
-        //shader->SetUniformMat4f("u_Model", model);
-        //robotMesh.Draw(shader);
-        
-        lux::Renderer::Draw(lightCube, lightShader);
-        planeShader->SetUniformMat4f("u_Model", glm::identity<glm::mat4>());
-        lux::Renderer::Draw(plane, planeShader);
-        ground.Draw(groundShader);
 
-        //lux::Renderer::Draw(ground, groundShader);
+            //shader->SetUniformMat4f("u_Model", model);
+            //girlModel->Draw(shader);
 
-        //lines.Draw(groundShader);
+            //shader->SetUniformMat4f("u_Model", model);
+            //robotMesh.Draw(shader);
 
-        
-        const auto& groundView = registry.view<lux::MeshComponent, lux::TransformComponent, lux::TagComponent>();
-        for (auto entityHandle : groundView)
-        {
-            const auto& [mesh, transform, tag] = groundView.get<lux::MeshComponent, lux::TransformComponent, lux::TagComponent>(entityHandle);
-            if (tag == "Ground Cube")
+            lux::Renderer::Draw(lightCube, lightShader);
+            planeShader->SetUniformMat4f("u_Model", glm::identity<glm::mat4>());
+            lux::Renderer::Draw(plane, planeShader);
+            ground.Draw(groundShader);
+
+            //lux::Renderer::Draw(ground, groundShader);
+
+            //lines.Draw(groundShader);
+
+
+            const auto& groundView = registry.view<lux::MeshComponent, lux::TransformComponent, lux::TagComponent>();
+            for (auto entityHandle : groundView)
             {
-                planeShader->SetUniformMat4f("u_Model", glm::identity<glm::mat4>() * transform.Transform);
-                lux::Renderer::Draw(mesh, planeShader);
+                const auto& [mesh, transform, tag] = groundView.get<lux::MeshComponent, lux::TransformComponent, lux::TagComponent>(entityHandle);
+                if (tag == "Ground Cube")
+                {
+                    planeShader->SetUniformMat4f("u_Model", glm::identity<glm::mat4>() * transform.Transform);
+                    lux::Renderer::Draw(mesh, planeShader);
+                }
             }
+
+
+            // 130 (65 * 2) = distance, 4 = seconds        
+            //lightPos.x = lux::Renderer::GetTimestep().PingPong(lightPos.x, lightInc.x, -65.0f, 65.0f, 165.0f, 4.0f);      
+            //lightShader->SetUniformMat4f("u_Model", glm::translate(glm::identity<glm::mat4>(), lightPos));
+            //lux::s_Data.LightData.LightPosition = lightPos;
+            //lightSpec.Publish(&lux::s_Data.LightData);
+
+            lcarsLayer.OnUpdate();
+
+            bool changed = false;
+
+
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            ImGui::Begin("Parameters");
+            
+            ImGui::Text("Transformation");
+            ImGui::SliderFloat("M1 Scale", &scale, 1.0f, 50.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat3("M1 Translate", &translate[0], -20.0f, 20.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat3("M1 Rotate", &mRotate[0], 0.0f, lux::RAD<float>);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::Separator();
+            ImGui::SliderFloat("M2 Scale", &scale2, 1.0f, 50.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat3("M2 Translate", &translate2[0], -20.0f, 20.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat3("M2 Rotate", &rotate2[0], 0.0f, lux::RAD<float>);
+            if (ImGui::IsItemActive()) changed = true;
+
+            ImGui::Separator();
+            ImGui::Text("Material");
+            ImGui::ColorEdit3("Color", &lux::s_Data.MaterialData.Color[0], imgui_misc_flags);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::ColorEdit3("Ambient", &lux::s_Data.MaterialData.Ambient[0], imgui_misc_flags);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::ColorEdit3("Diffuse", &lux::s_Data.MaterialData.Diffuse[0], imgui_misc_flags);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::ColorEdit3("Specular", &lux::s_Data.MaterialData.Specular[0], imgui_misc_flags);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat("Shininess", &lux::s_Data.MaterialData.Shininess, 0.0f, 128.0f);
+            if (ImGui::IsItemActive()) changed = true;
+
+            //Ambient = glm::vec4(glm::vec3(0.3f), 1.0f); //vec3(1.0f, 0.5f, 0.31f); // 16  16
+            //glm::vec4 Diffuse = glm::vec4(1.0f); //vec3(1.0f, 0.5f, 0.31f);           // 16  32
+            //glm::vec4 Specular = glm::vec4(1.0f); //vec3(0.5f, 0.5f, 0.5f);           // 16  48
+            //float Shininess
+
+            ImGui::Separator();
+            ImGui::Text("Shadows");
+            ImGui::SliderInt("Shadow Samples", &lux::s_Data.ShadowData.ShadowSamples, 1, 20);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat("Shadow Bias", &lux::s_Data.ShadowData.ShadowBias, 0.0f, 1.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat("Shadow Alpha", &lux::s_Data.ShadowData.ShadowAmount, 0.0f, 1.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::Checkbox("Shadows", &lux::s_Data.ShadowData.Shadows);
+            if (ImGui::IsItemActive()) changed = true;
+
+            ImGui::Separator();
+            ImGui::Text("Camera");
+            ImGui::SliderFloat3("Camera Position", &lux::s_Data.CameraData.Position[0], -500.0f, 500.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat3("Camera Look At", (float*)&lux::s_Data.CameraData.LookAt, -100.0f, 100.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat("Angle", &lux::s_Data.CameraData.Angle, 0.0f, 90.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat("Z Near", &lux::s_Data.CameraData.zNear, 0.01f, 2000.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::SliderFloat("Z Far", &lux::s_Data.CameraData.zFar, 0.01f, 2000.0f);
+            if (ImGui::IsItemActive()) changed = true;
+
+            ImGui::Separator();
+            ImGui::Text("Light Source");
+            ImGui::SliderFloat3("Light Position", &lux::s_Data.LightData.LightPosition[0], -100.0f, 100.0f);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::ColorEdit3("Light Color", &lux::s_Data.LightData.LightColor[0], imgui_misc_flags);
+            if (ImGui::IsItemActive()) changed = true;
+            ImGui::Text("Bloom");
+            ImGui::ColorEdit3("Glow Color", &brightPinkColor[0], imgui_misc_flags);
+            if (ImGui::IsItemActive()) {
+                groundShader->SetUniformVec4f("u_Color", brightPinkColor);
+                groundShader->SetUniformVec4f("u_BrightColor", brightPinkColor * 2.0f);
+            }
+
+            //ImGui::Checkbox("Skybox", (bool*)&useSkybox); ImGui::SameLine();
+            //ImGui::Checkbox("Cubemap", (bool*)&useCubemap);
+
+            //ImGui::Checkbox("Animate", (bool*)&animate); ImGui::SameLine();
+            //ImGui::Checkbox("Show Text", (bool*)&showText);
+
+            if (ImGui::Button("Play Sound"))
+            {
+                auto soundPos = irrklang::vec3df(lightPos.x, lightPos.y, lightPos.z);
+                engine->play3D(soundFilename.c_str(), soundPos);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Supersize"))
+            {
+                window.SuperSize();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Resize"))
+            {
+                //window.Center();
+                window.FillWorkArea();
+            }
+
+            if (ImGui::Button("Exit"))
+            {
+                std::cout << "EXIT" << std::endl;
+                //break;
+                //exit(0);
+                window.Close();
+            }
+            
+            ImGui::End();
+
+            //ImGui::ShowDemoWindow();
+
+            // Rendering
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            //imguiLayer.EndFrame();
+
+
+
+            if (changed)
+            {
+                shader->SetUniformVec4f("u_Color", lux::s_Data.MaterialData.Color);
+
+                materialSpec.Publish(&lux::s_Data.MaterialData);
+
+                lux::s_Data.CameraData.Update();
+                cameraSpec.Publish(&lux::s_Data.CameraData);
+
+                lightSpec.Publish(&lux::s_Data.LightData);
+                lightPos = lux::s_Data.LightData.LightPosition;
+                //lightPos.z = -lightPos.z;
+                lightShader->SetUniformMat4f("u_Model", glm::translate(glm::identity<glm::mat4>(), lightPos));
+
+                shadowSpec.Publish(&lux::s_Data.ShadowData);
+
+                model = lux::MatrixUtils::Transform(
+                    lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate)
+                    , glm::vec3(scale2, scale2, scale2), translate2, rotate2);
+            }
+
+
+            canvas.Unbind();
+
+            lux::Renderer::Clear();
+
+            canvas.Draw();
+
+            window.SwapBuffers();
+
+            lux::Renderer::GetTimestep().Update();
+
+            n++;
         }
-        
-
-        // 130 (65 * 2) = distance, 4 = seconds        
-        //lightPos.x = lux::Renderer::GetTimestep().PingPong(lightPos.x, lightInc.x, -65.0f, 65.0f, 165.0f, 4.0f);      
-        //lightShader->SetUniformMat4f("u_Model", glm::translate(glm::identity<glm::mat4>(), lightPos));
-        //lux::s_Data.LightData.LightPosition = lightPos;
-        //lightSpec.Publish(&lux::s_Data.LightData);
-
-        lcarsLayer.OnUpdate();
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        ImGui::Begin("Parameters");
-        bool changed = false;
-        ImGui::Text("Transformation");
-        ImGui::SliderFloat("M1 Scale", &scale, 1.0f, 50.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat3("M1 Translate", &translate[0], -20.0f, 20.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat3("M1 Rotate", &mRotate[0], 0.0f, lux::RAD<float>);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::Separator();
-        ImGui::SliderFloat("M2 Scale", &scale2, 1.0f, 50.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat3("M2 Translate", &translate2[0], -20.0f, 20.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat3("M2 Rotate", &rotate2[0], 0.0f, lux::RAD<float>);
-        if (ImGui::IsItemActive()) changed = true;
-
-        ImGui::Separator();
-        ImGui::Text("Material");
-        ImGui::ColorEdit3("Color", &lux::s_Data.MaterialData.Color[0], imgui_misc_flags);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::ColorEdit3("Ambient", &lux::s_Data.MaterialData.Ambient[0], imgui_misc_flags);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::ColorEdit3("Diffuse", &lux::s_Data.MaterialData.Diffuse[0], imgui_misc_flags);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::ColorEdit3("Specular", &lux::s_Data.MaterialData.Specular[0], imgui_misc_flags);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat("Shininess", &lux::s_Data.MaterialData.Shininess, 0.0f, 128.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        
-        //Ambient = glm::vec4(glm::vec3(0.3f), 1.0f); //vec3(1.0f, 0.5f, 0.31f); // 16  16
-        //glm::vec4 Diffuse = glm::vec4(1.0f); //vec3(1.0f, 0.5f, 0.31f);           // 16  32
-        //glm::vec4 Specular = glm::vec4(1.0f); //vec3(0.5f, 0.5f, 0.5f);           // 16  48
-        //float Shininess
-
-        ImGui::Separator();
-        ImGui::Text("Shadows");
-        ImGui::SliderInt("Shadow Samples", &lux::s_Data.ShadowData.ShadowSamples, 1, 20);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat("Shadow Bias", &lux::s_Data.ShadowData.ShadowBias, 0.0f, 1.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat("Shadow Alpha", &lux::s_Data.ShadowData.ShadowAmount, 0.0f, 1.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::Checkbox("Shadows", &lux::s_Data.ShadowData.Shadows);
-        if (ImGui::IsItemActive()) changed = true;
-
-        ImGui::Separator();
-        ImGui::Text("Camera");
-        ImGui::SliderFloat3("Camera Position", &lux::s_Data.CameraData.Position[0], -500.0f, 500.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat3("Camera Look At", (float*)&lux::s_Data.CameraData.LookAt, -100.0f, 100.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat("Angle", &lux::s_Data.CameraData.Angle, 0.0f, 90.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat("Z Near", &lux::s_Data.CameraData.zNear, 0.01f, 2000.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::SliderFloat("Z Far", &lux::s_Data.CameraData.zFar, 0.01f, 2000.0f);
-        if (ImGui::IsItemActive()) changed = true;
-
-        ImGui::Separator();
-        ImGui::Text("Light Source");
-        ImGui::SliderFloat3("Light Position", &lux::s_Data.LightData.LightPosition[0], -100.0f, 100.0f);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::ColorEdit3("Light Color", &lux::s_Data.LightData.LightColor[0], imgui_misc_flags);
-        if (ImGui::IsItemActive()) changed = true;
-        ImGui::Text("Bloom");
-        ImGui::ColorEdit3("Glow Color", &brightPinkColor[0], imgui_misc_flags);
-        if (ImGui::IsItemActive()) {
-            groundShader->SetUniformVec4f("u_Color", brightPinkColor);
-            groundShader->SetUniformVec4f("u_BrightColor", brightPinkColor * 2.0f);
+        catch (const std::exception& exception) {
+            spdlog::critical("MAIN LOOP: {}", exception.what());
         }
-       
-        //ImGui::Checkbox("Skybox", (bool*)&useSkybox); ImGui::SameLine();
-        //ImGui::Checkbox("Cubemap", (bool*)&useCubemap);      
-        
-        //ImGui::Checkbox("Animate", (bool*)&animate); ImGui::SameLine();
-        //ImGui::Checkbox("Show Text", (bool*)&showText);
-
-        if (ImGui::Button("Play Sound"))
-        {
-            auto soundPos = irrklang::vec3df(lightPos.x, lightPos.y, lightPos.z);
-            engine->play3D(soundFilename.c_str(), soundPos);
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Supersize"))
-        {
-            window.SuperSize();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Resize"))
-        {
-            //window.Center();
-            window.FillWorkArea();
-        }
-        
-        if (ImGui::Button("Exit"))
-        {
-            std::cout << "EXIT" << std::endl;
-            //break;
-            //exit(0);
-            window.Close();
-        }
-        ImGui::End();
-
-        //ImGui::ShowDemoWindow();
-
-        // Rendering
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        //imguiLayer.EndFrame();
-
-
-        if (changed)
-        {
-            shader->SetUniformVec4f("u_Color", lux::s_Data.MaterialData.Color);
-
-            materialSpec.Publish(&lux::s_Data.MaterialData);
-
-            lux::s_Data.CameraData.Update();
-            cameraSpec.Publish(&lux::s_Data.CameraData);
-
-            lightSpec.Publish(&lux::s_Data.LightData);
-            lightPos = lux::s_Data.LightData.LightPosition;
-            //lightPos.z = -lightPos.z;
-            lightShader->SetUniformMat4f("u_Model", glm::translate(glm::identity<glm::mat4>(), lightPos));
-
-            shadowSpec.Publish(&lux::s_Data.ShadowData);
-
-            model = lux::MatrixUtils::Transform(
-                lux::MatrixUtils::Transform(glm::mat4(1.0f), glm::vec3(scale, scale, scale), translate, mRotate)
-                , glm::vec3(scale2, scale2, scale2), translate2, rotate2);
-        }
-        
-
-        canvas.Unbind();
-
-        lux::Renderer::Clear();
-
-        canvas.Draw();
-
-        window.SwapBuffers();
-
-        lux::Renderer::GetTimestep().Update();
     }
     window.Destroy();
 

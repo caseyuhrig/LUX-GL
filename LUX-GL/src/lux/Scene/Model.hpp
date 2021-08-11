@@ -34,20 +34,20 @@ namespace lux {
 
         void LoadModel(const std::string& path)
         {
-            UX_LOG_INFO("Loading Model: %s", path.c_str());
+            spdlog::info("Loading Model: {}", path.c_str());
             Assimp::Importer import;
             const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
             if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
             {
-                UX_LOG_ERROR("ERROR::ASSIMP: %s", import.GetErrorString());
+                spdlog::error("ASSIMP: {}", import.GetErrorString());
                 return;
             }
             m_Directory = path.substr(0, path.find_last_of('/'));
 
             ProcessNode(scene->mRootNode, scene);
 
-            UX_LOG_INFO("Meshes: %d", m_Meshes.size());
+            spdlog::info("Meshes: {}", m_Meshes.size());
         }
 
         void ProcessNode(aiNode* node, const aiScene* scene)

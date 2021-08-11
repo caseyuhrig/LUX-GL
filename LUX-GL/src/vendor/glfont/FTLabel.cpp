@@ -1,17 +1,9 @@
+#include <pch.hpp>
+
 #include "FTLabel.h"
 #include "GLUtils.h"
 #include "FontAtlas.h"
 
-#include <stdio.h>
-#include <vector>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
-#include <iostream>
-
-// GLM
-#include "glm\gtc\type_ptr.hpp"
-#include "glm\gtx\transform.hpp"
 
 
 

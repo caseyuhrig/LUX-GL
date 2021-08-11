@@ -1,7 +1,8 @@
+#include <pch.hpp>
+
 #include "GLFont.h"
 
-#include <string>
-#include <exception>
+
 
 
 GLFont::GLFont(const std::string& fontFile)

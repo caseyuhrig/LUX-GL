@@ -1,5 +1,7 @@
 #pragma once
 
+#include <pch.hpp>
+
 #include "lux/Scene/Scene.hpp"
 #include "lux/Scene/Components.hpp"
 #include "lux/Scene/Model.hpp"
@@ -28,13 +30,14 @@ namespace lux {
         {
             return m_Scene->m_Registry.get<T>(m_EntityHandle);
         }
-
+        /*
         template<typename T>
         bool HasComponent()
         {
             return m_Scene->m_Registry.has<T>(m_EntityHandle);
+            m_Scene->m_Registry.
         }
-
+        */
         template<typename T>
         void RemoveComponent()
         {

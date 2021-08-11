@@ -1,11 +1,6 @@
+#include <pch.hpp>
+
 #include "Mesh.hpp"
-
-#include <glm/gtx/normal.hpp>
-#include <glm/gtx/string_cast.hpp>
-
-#include "lux/Color.hpp"
-#include "lux/Log.hpp"
-#include "OBJ_Loader.h"
 
 
 // CCW is GL front facing.
@@ -225,7 +220,7 @@ namespace lux {
             end_angle = 180.0f;
             break;
         default:
-            UX_LOG_ERROR("Corner Position %d Invalid.", position);
+            spdlog::error("Corner Position {} Invalid.", position);
             break;
         }
         // draw an arc from the bottom left to the top right.
@@ -273,7 +268,7 @@ namespace lux {
             end_angle = 180.0f;
             break;
         default:
-            UX_LOG_ERROR("Scooped Corner Position %d Invalid.", position);
+            spdlog::error("Scooped Corner Position {} Invalid.", position);
             break;
         }        
         //glm::vec3 normal = { 0.0f, 0.0f, -1.0f };
@@ -382,18 +377,18 @@ namespace lux {
 
         if (!loaded)
         {
-            UX_LOG_ERROR("Failed to load %s", file_path);
+            spdlog::error("Failed to load {}", file_path);
         }
         if (loaded)
         {
-            UX_LOG_INFO("READING: %s", file_path);
+            spdlog::info("READING: {}", file_path);
             for (int i = 0; i < loader.LoadedMeshes.size(); i++)
             {
                 objl::Mesh curMesh = loader.LoadedMeshes[i];
-                UX_LOG_INFO("Mesh %d: %s", i, curMesh.MeshName);
+                spdlog::info("Mesh {}: {}", i, curMesh.MeshName);
                 if (mesh_name == curMesh.MeshName)
                 {
-                    UX_LOG_INFO("LOADING: %s", mesh_name);
+                    spdlog::info("LOADING: {}", mesh_name);
                     for (size_t j = 0; j < curMesh.Vertices.size(); j++)
                     {
                         glm::vec3 position = { curMesh.Vertices[j].Position.X, curMesh.Vertices[j].Position.Y, curMesh.Vertices[j].Position.Z };

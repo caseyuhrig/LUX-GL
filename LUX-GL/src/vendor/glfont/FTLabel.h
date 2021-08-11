@@ -1,16 +1,13 @@
 #pragma once
 
-#include <glad\glad.h>
+#include <pch.hpp>
+
+
 #include "ft2build.h"
 #include FT_FREETYPE_H
-#include "glm\glm.hpp"
 
 #include "GLFont.h"
 
-#include <string>
-#include <memory>
-#include <map>
-#include <vector>
 
 #include "lux/Types.hpp"
 

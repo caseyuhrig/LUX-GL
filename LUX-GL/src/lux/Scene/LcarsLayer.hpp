@@ -3,12 +3,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <imgui/imgui.h>
+//#include <imgui/imgui.h>
 
 #include "lux/Renderer/Renderer.hpp"
 #include "lux/Scene/Layer.hpp"
 #include "lux/Window.hpp"
 #include "lux/Primitive/BezierCurve.hpp"
+
+#include <fmt/printf.h>
 
 
 namespace lux {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <gl/glew.h>
 
 #include "glm/gtc/matrix_transform.hpp"
 

@@ -58,7 +58,7 @@ namespace lux {
 
                     if (GetMonitorInfo(hMonitor, &mi) == 0)
                     {
-                        UX_LOG_ERROR("GetMonitorInfo");
+                        spdlog::error("GetMonitorInfo");
                     }
                     return { mi.rcWork.left, mi.rcWork.top, mi.rcWork.right, mi.rcWork.bottom };
                 }
@@ -81,14 +81,14 @@ namespace lux {
                     RECT crect;
                     GetClientRect(hwnd, &crect);
 
-                    UX_LOG_INFO("win rect: %d %d %d %d", wrect.left, wrect.top, wrect.right, wrect.bottom);
-                    UX_LOG_INFO("client rect: %d %d %d %d", crect.left, crect.top, crect.right, crect.bottom);
+                    spdlog::info("win rect: {} {} {} {}", wrect.left, wrect.top, wrect.right, wrect.bottom);
+                    spdlog::info("client rect: {} {} {} {}", crect.left, crect.top, crect.right, crect.bottom);
 
                     POINT lefttop = { crect.left, crect.top }; // Practicaly both are 0
                     ClientToScreen(hwnd, &lefttop);
                     POINT rightbottom = { crect.right, crect.bottom };
                     ClientToScreen(hwnd, &rightbottom);
-                    UX_LOG_INFO("title: %d %d %d %d", lefttop.x, lefttop.y, rightbottom.x, rightbottom.y);
+                    spdlog::info("title: {} {} {} {}", lefttop.x, lefttop.y, rightbottom.x, rightbottom.y);
                     return rightbottom.y - lefttop.y;
                 }
             private:

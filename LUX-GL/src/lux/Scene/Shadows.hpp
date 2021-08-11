@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <gl/glew.h>
 #include <entt/entt.hpp>
 
 #include "lux/Scene/Components.hpp"

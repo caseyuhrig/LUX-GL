@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <gl/glew.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -154,9 +154,9 @@ namespace lux {
                 // malloc allocates on the heap.
                 std::string message;
                 glGetShaderInfoLog(id, length, &length, message.data());
-                UX_LOG_ERROR("Failed to compile %s shader!", (type == GL_VERTEX_SHADER ? "vertex" : "fragment"));
-                UX_LOG_ERROR("%s", message);
-                UX_LOG_ERROR("%s", source);
+                spdlog::error("Failed to compile {} shader!", (type == GL_VERTEX_SHADER ? "vertex" : "fragment"));
+                spdlog::error("{}", message);
+                spdlog::error("{}", source);
                 glDeleteShader(id);
                 return 0;
             }
@@ -195,7 +195,7 @@ namespace lux {
 
             auto location = glGetUniformLocation(programID, name.c_str());
             if (location == -1)
-                UX_LOG_ERROR("Warning: uniform '%s' doesn't exist!", name.c_str());
+                spdlog::error("Warning: uniform '{}' doesn't exist!", name.c_str());
 
             m_UniformLocationCache[name] = location;
             return location;

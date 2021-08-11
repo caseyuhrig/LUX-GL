@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
+#include <gl/glew.h>
 
 #include <memory>
 #include <iostream>
@@ -54,10 +54,10 @@ namespace lux {
         UniformBuffer(const std::string& name, const uint32_t bindingPoint, const uint32_t dataSize, const void* data)
             : m_Name(name), m_BindingPoint(bindingPoint), m_DataSize(dataSize)
         {
-            UX_LOG_INFO("[UniformBuffer]----------------------------");
-            UX_LOG_INFO("          Init: %s", m_Name);
-            UX_LOG_INFO(" Binding Point: %d", m_BindingPoint);
-            UX_LOG_INFO("     Data Size: %d", m_DataSize);
+            spdlog::info("[UniformBuffer]----------------------------");
+            spdlog::info("          Init: {}", m_Name);
+            spdlog::info(" Binding Point: {}", m_BindingPoint);
+            spdlog::info("     Data Size: {}", m_DataSize);
 
             // Block index will bind when you have to manually link the structs in the GlSL program.
             // @ binding = #, in the uniform struct, the *new* way in std140!
@@ -125,8 +125,7 @@ namespace lux {
         void AddUniform(std::string name, unsigned int offset, unsigned int size)
         {
             if (m_Uniforms.count(name) > 0)
-                std::cout << "[ERROR] " << name << " not found in Uniform Buffer " << m_Name <<
-                ", NOT ADDING UNIFORM TO BUFFER!" << std::endl;
+                spdlog::error("{} not found in Uniform Buffer {} NOT ADDING UNIFORM TO BUFFER!", name, m_Name);
             else
                 m_Uniforms.insert(std::make_pair(name, byte_offset{ offset, size }));
         }
@@ -135,8 +134,7 @@ namespace lux {
         void AddUniform(std::string name, unsigned int offset, unsigned int size, void* data)
         {
             if (m_Uniforms.count(name) > 0) {
-                std::cout << "[ERROR] " << name << " not found in Uniform Buffer " << m_Name <<
-                    ", NOT ADDING UNIFORM TO BUFFER!" << std::endl;
+                spdlog::error("{} not found in Uniform Buffer {} NOT ADDING UNIFORM TO BUFFER!", name, m_Name);
             }
             else {
                 m_Uniforms.insert(std::make_pair(name, byte_offset{ offset, size }));

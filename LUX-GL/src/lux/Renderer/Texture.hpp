@@ -1,10 +1,6 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <string>
-#include <memory>
-
-#include "stb_image/stb_image.h"
+#include <pch.hpp>
 
 
 namespace lux {

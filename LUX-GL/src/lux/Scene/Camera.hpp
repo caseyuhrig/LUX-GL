@@ -65,7 +65,7 @@ namespace lux {
             CalcViewProjection();
 
             auto size = sizeof(CameraSpecification);
-            UX_LOG_DEBUG("Camera Spec Size %d", size);
+            spdlog::debug("Camera Spec Size {}", size);
 
             m_UniformBuffer = UniformBuffer::Scope("CameraProperties", bindingPoint, size, &m_Spec);
             // TODO integrate the camera index

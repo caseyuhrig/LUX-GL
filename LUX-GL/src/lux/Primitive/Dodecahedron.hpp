@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <glm/gtx/string_cast.hpp>
+#include <pch.hpp>
 
 #include "lux/Primitive/Mesh.hpp"
 
@@ -38,6 +38,7 @@ namespace lux {
         {
             Build();
         }
+
         void CreateGeometry() override
         {
             // I'm gonna lay everything out very simply, since I'm not a math nerd ;)

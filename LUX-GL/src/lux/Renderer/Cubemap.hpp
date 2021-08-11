@@ -1,6 +1,8 @@
 #pragma once
 
-#include "lux/Types.hpp"
+#include <pch.hpp>
+
+#include <lux/Types.hpp>
 
 
 namespace lux {
