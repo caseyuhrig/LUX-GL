@@ -64,7 +64,8 @@ namespace lux {
         }
         const bool& ShouldClose() const { return m_Window->ShouldClose(); }
         void Clear() const { m_Renderer.Clear(); }
-        void SwapBuffers() const { m_Window->SwapBuffers(); }
+        // Update was SwapBuffers
+        void Update() const { m_Window->Update(); }
         void Destroy() const { m_Window->Destroy(); }
     private:
         Ref<Window> m_Window;

@@ -40,6 +40,8 @@
 #include "lux/Platform/Microsoft/Windows.hpp"
 #include "lux/Interface.hpp"
 
+#include <cu/scheduler.hpp>
+#include <cu/user.hpp>
 
 // OpenEXR
 // https://github.com/AcademySoftwareFoundation/openexr
@@ -64,12 +66,40 @@
 
 int main(int argc, char** argv)
 {
-    std::string name = "Casey";
+    //using CurrentUser = cu::CurrentUser;
+
+    spdlog::set_level(spdlog::level::trace);
+
+    const std::string name = "Casey";
     spdlog::info("hello {}", name);
+
+    // Scheduler ---------------------------
+
+    auto scheduler = cu::scheduler();
+    scheduler.every(std::chrono::seconds(10), "hello", [] {        
+        const auto ticks = cu::CurrentUser::GetIdleMilliseconds();
+        std::chrono::milliseconds m(ticks);
+        std::chrono::duration d(m);
+
+        spdlog::debug("Idle Duration: {}", d);
+    });
+    scheduler.cron("10 * * * * *", "some cron job", [] {
+        spdlog::debug("Every minute on the 10th second.");
+    });
+
+
 
     auto window = lux::Window("LUX/GL", 1500, 900);
     window.Center();
     window.FillWorkArea();
+
+    auto context = std::make_unique<lux::Context>(window.GetGlfwWindow());
+    context->Init();
+     
+    auto window2 = lux::Window("UI2", 800, 600, window.GetGlfwWindow());
+    window2.Center();
+
+    window.MakeContextCurrent();
 
     lux::Renderer::Init(window.GetWidth(), window.GetHeight());
     lux::Renderer::SetClearColor(lux::Colors::Black);
@@ -79,17 +109,17 @@ int main(int argc, char** argv)
 
     lux::LightProperties lightProps[2] = {
         lux::LightProperties(
-        glm::vec3(13.0, 17.0, 1.0),    // color
-        glm::vec4(0.2, 0.2, 0.2, 1.0), // ambient
-        glm::vec4(0.5, 0.5, 0.5, 1.0), // diffuse
-        glm::vec4(0.2, 0.2, 0.2, 1.0)  // specular
-    ),
+            glm::vec3(13.0, 17.0, 1.0),    // color
+            glm::vec4(0.2, 0.2, 0.2, 1.0), // ambient
+            glm::vec4(0.5, 0.5, 0.5, 1.0), // diffuse
+            glm::vec4(0.2, 0.2, 0.2, 1.0)  // specular
+        ),
         lux::LightProperties(
-        glm::vec3(1.0f, 1.0f, -24.0f), // color
-        glm::vec4(0.2, 0.2, 0.2, 1.0), // ambient
-        glm::vec4(0.5, 0.5, 0.5, 1.0), // diffuse
-        glm::vec4(0.2, 0.2, 0.2, 1.0)  // specular
-    )
+            glm::vec3(1.0f, 1.0f, -24.0f), // color
+            glm::vec4(0.2, 0.2, 0.2, 1.0), // ambient
+            glm::vec4(0.5, 0.5, 0.5, 1.0), // diffuse
+            glm::vec4(0.2, 0.2, 0.2, 1.0)  // specular
+        )
     };
 
 
@@ -97,31 +127,32 @@ int main(int argc, char** argv)
 
     
     glm::vec3 lightPos = lights.GetPosition(0).xyz;
-    glm::vec3 lightInc = glm::vec3(1.0, 0.0, 0.0);
+    auto lightInc = glm::vec3(1.0, 0.0, 0.0);
 
-    float scale = 1.0f; // 5.0 1.0; //0.125;  
-    glm::vec3 translate = { 0.0, 0.0, 0.0 };
-    glm::vec3 mRotate = { 0.0, 0.0, 0.0 };
-    float translateZ = -100.0;
-    glm::vec2 rotateXY = glm::vec2(0.0, glm::radians(0.0));
+    auto scale = 1.0f; // 5.0 1.0; //0.125;  
+    auto translate = glm::vec3(0.0, 0.0, 0.0);
+    auto mRotate = glm::vec3(0.0, 0.0, 0.0);
+    auto translateZ = -100.0f;
+    auto rotateXY = glm::vec2(0.0, glm::radians(0.0));
 
-    float scale2 = 1.0f;
-    glm::vec3 translate2 = { 0.0f, 0.0f, 0.0f };
-    glm::vec3 rotate2 = { 0.0f, 0.0f, 0.0f };
+    auto scale2 = 1.0f;
+    auto translate2 = glm::vec3(0.0f, 0.0f, 0.0f);
+    auto rotate2 = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    glm::vec3 scaleCube = glm::vec3(1.0);
-    glm::vec3 translateCube = glm::vec3(0.0);
-    glm::vec3 rotateCube = glm::vec3(0.0);
+    auto scaleCube = glm::vec3(1.0);
+    auto translateCube = glm::vec3(0.0);
+    auto rotateCube = glm::vec3(0.0);
     
 
    
 
     auto gray = glm::vec4(0.45f, 0.45f, 0.45f, 1.0f);
     
-    const auto axis = glm::vec3(0.0f, 0.0f, 0.0f);
+    const auto axis = glm::vec3(0.0f);
 
     auto brightPinkColor = lux::Colors::DeepPink * 2.0f;
-    const ImGuiColorEditFlags imgui_misc_flags = ImGuiColorEditFlags_Float;
+    //const ImGuiColorEditFlags imgui_misc_flags = ImGuiColorEditFlags_Float;
+    const auto imgui_misc_flags = ImGuiColorEditFlags_Float;
 
 
 
@@ -459,15 +490,17 @@ int main(int argc, char** argv)
     //float dot = glm::dot(gray.rgb(), glm::vec3(0.2126, 0.7152, 0.0722));
     //UX_LOG_DEBUG("DOT: %f", dot);
 
-    //auto girlModel = lux::Model::Create("res/meshes/Toon-Female-blockout.obj");
+    auto girlModel = lux::Model::Create("res/meshes/Toon-Female-blockout.obj");
     //auto girlModel = lux::Model::Create("c:/Users/casey/Downloads/race_spaceship.obj");
-    //lux::Entity::MakeModel(registry, scene, "Girl", girlModel, glm::identity<glm::mat4>());
+    lux::Entity::MakeModel(registry, scene, "Girl", girlModel, glm::identity<glm::mat4>());
 
     long long n = 0L;
 
-    while (!window.ShouldClose())
+    while (!window.ShouldClose()) // && !window2.ShouldClose())
     {
         try {
+            window.MakeContextCurrent();
+
             //spdlog::info("COUNT: {}", n);
 
             // 1. Render everything that casts a shadow.
@@ -523,7 +556,7 @@ int main(int argc, char** argv)
             lux::Renderer::Draw(plane, planeShader);
             ground.Draw(groundShader);
 
-            //lux::Renderer::Draw(ground, groundShader);
+            
 
             //lines.Draw(groundShader);
 
@@ -694,10 +727,35 @@ int main(int argc, char** argv)
             canvas.Unbind();
 
             lux::Renderer::Clear();
-
             canvas.Draw();
 
-            window.SwapBuffers();
+            //context->SwapBuffers();
+            window.Update();
+
+            // --------------------------------------------------------------------------------
+            
+            window2.MakeContextCurrent();
+
+            canvas.Bind();
+            lux::Renderer::Clear();
+            lux::Renderer::SetViewport(0, 0, window2.GetWidth(), window2.GetHeight());
+
+            lux::Renderer::Draw(lightCube, lightShader);
+            planeShader->SetUniformMat4f("u_Model", glm::identity<glm::mat4>());
+            lux::Renderer::Draw(plane, planeShader);
+            ground.Draw(groundShader);
+            lcarsLayer.OnUpdate();
+            canvas.Unbind();
+            
+            lux::Renderer::Clear();
+            //lux::Renderer::SetViewport(0, 0, window2.GetWidth(), window2.GetHeight());
+            canvas.Draw();
+            
+            window2.Update();
+            
+            
+            
+
 
             lux::Renderer::GetTimestep().Update();
 

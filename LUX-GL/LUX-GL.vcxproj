@@ -184,6 +184,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\cu\scheduler.hpp" />
+    <ClInclude Include="src\cu\scheduler\ctpl_stl.hpp" />
+    <ClInclude Include="src\cu\scheduler\interruptable_sleep.hpp" />
+    <ClInclude Include="src\cu\scheduler\job.hpp" />
+    <ClInclude Include="src\cu\scheduler\task.hpp" />
+    <ClInclude Include="src\cu\user.hpp" />
     <ClInclude Include="src\lux\Array.hpp" />
     <ClInclude Include="src\lux\Color.hpp" />
     <ClInclude Include="src\lux\Context.hpp" />
@@ -243,7 +249,6 @@
     <ClInclude Include="src\vendor\glfont\FTLabel.h" />
     <ClInclude Include="src\vendor\glfont\GLFont.h" />
     <ClInclude Include="src\vendor\glfont\GLUtils.h" />
-    <ClInclude Include="src\vendor\KHR\khrplatform.h" />
     <ClInclude Include="src\vendor\OBJ_Loader.h" />
   </ItemGroup>
   <ItemGroup>

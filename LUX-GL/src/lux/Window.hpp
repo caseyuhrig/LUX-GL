@@ -14,14 +14,14 @@ namespace lux {
     class Window {
     private:
         GLFWwindow* _window_handle;
-        Scope<Context> _context;
+        //Scope<Context> _context;
         std::string title;
         int _window_width, _window_height;
         int _framebuffer_width, _framebuffer_height;
         bool m_vSync = false;
         std::vector<std::function<void(int width, int height)>> m_ResizeListeners;
     public:
-        Window(const std::string& title, int window_width = 1280, int window_height = 720)
+        Window(const std::string& title, int window_width = 1280, int window_height = 720, GLFWwindow* share = nullptr)
             : _window_width(window_width), _window_height(window_height),
             _framebuffer_width(0), _framebuffer_height(0), _window_handle(nullptr)
         {
@@ -38,6 +38,7 @@ namespace lux {
             glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
             glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
             glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+            //glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, false);
             // GLFW_SAMPLES doesn't do anything when using custom framebuffers.
             //if (USE_ANTIALIASING) glfwWindowHint(GLFW_SAMPLES, 8);
             //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
@@ -49,15 +50,15 @@ namespace lux {
             //glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
             //glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
-            auto* primaryMonitor = glfwGetPrimaryMonitor();
+            const auto* primaryMonitor = glfwGetPrimaryMonitor();
 
             int count;
             auto** monitors = glfwGetMonitors(&count);
-            for (int n = 0;n < count;n++)
+            for (auto n = 0;n < count;n++)
             {
                 auto* monitor = monitors[n];
                 const auto* monitorName = glfwGetMonitorName(monitor);
-                int xpos = 0, ypos = 0;
+                auto xpos = 0, ypos = 0;
                 glfwGetMonitorPos(monitor, &xpos, &ypos);
                 const auto* mode = glfwGetVideoMode(monitor);
                 const auto primary = (monitor == primaryMonitor) ? true : false;
@@ -70,7 +71,7 @@ namespace lux {
                 //UX_LOG_INFO("WorkArea: %d %d %d %d", workArea.x1, workArea.y1, workArea.x2, workArea.y2);
             }
             // Create a windowed mode window and its OpenGL context.
-            _window_handle = glfwCreateWindow(window_width, window_height, title.c_str(), NULL, NULL);
+            _window_handle = glfwCreateWindow(window_width, window_height, title.c_str(), NULL, share);
             if (!_window_handle)
             {
                 spdlog::critical("Something went wrong creating the window!");
@@ -190,11 +191,16 @@ namespace lux {
             
 
 
-            _context = CreateScope<Context>(_window_handle);
-            _context->Init();
+            //_context = CreateScope<Context>(_window_handle);
+            //_context->Init();
         }
 
         ~Window() = default;
+
+        void MakeContextCurrent() const
+        {
+            glfwMakeContextCurrent(_window_handle);
+        }
 
         void AddResizeListener(std::function<void(int width, int height)> callback)
         {
@@ -327,9 +333,10 @@ namespace lux {
         void SetPosition(const int x, const int y) const { glfwSetWindowPos(_window_handle, x, y); }
         bool ShouldClose() const { return glfwWindowShouldClose(_window_handle); }
 
-        void SwapBuffers() const 
+        void Update() const
         {          
-            _context->SwapBuffers();
+            glfwSwapBuffers(_window_handle);
+            //_context->SwapBuffers();
             glfwPollEvents();
         }
 

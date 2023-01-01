@@ -17,16 +17,23 @@ namespace lux {
     {
     private:
         GLFWwindow* _window_handle;
+        const bool m_EnableDebug;
     public:
-        Context(GLFWwindow* window_handle) : _window_handle(window_handle) {}
+        Context(GLFWwindow* window_handle, const bool enableDebug = true) : 
+            _window_handle(window_handle), m_EnableDebug(enableDebug) {}
 
         //static Scope<Context> CreateScope<Context>(_window_handle)
         //{
 
         //}
 
+        inline const GLFWwindow* GetPrimaryWindowHandle() const { return _window_handle; }
+
+
+
         void Init()
         {
+            spdlog::info("----------------------- HELLO ---------------------");
             glfwMakeContextCurrent(_window_handle);    // <---- IMPORTANT: has to be done before glewInit()
             if (_window_handle == NULL)
             {
@@ -45,6 +52,7 @@ namespace lux {
             else {
                 spdlog::info("GLEW OK");
             }
+            spdlog::info("       Using GLEW: {}", glewGetString(GLEW_VERSION));
             /*
             if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
             {
@@ -57,8 +65,6 @@ namespace lux {
             }
             */
             spdlog::info("     Using OpenGL: {}", glGetString(GL_VERSION));
-            //UX_LOG_INFO("Status: Using GLEW: %s", glewGetString(GLEW_VERSION));
-
      
             std::string glVendorString = (char*)glGetString(GL_VENDOR);
             std::string glVersionString = (char*)glGetString(GL_VERSION);
@@ -75,73 +81,69 @@ namespace lux {
             spdlog::info("Renderer: {}", glRendererString);
             spdlog::info(" Version: {}", glVersionString);
 
-            //HZ_CORE_INFO("OpenGL Info:");
-            //HZ_CORE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
-            //HZ_CORE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
-            //HZ_CORE_INFO("  Version: {0}", glGetString(GL_VERSION));
-
-            //HZ_CORE_ASSERT(versionMajor > 4 || (versionMajor == 4 && versionMinor >= 5), "Hazel requires at least OpenGL version 4.5!");
             if (versionMajor < 4 || (versionMajor == 4 && versionMinor < 5))
             {
                 spdlog::error("LUX requires at least OpenGL version 4.5!");
             }
             glDisable(GL_DEBUG_OUTPUT);
-#ifdef UX_ENABLE_DEBUG
-            // During init, enable debug output
-            glEnable(GL_DEBUG_OUTPUT);
-            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-            //glDebugMessageCallback(OpenGLMessageCallback, nullptr);
+            if (m_EnableDebug)
+            {
+                spdlog::critical("OPENGL DEBUG ENABLED");
+                // During init, enable debug output
+                glEnable(GL_DEBUG_OUTPUT);
+                glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+                //glDebugMessageCallback(OpenGLMessageCallback, nullptr);
 
-            //glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
-            //glDebugMessageCallback(ux::Window::message_callback, 0);
-            glDebugMessageCallback([](unsigned int source, unsigned int type, unsigned int id,
-                unsigned int severity, int length,
-                const char* message, const void* userParam)
-                {
-                    //fprintf(stdout, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-                    //    (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
-
-                    // ignore non-significant error/warning codes
-                    //if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
-
-                    std::cout << "---------------" << std::endl;
-                    std::cout << "Debug message (" << id << "): " << message << std::endl;
-
-                    switch (source)
+                //glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
+                //glDebugMessageCallback(ux::Window::message_callback, 0);
+                glDebugMessageCallback([](unsigned int source, unsigned int type, unsigned int id,
+                    unsigned int severity, int length,
+                    const char* message, const void* userParam)
                     {
-                    case GL_DEBUG_SOURCE_API:             std::cout << "Source: API"; break;
-                    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "Source: Window System"; break;
-                    case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "Source: Shader Compiler"; break;
-                    case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "Source: Third Party"; break;
-                    case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "Source: Application"; break;
-                    case GL_DEBUG_SOURCE_OTHER:           std::cout << "Source: Other"; break;
-                    } std::cout << std::endl;
+                        //fprintf(stdout, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+                        //    (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
 
-                    switch (type)
-                    {
-                    case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error"; break;
-                    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "Type: Deprecated Behaviour"; break;
-                    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "Type: Undefined Behaviour"; break;
-                    case GL_DEBUG_TYPE_PORTABILITY:         std::cout << "Type: Portability"; break;
-                    case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "Type: Performance"; break;
-                    case GL_DEBUG_TYPE_MARKER:              std::cout << "Type: Marker"; break;
-                    case GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << "Type: Push Group"; break;
-                    case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "Type: Pop Group"; break;
-                    case GL_DEBUG_TYPE_OTHER:               std::cout << "Type: Other"; break;
-                    } std::cout << std::endl;
+                        // ignore non-significant error/warning codes
+                        //if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
-                    switch (severity)
-                    {
-                    case GL_DEBUG_SEVERITY_HIGH:         std::cout << "Severity: high"; break;
-                    case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "Severity: medium"; break;
-                    case GL_DEBUG_SEVERITY_LOW:          std::cout << "Severity: low"; break;
-                    case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: notification"; break;
-                    } std::cout << std::endl;
-                    std::cout << std::endl;
-                }, 0);
-            //glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_TRUE);
-            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-#endif
+                        std::cout << "---------------" << std::endl;
+                        std::cout << "Debug message (" << id << "): " << message << std::endl;
+
+                        switch (source)
+                        {
+                        case GL_DEBUG_SOURCE_API:             std::cout << "Source: API"; break;
+                        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "Source: Window System"; break;
+                        case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "Source: Shader Compiler"; break;
+                        case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "Source: Third Party"; break;
+                        case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "Source: Application"; break;
+                        case GL_DEBUG_SOURCE_OTHER:           std::cout << "Source: Other"; break;
+                        } std::cout << std::endl;
+
+                        switch (type)
+                        {
+                        case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error"; break;
+                        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "Type: Deprecated Behaviour"; break;
+                        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "Type: Undefined Behaviour"; break;
+                        case GL_DEBUG_TYPE_PORTABILITY:         std::cout << "Type: Portability"; break;
+                        case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "Type: Performance"; break;
+                        case GL_DEBUG_TYPE_MARKER:              std::cout << "Type: Marker"; break;
+                        case GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << "Type: Push Group"; break;
+                        case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "Type: Pop Group"; break;
+                        case GL_DEBUG_TYPE_OTHER:               std::cout << "Type: Other"; break;
+                        } std::cout << std::endl;
+
+                        switch (severity)
+                        {
+                        case GL_DEBUG_SEVERITY_HIGH:         std::cout << "Severity: high"; break;
+                        case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "Severity: medium"; break;
+                        case GL_DEBUG_SEVERITY_LOW:          std::cout << "Severity: low"; break;
+                        case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: notification"; break;
+                        } std::cout << std::endl;
+                        std::cout << std::endl;
+                    }, 0);
+                //glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_TRUE);
+                glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+            }
             // Uniform Buffer Object (UBO)
             int max_uniform_buffer_bindings, max_uniform_block_size,
                 max_vertex_uniform_blocks, max_fragment_uniform_blocks,
@@ -180,9 +182,9 @@ namespace lux {
             //std::cout << sExtensions << std::endl;
         }
 
-        void SwapBuffers() const
-        {
-            glfwSwapBuffers(_window_handle);
-        }
+        //void SwapBuffers() const
+        //{
+        //    glfwSwapBuffers(_window_handle);
+        //}
     };
 }

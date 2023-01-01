@@ -44,6 +44,8 @@
 //#include <stb_image.h>
 //#endif
 
+#include <pqxx/pqxx>
+
 #include <entt/entt.hpp>
 
 #include <irrKlang/irrKlang.h>
